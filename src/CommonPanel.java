@@ -1,0 +1,33 @@
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+
+import javax.swing.JPanel;
+
+public class CommonPanel extends JPanel{
+	
+	private JPanel documentControlPanel;
+	private JPanel tabPanel;
+	private JPanel panel_6;
+
+	public CommonPanel(){
+		setPreferredSize(new Dimension(1280, 800));
+		setLayout(new BorderLayout(0, 0));
+		
+		tabPanel = new TabPanel();		
+		add(tabPanel, BorderLayout.WEST);
+		
+		
+		panel_6 = new JPanel();
+		add(panel_6, BorderLayout.CENTER);
+		panel_6.setLayout(new BorderLayout(0, 0));
+		
+		documentControlPanel = new DocumentControlPanel();
+		panel_6.add(documentControlPanel, BorderLayout.NORTH);
+	}
+	
+	public void addVariablePanel(JPanel variablePanel){
+		
+		panel_6.add(variablePanel, BorderLayout.CENTER);
+		
+	}
+}

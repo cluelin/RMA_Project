@@ -1,50 +1,30 @@
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Toolkit;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
 
 import javax.swing.BorderFactory;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
-import javax.swing.JButton;
-import java.awt.FlowLayout;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
-import java.awt.GridLayout;
-import javax.swing.JScrollPane;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.BoxLayout;
-import java.awt.CardLayout;
-import net.miginfocom.swing.MigLayout;
-import javax.swing.JList;
-import java.awt.BorderLayout;
-import javax.swing.JTextArea;
-import javax.swing.JTable;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-import org.eclipse.wb.swing.FocusTraversalOnArray;
-import java.awt.Component;
 import javax.swing.border.EmptyBorder;
 
-public class AdvancedReplacementPanel extends JFrame{
-	private JTable table;
+public class AdvancedReplacementPanel extends JPanel{
+	
+	private JTable _RMAitemTable;
 	private JTextField textField_11;
 	private JTextField textField_12;
 	private JTextField textField_13;
 	private JTextField textField_14;
 	private JTextField textField_15;
-	private JScrollPane advancedReplacementScrollPane;
-	private JTextArea txtrBillTo;
-	private JTextArea txtrShipTo;
-	private JLabel lblBillTo;
-	private JLabel lblShipTo;
-	private JScrollPane scrollPane;
-	private JPanel historyPanel;
-	private JLabel historyLabel;
-	private JList historyList;
 	private JPanel panel_3;
 	private JLabel label_17;
 	private JLabel label_18;
@@ -58,59 +38,34 @@ public class AdvancedReplacementPanel extends JFrame{
 	private JTextField textField_20;
 	private JLabel label_22;
 	private JTextField textField_21;
-	private JPanel panel_4;
-	private JPanel panel_5;
-	private JButton button;
-	private JButton button_1;
-	private JButton button_2;
-	private JButton button_3;
-	private JButton button_4;
-	private JButton button_5;
-	private JPanel panel_6;
-	private JPanel panel;
-	private JButton button_6;
-	private JButton button_7;
-	private JButton button_8;
-	private JButton button_9;
-	private JButton button_10;
-	private JPanel panel_7;
-	private JPanel panel_8;
+	private JPanel advancedReplacementPanel;
 	private JPanel panel_2;
+	
+	private JTextArea txtrBillTo;
+	private JTextArea txtrShipTo;
+	private JLabel lblBillTo;
+	private JLabel lblShipTo;
+	private JScrollPane _RMAitemInformationScrollPanel;
+	
 	private JPanel panel_9;
 	private JPanel panel_10;
 	private JLabel label_5;
 	private JTextPane textPane;
-	private JPanel panel_11;
-	private JPanel panel_13;
-	private JPanel panel_14;
-	private JButton btnSearch;
+	private JPanel _RMAcontentsPanel;
+	private JPanel _RMAbillTo;
+	private JPanel _RMAshipTo;
+	
+	private JScrollPane advancedReplacementScrollPane;
+	
+	private JPanel historyPanel;
+	private JLabel historyLabel;
+	private JList historyList;
 	
 	public AdvancedReplacementPanel(){
-		super("RMA");
-		setSize(new Dimension(1280, 800));
 		
+		setLayout(new BorderLayout(0, 0));
 		
-		
-		
-		
-		
-		
-		loadAdvancedReplacementPanel();
-		
-		loadHistoryPanel();
-		
-		
-		loadTypePanel();
-		
-	}
-	
-	private void loadAdvancedReplacementPanel(){
-		
-		
-		
-	}
-	
-	private void loadTypePanel(){
+		advancedReplacementScrollPane = new JScrollPane(null);
 		
 		String[] columnNames = {"Item Name",
                 "Serial number",
@@ -130,95 +85,19 @@ public class AdvancedReplacementPanel extends JFrame{
 			    {"Joe", "Brown",
 			     "Pool", new Integer(10), new Boolean(false)}
 			};
-		getContentPane().setLayout(new BorderLayout(0, 0));
 		
-		panel_4 = new JPanel();
-		panel_4.setPreferredSize(new Dimension(1280, 800));
-		getContentPane().add(panel_4, BorderLayout.CENTER);
-		panel_4.setLayout(new BorderLayout(0, 0));
 		
-		panel_5 = new JPanel();
-		panel_5.setBorder(BorderFactory.createLineBorder(Color.black));
-		panel_4.add(panel_5, BorderLayout.WEST);
-		panel_5.setLayout(new GridLayout(0, 1, 0, 0));
 		
-		button = new JButton("<Html>Advanced <br/>Replacement<Html>");
-		panel_5.add(button);
+		advancedReplacementPanel = new JPanel();
+		advancedReplacementPanel.setBorder(new EmptyBorder(15, 15, 15, 15));
 		
-		button_1 = new JButton("<Html>Repair<Html>");
-		panel_5.add(button_1);
-		
-		button_2 = new JButton("<Html>PO <br/>Return<Html>");
-		panel_5.add(button_2);
-		
-		button_3 = new JButton("<Html>Vender<Html>");
-		panel_5.add(button_3);
-		
-		button_4 = new JButton("<Html>Case <br/>number<Html>");
-		panel_5.add(button_4);
-		
-		button_5 = new JButton("<Html>back to <br/>Stock<Html>");
-		button_5.setPreferredSize(new Dimension(40, 40));
-		panel_5.add(button_5);
-		
-		panel_6 = new JPanel();
-		panel_4.add(panel_6, BorderLayout.CENTER);
-		panel_6.setLayout(new BorderLayout(0, 0));
-		
-		panel = new JPanel();
-		panel.setPreferredSize(new Dimension(10, 50));
-		panel_6.add(panel, BorderLayout.NORTH);
-		panel.setLayout(new GridLayout(1, 0, 0, 0));
-		
-		button_6 = new JButton("New");
-		panel.add(button_6);
-		
-		button_7 = new JButton("Save");
-		panel.add(button_7);
-		
-		button_8 = new JButton("clear");
-		panel.add(button_8);
-		
-		btnSearch = new JButton("Search");
-		panel.add(btnSearch);
-		
-		button_9 = new JButton("Print");
-		panel.add(button_9);
-		
-		button_10 = new JButton("Open/Close");
-		panel.add(button_10);
-		
-		panel_7 = new JPanel();
-		panel_6.add(panel_7, BorderLayout.CENTER);
-		panel_7.setLayout(new BorderLayout(0, 0));
-		
-		historyPanel = new JPanel();
-		historyPanel.setPreferredSize(new Dimension(this.getSize().width/6, 10));
-		panel_7.add(historyPanel, BorderLayout.EAST);
-		historyPanel.setLayout(new BorderLayout(0, 0));
-		
-		historyLabel = new JLabel("History");
-		historyLabel.setPreferredSize(new Dimension(46, 50));
-		historyPanel.add(historyLabel, BorderLayout.NORTH);
-		historyPanel.setBorder(BorderFactory.createLineBorder(Color.black));
-		
-		historyList = new JList();
-		historyList.setPreferredSize(new Dimension(200, 10));
-		historyPanel.add(historyList, BorderLayout.CENTER);
-		
-		advancedReplacementScrollPane = new JScrollPane(null);
-		panel_7.add(advancedReplacementScrollPane, BorderLayout.CENTER);
-		advancedReplacementScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-		
-		panel_8 = new JPanel();
-		panel_8.setBorder(new EmptyBorder(15, 15, 15, 15));
-		advancedReplacementScrollPane.setViewportView(panel_8);
-		panel_8.setPreferredSize(new Dimension(50, 50));
-		panel_8.setLayout(new BorderLayout(0, 0));
+		advancedReplacementScrollPane.setViewportView(advancedReplacementPanel);
+		advancedReplacementPanel.setPreferredSize(new Dimension(697, 619));
+		advancedReplacementPanel.setLayout(new BorderLayout(0, 0));
 		
 		panel_2 = new JPanel();
 		panel_2.setPreferredSize(new Dimension(10, 300));
-		panel_8.add(panel_2, BorderLayout.NORTH);
+		advancedReplacementPanel.add(panel_2, BorderLayout.NORTH);
 		panel_2.setLayout(new GridLayout(0, 2, 0, 0));
 		
 		JPanel panel_1 = new JPanel();
@@ -319,21 +198,38 @@ public class AdvancedReplacementPanel extends JFrame{
 		panel_3.add(textField_21);
 		
 		panel_9 = new JPanel();
-		panel_8.add(panel_9, BorderLayout.CENTER);
+		advancedReplacementPanel.add(panel_9, BorderLayout.CENTER);
 		panel_9.setLayout(new BorderLayout(0, 0));
 		
-		scrollPane = new JScrollPane();
-		scrollPane.setPreferredSize(new Dimension(0, 150));
-		scrollPane.setMinimumSize(new Dimension(100, 100));
-		scrollPane.setMaximumSize(new Dimension(100, 100));
-		panel_9.add(scrollPane, BorderLayout.NORTH);
+		_RMAitemInformationScrollPanel = new JScrollPane();
+		_RMAitemInformationScrollPanel.setPreferredSize(new Dimension(0, 150));
+		_RMAitemInformationScrollPanel.setMinimumSize(new Dimension(100, 100));
+		_RMAitemInformationScrollPanel.setMaximumSize(new Dimension(100, 100));
+		panel_9.add(_RMAitemInformationScrollPanel, BorderLayout.NORTH);
 		
-		table = new JTable(data, columnNames);
-		table.setPreferredSize(new Dimension(375, 100));
-		scrollPane.setViewportView(table);
+		_RMAitemTable = new JTable(data, columnNames);
+		_RMAitemTable.setPreferredSize(new Dimension(375, 100));
+		_RMAitemInformationScrollPanel.setViewportView(_RMAitemTable);
 		
 		loadContentsPanel();
 		
+		add(advancedReplacementScrollPane, BorderLayout.CENTER);
+		
+		
+		
+		historyPanel = new JPanel();
+		historyPanel.setPreferredSize(new Dimension(200, 10));
+		add(historyPanel, BorderLayout.EAST);
+		historyPanel.setLayout(new BorderLayout(0, 0));
+		
+		historyLabel = new JLabel("History");
+		historyLabel.setPreferredSize(new Dimension(46, 50));
+		historyPanel.add(historyLabel, BorderLayout.NORTH);
+		historyPanel.setBorder(BorderFactory.createLineBorder(Color.black));
+		
+		historyList = new JList();
+		historyList.setPreferredSize(new Dimension(200, 10));
+		historyPanel.add(historyList, BorderLayout.CENTER);
 	}
 	
 	private void loadContentsPanel(){
@@ -343,77 +239,63 @@ public class AdvancedReplacementPanel extends JFrame{
 		gbl_panel_10.columnWeights = new double[]{2.0, 1.0, 1.0};
 		panel_10.setLayout(gbl_panel_10);
 		
-		panel_11 = new JPanel();
-		GridBagConstraints gbc_panel_11 = new GridBagConstraints();
-		gbc_panel_11.insets = new Insets(10, 10, 10, 10);
-		gbc_panel_11.gridx = 0;
-		gbc_panel_11.gridy = 0;
-		gbc_panel_11.fill = GridBagConstraints.BOTH;
-		gbc_panel_11.gridwidth = 1;
-		gbc_panel_11.gridheight = 1;
-		gbc_panel_11.weighty = 1.0;
-		panel_10.add(panel_11, gbc_panel_11);
-		panel_11.setLayout(new BorderLayout(0, 0));
+		_RMAcontentsPanel = new JPanel();
+		GridBagConstraints gbc__RMAcontentsPanel = new GridBagConstraints();
+		gbc__RMAcontentsPanel.insets = new Insets(10, 10, 10, 10);
+		gbc__RMAcontentsPanel.gridx = 0;
+		gbc__RMAcontentsPanel.gridy = 0;
+		gbc__RMAcontentsPanel.fill = GridBagConstraints.BOTH;
+		gbc__RMAcontentsPanel.gridwidth = 1;
+		gbc__RMAcontentsPanel.gridheight = 1;
+		gbc__RMAcontentsPanel.weighty = 1.0;
+		panel_10.add(_RMAcontentsPanel, gbc__RMAcontentsPanel);
+		_RMAcontentsPanel.setLayout(new BorderLayout(0, 0));
 		
 		textPane = new JTextPane();
-		panel_11.add(textPane, BorderLayout.CENTER);
+		_RMAcontentsPanel.add(textPane, BorderLayout.CENTER);
 		textPane.setPreferredSize(new Dimension(10, 100));
 		
 		label_5 = new JLabel("Contents");
-		panel_11.add(label_5, BorderLayout.NORTH);
+		_RMAcontentsPanel.add(label_5, BorderLayout.NORTH);
 		
 		
 		
-		panel_13 = new JPanel();
-		GridBagConstraints gbc_panel_13 = new GridBagConstraints();
-		gbc_panel_13.insets = new Insets(10, 10, 10, 10);
-		gbc_panel_13.gridx = 1;
-		gbc_panel_13.gridy = 0;
-		gbc_panel_13.fill=GridBagConstraints.BOTH;
-		gbc_panel_13.gridwidth = 1;
-		gbc_panel_13.gridheight = 1;
+		_RMAbillTo = new JPanel();
+		GridBagConstraints gbc__RMAbillTo = new GridBagConstraints();
+		gbc__RMAbillTo.insets = new Insets(10, 10, 10, 10);
+		gbc__RMAbillTo.gridx = 1;
+		gbc__RMAbillTo.gridy = 0;
+		gbc__RMAbillTo.fill=GridBagConstraints.BOTH;
+		gbc__RMAbillTo.gridwidth = 1;
+		gbc__RMAbillTo.gridheight = 1;
 		
-		panel_10.add(panel_13, gbc_panel_13);
-		panel_13.setLayout(new BorderLayout(0, 0));
+		panel_10.add(_RMAbillTo, gbc__RMAbillTo);
+		_RMAbillTo.setLayout(new BorderLayout(0, 0));
 		
 		txtrBillTo = new JTextArea();
-		panel_13.add(txtrBillTo, BorderLayout.CENTER);
+		_RMAbillTo.add(txtrBillTo, BorderLayout.CENTER);
 		
 		lblBillTo = new JLabel("Bill to");
-		panel_13.add(lblBillTo, BorderLayout.NORTH);
+		_RMAbillTo.add(lblBillTo, BorderLayout.NORTH);
 		
 		
 		
 		
-		panel_14 = new JPanel();
-		GridBagConstraints gbc_panel_14 = new GridBagConstraints();
-		gbc_panel_14.insets = new Insets(10, 10, 10, 10);
-		gbc_panel_14.gridx = 2;
-		gbc_panel_14.gridy = 0;
-		gbc_panel_14.fill = GridBagConstraints.BOTH;
-		gbc_panel_14.gridwidth = 1;
-		panel_10.add(panel_14, gbc_panel_14);
-		panel_14.setLayout(new BorderLayout(0, 0));
+		_RMAshipTo = new JPanel();
+		GridBagConstraints gbc__RMAshipTo = new GridBagConstraints();
+		gbc__RMAshipTo.insets = new Insets(10, 10, 10, 10);
+		gbc__RMAshipTo.gridx = 2;
+		gbc__RMAshipTo.gridy = 0;
+		gbc__RMAshipTo.fill = GridBagConstraints.BOTH;
+		gbc__RMAshipTo.gridwidth = 1;
+		panel_10.add(_RMAshipTo, gbc__RMAshipTo);
+		_RMAshipTo.setLayout(new BorderLayout(0, 0));
 		
 		lblShipTo = new JLabel("Ship to");
-		panel_14.add(lblShipTo, BorderLayout.NORTH);
+		_RMAshipTo.add(lblShipTo, BorderLayout.NORTH);
 		
 		txtrShipTo = new JTextArea();
-		panel_14.add(txtrShipTo, BorderLayout.CENTER);
+		_RMAshipTo.add(txtrShipTo, BorderLayout.CENTER);
 	}
-	
-	private void loadHistoryPanel(){
-		
-	}
-	public static void main(String[] args){
-		AdvancedReplacementPanel layout = new AdvancedReplacementPanel();
-		layout.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		layout.setSize(1280, 800);
-//		layout.setResizable(false);
-		layout.setVisible(true);
-		
-		
-		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-		layout.setLocation(dim.width /2 - layout.getSize().width /2, dim.height /2 -layout.getSize().height /2);
-	}
+
 }
