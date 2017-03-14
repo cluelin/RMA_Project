@@ -13,8 +13,13 @@ public class CommonPanel extends JPanel{
 		setPreferredSize(new Dimension(1280, 800));
 		setLayout(new BorderLayout(0, 0));
 		
-		tabPanel = new TabPanel();		
+		
+		tabPanel = new TabPanel();
+		
+		
 		add(tabPanel, BorderLayout.WEST);
+		
+		
 		
 		
 		panel_6 = new JPanel();
@@ -29,5 +34,12 @@ public class CommonPanel extends JPanel{
 		
 		panel_6.add(variablePanel, BorderLayout.CENTER);
 		
+	}
+	
+	public void removeVariablePanel(JPanel variablePanel){
+		panel_6.remove(variablePanel);
+		panel_6.invalidate();
+		panel_6.validate();
+		panel_6.repaint();
 	}
 }

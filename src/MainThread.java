@@ -1,6 +1,8 @@
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
@@ -29,64 +31,68 @@ import org.eclipse.wb.swing.FocusTraversalOnArray;
 import java.awt.Component;
 import javax.swing.border.EmptyBorder;
 
-public class MainThread extends JFrame{
+public class MainThread extends JFrame {
+
 	
+	public static Dimension ScreenSize = Toolkit.getDefaultToolkit().getScreenSize();
+	public JPanel variablePanel;
 	
-	
-	
-	
+	private static MainThread mainThread = new MainThread(); 
 	private CommonPanel commonPanel;
 	
-	
-	
-	private JPanel panel_7;
-	
-	
-	
-	
-	
-	public MainThread(){
+
+	private MainThread() {
 		super("RMA");
 		setSize(new Dimension(1280, 800));
 		getContentPane().setLayout(new BorderLayout(0, 0));
-		
+
 		loadCommonPanel();
 		loadAdvancedReplacementPanel();
-		
-		
-		
+
 	}
 	
+	public static MainThread getMainThread(){
+		return mainThread;
+	}
 	
-	private void loadCommonPanel(){
-		
+	public CommonPanel getCommonPanel(){
+		return commonPanel;
+	}
+	
+
+	private void loadCommonPanel() {
+
 		commonPanel = new CommonPanel();
-		
+
 		getContentPane().add(commonPanel, BorderLayout.CENTER);
+
+	}
+
+	public void loadAdvancedReplacementPanel() {
+
 		
-		
-		
+
+		variablePanel = new AdvancedReplacementPanel();
+		commonPanel.addVariablePanel(variablePanel);
+
 	}
 	
-	private void loadAdvancedReplacementPanel(){
+	public void removeVariablePanel(){
 		
-		
-		panel_7 = new AdvancedReplacementPanel();
-		commonPanel.addVariablePanel(panel_7);
-		
+		//commmonPanel의 하위에 있는 Jpanel에 Variable Panel이 올라가있는 상황이라서, CommonPanel 내부에서 따로 제거해줘야한다. 
+		commonPanel.removeVariablePanel(variablePanel);
 		
 	}
-	
-	
-	public static void main(String[] args){
-		MainThread layout = new MainThread();
+
+	public static void main(String[] args) {
+		MainThread layout = getMainThread();
 		layout.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		layout.setSize(1280, 800);
-//		layout.setResizable(false);
+//		 layout.setResizable(false);
 		layout.setVisible(true);
+
 		
-		
-		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-		layout.setLocation(dim.width /2 - layout.getSize().width /2, dim.height /2 -layout.getSize().height /2);
+		layout.setLocation(ScreenSize.width / 2 - layout.getSize().width / 2, ScreenSize.height / 2 - layout.getSize().height / 2);
 	}
+
 }
