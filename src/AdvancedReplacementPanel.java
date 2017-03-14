@@ -371,7 +371,19 @@ public class AdvancedReplacementPanel extends JPanel implements ActionListener {
 				obj.put("companyPhone", txtCompanyPhone.getText());
 				obj.put("companyEmail", txtCompanyEmail.getText());
 				obj.put("companySiteName", txtSiteName.getText());
+				obj.put("rmaOrderNumber", txtOrderNumber.getText());
+				obj.put("rmaContents", txtContents.getText());
+				obj.put("rmaBillTo", txtBillTo.getText());
+				obj.put("rmaShipTo", txtShipTo.getText());
+				obj.put("rmaTrackingNumber", txtTrackingNumber.getText());
 				
+				
+				System.out.println("rmaContents " + txtContents.getText());
+				System.out.println("rmaBillTo " + txtBillTo.getText());
+				System.out.println("rmaShipTo " + txtShipTo.getText());
+				System.out.println("rmaTrackingNumber " + txtTrackingNumber.getText());
+				
+				//obj의 크기가 커져서 그런듯?? 어찌해결할꼬. 
 				printStream.println(obj.toJSONString());
 				
 				
