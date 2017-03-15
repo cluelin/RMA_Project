@@ -8,15 +8,21 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.Statement;
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.net.Socket;
 import java.nio.channels.FileChannel;
+import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -36,14 +42,12 @@ import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
 import org.json.simple.JSONObject;
-
-
+import org.json.simple.parser.JSONParser;
 
 public class AdvancedReplacementPanel extends JPanel implements ActionListener {
 
 	private static String FILE_NAME = "ReplacementInformation.txt";
 
-	private JTable _RMAitemTable;
 	private JTextField txtRMAnumber;
 	private JTextField txtCompanyName;
 	private JTextField txtCompanyAddress;
@@ -58,7 +62,7 @@ public class AdvancedReplacementPanel extends JPanel implements ActionListener {
 	private JPanel panel_3;
 	private JPanel advancedReplacementPanel;
 	private JPanel panel_2;
-
+	private JTable _RMAitemTable;
 	private JLabel label_17;
 	private JLabel lblPhone;
 	private JLabel lblCity;
@@ -91,6 +95,11 @@ public class AdvancedReplacementPanel extends JPanel implements ActionListener {
 	private JButton SaveBtn;
 	private JTextField txtTrackingNumber;
 	private JPanel panel_5;
+
+	
+	PrintStream printStream;
+	BufferedReader bufferedReader;
+	Socket client;
 
 	public AdvancedReplacementPanel() {
 
@@ -172,7 +181,7 @@ public class AdvancedReplacementPanel extends JPanel implements ActionListener {
 		txtDate.setColumns(10);
 		txtDate.setText(new SimpleDateFormat("MM-dd-YYYY").format(Calendar.getInstance().getTime()));
 		System.out.println(txtDate.getText().replace("-", ""));
-		
+
 		panel_3.add(txtDate);
 
 		label_17 = new JLabel("Site Name");
@@ -234,6 +243,30 @@ public class AdvancedReplacementPanel extends JPanel implements ActionListener {
 		historyList = new JList();
 		historyList.setPreferredSize(new Dimension(200, 10));
 		historyPanel.add(historyList, BorderLayout.CENTER);
+	}
+
+	private void getRMANumberFromDataBase(){
+
+		JSONObject obj = new JSONObject();
+		obj.put("Action", "requestRMANumber");
+
+		printStream.println(obj.toJSONString());
+		
+		
+		
+		JSONParser jsonParser = new JSONParser();
+		
+		try{
+			JSONObject jsonObject = (JSONObject) jsonParser.parse(bufferedReader.readLine());
+			
+			System.out.println("RMA number : " + jsonObject.get("RMANumber").toString());
+			
+			txtRMAnumber.setText(jsonObject.get("RMANumber").toString());
+
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		
 	}
 
 	private void loadContentsPanel() {
@@ -321,78 +354,24 @@ public class AdvancedReplacementPanel extends JPanel implements ActionListener {
 		txtTrackingNumber.setColumns(20);
 	}
 
-	private void saveInformation() {
-
-		// txtRMAnumber;
-		// txtCompanyName;
-		// txtCompanyAddress;
-		// txtPhoneNumber;
-		// txtEmail;
-		// txtDate;
-		// txtSiteName;
-		// txtSitePhoneNumber;
-		// txtSiteAddress;
-		// txtSiteEmail;
-		// txtOrderNumber;
-
-		System.out.println(txtRMAnumber.getText());
-
-		try {
-			File file = new File(FILE_NAME);
-			BufferedWriter fileWriter = new BufferedWriter(new FileWriter(file, true));
-
-			// 모든필드 내보내기.
-			fileWriter.write(txtRMAnumber.getText());
-
-			fileWriter.flush();
-			fileWriter.close();
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	private void connectServer() {
 
 		// 서버로 전송
 		try {
 
 			System.out.println("Client : connecting...");
-			Socket client = new Socket(ServerInformation.SERVER_IP, ServerInformation.SERVER_PORT);
+			client = new Socket(ServerInformation.SERVER_IP, ServerInformation.SERVER_PORT);
 			System.out.println("Client : connected");
 
 			try {
 
-				OutputStream outputStream = client.getOutputStream();
-				PrintStream printStream = new PrintStream(outputStream);
-				
-				JSONObject obj = new JSONObject();
-				obj.put("companyName", txtCompanyName.getText());
-				obj.put("companyAddress", txtCompanyAddress.getText());
-				obj.put("companyCity", txtCompanyCity.getText());
-				obj.put("companyZipCode", txtCompanyZipCode.getText());
-				obj.put("companyPhone", txtCompanyPhone.getText());
-				obj.put("companyEmail", txtCompanyEmail.getText());
-				obj.put("companySiteName", txtSiteName.getText());
-				obj.put("rmaOrderNumber", txtOrderNumber.getText());
-				obj.put("rmaContents", txtContents.getText());
-				obj.put("rmaBillTo", txtBillTo.getText());
-				obj.put("rmaShipTo", txtShipTo.getText());
-				obj.put("rmaTrackingNumber", txtTrackingNumber.getText());
-				
-				
-				System.out.println("rmaContents " + txtContents.getText());
-				System.out.println("rmaBillTo " + txtBillTo.getText());
-				System.out.println("rmaShipTo " + txtShipTo.getText());
-				System.out.println("rmaTrackingNumber " + txtTrackingNumber.getText());
-				
-				//obj의 크기가 커져서 그런듯?? 어찌해결할꼬. 
-				printStream.println(obj.toJSONString());
-				
-				
+				printStream = new PrintStream(client.getOutputStream());
+				bufferedReader = new BufferedReader(new InputStreamReader(client.getInputStream()));
 
 			} catch (Exception e) {
 				e.printStackTrace();
 			} finally {
-				client.close();
-				System.out.println("Client : close");
+
 			}
 
 		} catch (Exception e) {
@@ -403,12 +382,81 @@ public class AdvancedReplacementPanel extends JPanel implements ActionListener {
 
 	}
 
+	private void closeConnection() {
+
+		try {
+			client.close();
+			System.out.println("Client : close");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	private void saveFile() {
+
+		try {
+			File file = new File(FILE_NAME);
+			BufferedWriter fileWriter = new BufferedWriter(new FileWriter(file, true));
+
+			// 모든필드 내보내기.
+			fileWriter.write(txtTrackingNumber.getText());
+
+			fileWriter.flush();
+			fileWriter.close();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	// save RMA Information To Database
+	private void saveRMAInformation() {
+
+		JSONObject obj = new JSONObject();
+
+		obj.put("Action", "requestSaveRMAData");
+
+		obj.put("companyName", txtCompanyName.getText());
+		obj.put("companyAddress", txtCompanyAddress.getText());
+		obj.put("companyCity", txtCompanyCity.getText());
+		obj.put("companyZipCode", txtCompanyZipCode.getText());
+		obj.put("companyPhone", txtCompanyPhone.getText());
+		obj.put("companyEmail", txtCompanyEmail.getText());
+		obj.put("companySiteName", txtSiteName.getText());
+
+		obj.put("rmaNumber", txtRMAnumber.getText());
+		obj.put("rmaDate", txtDate.getText());
+		obj.put("rmaOrderNumber", txtOrderNumber.getText());
+		obj.put("rmaContents", txtContents.getText());
+		obj.put("rmaBillTo", txtBillTo.getText());
+		obj.put("rmaShipTo", txtShipTo.getText());
+		obj.put("rmaTrackingNumber", txtTrackingNumber.getText());
+
+		System.out.println("rmaContents " + txtContents.getText());
+		System.out.println("rmaBillTo " + txtBillTo.getText());
+		System.out.println("rmaShipTo " + txtShipTo.getText());
+		System.out.println("rmaTrackingNumber " + txtTrackingNumber.getText());
+
+		// obj의 크기가 커져서 그런듯?? 어찌해결할꼬.
+		printStream.println(obj.toJSONString());
+
+	}
+
 	@Override
 	public void actionPerformed(ActionEvent e) {
 
 		if (e.getSource() == SaveBtn) {
-			saveInformation();
+			// save 버튼
+			connectServer();
+			// saveRMAInformation();
+			getRMANumberFromDataBase();
+			closeConnection();
+
 		} else if (e.getSource() == attachFileBtn) {
+
+			// 파일 첨부 버튼
 			JFileChooser jFileChooser = new JFileChooser();
 			int returnVal = jFileChooser.showOpenDialog(null);
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
