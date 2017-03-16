@@ -96,7 +96,6 @@ public class AdvancedReplacementPanel extends JPanel implements ActionListener {
 	private JTextField txtTrackingNumber;
 	private JPanel panel_5;
 
-	
 	PrintStream printStream;
 	BufferedReader bufferedReader;
 	Socket client;
@@ -243,30 +242,36 @@ public class AdvancedReplacementPanel extends JPanel implements ActionListener {
 		historyList = new JList();
 		historyList.setPreferredSize(new Dimension(200, 10));
 		historyPanel.add(historyList, BorderLayout.CENTER);
+
+		// RMA number seting.
+		connectServer();
+		getRMANumberFromDataBase();
+		closeConnection();
+
 	}
 
-	private void getRMANumberFromDataBase(){
+	
+	//rma number setting
+	private void getRMANumberFromDataBase() {
 
 		JSONObject obj = new JSONObject();
 		obj.put("Action", "requestRMANumber");
 
 		printStream.println(obj.toJSONString());
-		
-		
-		
+
 		JSONParser jsonParser = new JSONParser();
-		
-		try{
+
+		try {
 			JSONObject jsonObject = (JSONObject) jsonParser.parse(bufferedReader.readLine());
-			
+
 			System.out.println("RMA number : " + jsonObject.get("RMANumber").toString());
-			
+
 			txtRMAnumber.setText(jsonObject.get("RMANumber").toString());
 
-		}catch(Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 	}
 
 	private void loadContentsPanel() {
@@ -450,7 +455,9 @@ public class AdvancedReplacementPanel extends JPanel implements ActionListener {
 		if (e.getSource() == SaveBtn) {
 			// save ¹öÆ°
 			connectServer();
-			// saveRMAInformation();
+			saveRMAInformation();
+			closeConnection();
+			connectServer();
 			getRMANumberFromDataBase();
 			closeConnection();
 
