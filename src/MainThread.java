@@ -72,7 +72,7 @@ public class MainThread extends JFrame {
 
 		
 
-		variablePanel = new AdvancedReplacementPanel();
+		variablePanel = new AdvancedReplacementOperation().getGUIadvancedReplacementPanel();
 		commonPanel.addVariablePanel(variablePanel);
 
 	}

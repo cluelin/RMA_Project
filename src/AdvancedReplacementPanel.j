@@ -40,6 +40,7 @@ import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableModel;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -59,9 +60,9 @@ public class AdvancedReplacementPanel extends JPanel implements ActionListener {
 	private JTextField txtCompanyPhone;
 	private JTextField txtOrderNumber;
 
-	private JPanel panel_3;
+	private JPanel rightCompanyInformationPanel;
 	private JPanel advancedReplacementPanel;
-	private JPanel panel_2;
+	private JPanel companyInformationPanel;
 	private JTable _RMAitemTable;
 	private JLabel label_17;
 	private JLabel lblPhone;
@@ -78,8 +79,8 @@ public class AdvancedReplacementPanel extends JPanel implements ActionListener {
 
 	private JScrollPane _RMAitemInformationScrollPanel;
 
-	private JPanel panel_9;
-	private JPanel panel_10;
+	private JPanel itemAndOtherPanel;
+	private JPanel rmaContentsAndShipToPanel;
 	private JPanel _RMAcontentsPanel;
 	private JPanel _RMAbillTo;
 	private JPanel _RMAshipTo;
@@ -104,76 +105,78 @@ public class AdvancedReplacementPanel extends JPanel implements ActionListener {
 
 		setLayout(new BorderLayout(0, 0));
 
+		//확장성을 위한 Scroll Panel. 
 		advancedReplacementScrollPane = new JScrollPane(null);
 
 		String[] columnNames = { "Item Name", "Serial number", "Description", "Price" };
 
-		Object[][] data = { { "Kathy", "Smith", "Snowboarding", new Integer(5), new Boolean(false) },
-				{ "John", "Doe", "Rowing", new Integer(3), new Boolean(true) },
-				{ "Sue", "Black", "Knitting", new Integer(2), new Boolean(false) },
-				{ "Jane", "White", "Speed reading", new Integer(20), new Boolean(true) },
-				{ "Joe", "Brown", "Pool", new Integer(10), new Boolean(false) } };
+//		Object[][] data = { { "PM-COS4-U", "1", "Snowboarding", new Integer(5), new Boolean(false) },
+//				{ "PM-COS4-U", "2", "Rowing", new Integer(3), new Boolean(true) },
+//				{ "PM-HOS4-U", "3", "Knitting", new Integer(2), new Boolean(false) },
+//				{ "PM-COS4-U", "4", "Speed reading", new Integer(20), new Boolean(true) },
+//				{ "PM-HOS4-U", "5", "Pool", new Integer(10), new Boolean(false) } };
 
+		//실질적인 기능을 수행 하는 패널. 
 		advancedReplacementPanel = new JPanel();
 		advancedReplacementPanel.setBorder(new EmptyBorder(15, 15, 15, 15));
 
 		advancedReplacementScrollPane.setViewportView(advancedReplacementPanel);
-		advancedReplacementPanel.setPreferredSize(new Dimension(697, 619));
+//		advancedReplacementPanel.setPreferredSize(new Dimension(697, 619));
 		advancedReplacementPanel.setLayout(new BorderLayout(0, 0));
 
-		panel_2 = new JPanel();
-		panel_2.setPreferredSize(new Dimension(10, 300));
-		advancedReplacementPanel.add(panel_2, BorderLayout.NORTH);
-		panel_2.setLayout(new GridLayout(0, 2, 0, 0));
+		companyInformationPanel = new JPanel();
+		companyInformationPanel.setPreferredSize(new Dimension(10, 300));
+		advancedReplacementPanel.add(companyInformationPanel, BorderLayout.NORTH);
+		companyInformationPanel.setLayout(new GridLayout(0, 2, 0, 0));
 
-		JPanel panel_1 = new JPanel();
-		panel_1.setBorder(new EmptyBorder(0, 5, 5, 5));
-		panel_2.add(panel_1);
-		panel_1.setLayout(new GridLayout(6, 2));
+		JPanel leftCompanyInformationPanel = new JPanel();
+		leftCompanyInformationPanel.setBorder(new EmptyBorder(0, 5, 5, 5));
+		companyInformationPanel.add(leftCompanyInformationPanel);
+		leftCompanyInformationPanel.setLayout(new GridLayout(6, 2));
 
 		JLabel label = new JLabel("RMA Number");
-		panel_1.add(label);
+		leftCompanyInformationPanel.add(label);
 
 		txtRMAnumber = new JTextField();
 		txtRMAnumber.setEditable(false);
 		txtRMAnumber.setColumns(10);
-		panel_1.add(txtRMAnumber);
+		leftCompanyInformationPanel.add(txtRMAnumber);
 
 		JLabel lblCompanyName = new JLabel("Company Name");
-		panel_1.add(lblCompanyName);
+		leftCompanyInformationPanel.add(lblCompanyName);
 
 		txtCompanyName = new JTextField();
 		txtCompanyName.setColumns(10);
-		panel_1.add(txtCompanyName);
+		leftCompanyInformationPanel.add(txtCompanyName);
 
 		JLabel label_2 = new JLabel("Address");
-		panel_1.add(label_2);
+		leftCompanyInformationPanel.add(label_2);
 
 		txtCompanyAddress = new JTextField();
 		txtCompanyAddress.setColumns(10);
-		panel_1.add(txtCompanyAddress);
+		leftCompanyInformationPanel.add(txtCompanyAddress);
 
 		JLabel lblZipCode = new JLabel("Zip Code");
-		panel_1.add(lblZipCode);
+		leftCompanyInformationPanel.add(lblZipCode);
 
 		txtCompanyZipCode = new JTextField();
 		txtCompanyZipCode.setColumns(10);
-		panel_1.add(txtCompanyZipCode);
+		leftCompanyInformationPanel.add(txtCompanyZipCode);
 
 		JLabel label_4 = new JLabel("Email");
-		panel_1.add(label_4);
+		leftCompanyInformationPanel.add(label_4);
 
 		txtCompanyEmail = new JTextField();
 		txtCompanyEmail.setColumns(10);
-		panel_1.add(txtCompanyEmail);
+		leftCompanyInformationPanel.add(txtCompanyEmail);
 
-		panel_3 = new JPanel();
-		panel_3.setBorder(new EmptyBorder(0, 5, 5, 5));
-		panel_2.add(panel_3);
-		panel_3.setLayout(new GridLayout(6, 2));
+		rightCompanyInformationPanel = new JPanel();
+		rightCompanyInformationPanel.setBorder(new EmptyBorder(0, 5, 5, 5));
+		companyInformationPanel.add(rightCompanyInformationPanel);
+		rightCompanyInformationPanel.setLayout(new GridLayout(6, 2));
 
 		label_22 = new JLabel("Date");
-		panel_3.add(label_22);
+		rightCompanyInformationPanel.add(label_22);
 
 		txtDate = new JTextField();
 		txtDate.setEditable(false);
@@ -181,47 +184,53 @@ public class AdvancedReplacementPanel extends JPanel implements ActionListener {
 		txtDate.setText(new SimpleDateFormat("MM-dd-YYYY").format(Calendar.getInstance().getTime()));
 		System.out.println(txtDate.getText().replace("-", ""));
 
-		panel_3.add(txtDate);
+		rightCompanyInformationPanel.add(txtDate);
 
 		label_17 = new JLabel("Site Name");
-		panel_3.add(label_17);
+		rightCompanyInformationPanel.add(label_17);
 
 		txtSiteName = new JTextField();
 		txtSiteName.setColumns(10);
-		panel_3.add(txtSiteName);
+		rightCompanyInformationPanel.add(txtSiteName);
 
 		lblCity = new JLabel("City");
-		panel_3.add(lblCity);
+		rightCompanyInformationPanel.add(lblCity);
 
 		txtCompanyCity = new JTextField();
 		txtCompanyCity.setColumns(10);
-		panel_3.add(txtCompanyCity);
+		rightCompanyInformationPanel.add(txtCompanyCity);
 
 		lblPhone = new JLabel("Phone");
-		panel_3.add(lblPhone);
+		rightCompanyInformationPanel.add(lblPhone);
 
 		txtCompanyPhone = new JTextField();
 		txtCompanyPhone.setColumns(10);
-		panel_3.add(txtCompanyPhone);
+		rightCompanyInformationPanel.add(txtCompanyPhone);
 
 		label_21 = new JLabel("Order Number");
-		panel_3.add(label_21);
+		rightCompanyInformationPanel.add(label_21);
 
 		txtOrderNumber = new JTextField();
 		txtOrderNumber.setColumns(10);
-		panel_3.add(txtOrderNumber);
+		rightCompanyInformationPanel.add(txtOrderNumber);
 
-		panel_9 = new JPanel();
-		advancedReplacementPanel.add(panel_9, BorderLayout.CENTER);
-		panel_9.setLayout(new BorderLayout(0, 0));
+		itemAndOtherPanel = new JPanel();
+		advancedReplacementPanel.add(itemAndOtherPanel, BorderLayout.CENTER);
+		itemAndOtherPanel.setLayout(new BorderLayout(0, 0));
 
 		_RMAitemInformationScrollPanel = new JScrollPane();
 		_RMAitemInformationScrollPanel.setPreferredSize(new Dimension(0, 150));
 		_RMAitemInformationScrollPanel.setMinimumSize(new Dimension(100, 100));
 		_RMAitemInformationScrollPanel.setMaximumSize(new Dimension(100, 100));
-		panel_9.add(_RMAitemInformationScrollPanel, BorderLayout.NORTH);
+		itemAndOtherPanel.add(_RMAitemInformationScrollPanel, BorderLayout.NORTH);
 
-		_RMAitemTable = new JTable(data, columnNames);
+		
+		DefaultTableModel defaultTableModel = new DefaultTableModel(5,columnNames.length);
+		defaultTableModel.setColumnIdentifiers(columnNames);
+		
+		_RMAitemTable = new JTable(defaultTableModel);
+		_RMAitemTable.setPreferredSize(new Dimension(0, 0));
+		_RMAitemTable.setPreferredScrollableViewportSize(new Dimension(0, 0));
 		_RMAitemTable.setRowHeight(50);
 		_RMAitemInformationScrollPanel.setViewportView(_RMAitemTable);
 
@@ -277,13 +286,13 @@ public class AdvancedReplacementPanel extends JPanel implements ActionListener {
 	private void loadContentsPanel() {
 
 		panel = new JPanel();
-		panel_9.add(panel, BorderLayout.CENTER);
+		itemAndOtherPanel.add(panel, BorderLayout.CENTER);
 		panel.setLayout(new BorderLayout(0, 0));
-		panel_10 = new JPanel();
-		panel.add(panel_10);
-		GridBagLayout gbl_panel_10 = new GridBagLayout();
-		gbl_panel_10.columnWeights = new double[] { 2.0, 1.0, 1.0 };
-		panel_10.setLayout(gbl_panel_10);
+		rmaContentsAndShipToPanel = new JPanel();
+		panel.add(rmaContentsAndShipToPanel);
+		GridBagLayout gbl_rmaContentsAndShipToPanel = new GridBagLayout();
+		gbl_rmaContentsAndShipToPanel.columnWeights = new double[] { 2.0, 1.0, 1.0 };
+		rmaContentsAndShipToPanel.setLayout(gbl_rmaContentsAndShipToPanel);
 
 		_RMAcontentsPanel = new JPanel();
 		GridBagConstraints gbc__RMAcontentsPanel = new GridBagConstraints();
@@ -294,7 +303,7 @@ public class AdvancedReplacementPanel extends JPanel implements ActionListener {
 		gbc__RMAcontentsPanel.gridwidth = 1;
 		gbc__RMAcontentsPanel.gridheight = 1;
 		gbc__RMAcontentsPanel.weighty = 1.0;
-		panel_10.add(_RMAcontentsPanel, gbc__RMAcontentsPanel);
+		rmaContentsAndShipToPanel.add(_RMAcontentsPanel, gbc__RMAcontentsPanel);
 		_RMAcontentsPanel.setLayout(new BorderLayout(0, 0));
 
 		txtContents = new JTextPane();
@@ -313,7 +322,7 @@ public class AdvancedReplacementPanel extends JPanel implements ActionListener {
 		gbc__RMAbillTo.gridwidth = 1;
 		gbc__RMAbillTo.gridheight = 1;
 
-		panel_10.add(_RMAbillTo, gbc__RMAbillTo);
+		rmaContentsAndShipToPanel.add(_RMAbillTo, gbc__RMAbillTo);
 		_RMAbillTo.setLayout(new BorderLayout(0, 0));
 
 		txtBillTo = new JTextArea();
@@ -329,7 +338,7 @@ public class AdvancedReplacementPanel extends JPanel implements ActionListener {
 		gbc__RMAshipTo.gridy = 0;
 		gbc__RMAshipTo.fill = GridBagConstraints.BOTH;
 		gbc__RMAshipTo.gridwidth = 1;
-		panel_10.add(_RMAshipTo, gbc__RMAshipTo);
+		rmaContentsAndShipToPanel.add(_RMAshipTo, gbc__RMAshipTo);
 		_RMAshipTo.setLayout(new BorderLayout(0, 0));
 
 		lblShipTo = new JLabel("Ship to");
@@ -430,6 +439,8 @@ public class AdvancedReplacementPanel extends JPanel implements ActionListener {
 		obj.put("companyPhone", txtCompanyPhone.getText());
 		obj.put("companyEmail", txtCompanyEmail.getText());
 		obj.put("companySiteName", txtSiteName.getText());
+		
+		System.out.println("0,0 : " + _RMAitemTable.getValueAt(0, 0));
 
 		obj.put("rmaNumber", txtRMAnumber.getText());
 		obj.put("rmaDate", txtDate.getText());
@@ -443,8 +454,15 @@ public class AdvancedReplacementPanel extends JPanel implements ActionListener {
 		System.out.println("rmaBillTo " + txtBillTo.getText());
 		System.out.println("rmaShipTo " + txtShipTo.getText());
 		System.out.println("rmaTrackingNumber " + txtTrackingNumber.getText());
+		
+		
+		obj.put("itemCount", _RMAitemTable.getRowCount());
+		
+		for(int i = 0 ; i < _RMAitemTable.getRowCount() ; i++){
+			obj.put("itemName" + i, _RMAitemTable.getValueAt(i, 0));
+			obj.put("serialNumber" + i, _RMAitemTable.getValueAt(i, 1));
+		}
 
-		// obj의 크기가 커져서 그런듯?? 어찌해결할꼬.
 		printStream.println(obj.toJSONString());
 
 	}
@@ -513,5 +531,149 @@ public class AdvancedReplacementPanel extends JPanel implements ActionListener {
 		else
 			return "";
 	}
+
+
+	public JTextField getTxtRMAnumber() {
+		return txtRMAnumber;
+	}
+
+
+	public void setTxtRMAnumber(JTextField txtRMAnumber) {
+		this.txtRMAnumber = txtRMAnumber;
+	}
+
+
+	public JTextField getTxtCompanyName() {
+		return txtCompanyName;
+	}
+
+
+	public void setTxtCompanyName(JTextField txtCompanyName) {
+		this.txtCompanyName = txtCompanyName;
+	}
+
+
+	public JTextField getTxtCompanyAddress() {
+		return txtCompanyAddress;
+	}
+
+
+	public void setTxtCompanyAddress(JTextField txtCompanyAddress) {
+		this.txtCompanyAddress = txtCompanyAddress;
+	}
+
+
+	public JTextField getTxtCompanyZipCode() {
+		return txtCompanyZipCode;
+	}
+
+
+	public void setTxtCompanyZipCode(JTextField txtCompanyZipCode) {
+		this.txtCompanyZipCode = txtCompanyZipCode;
+	}
+
+
+	public JTextField getTxtCompanyEmail() {
+		return txtCompanyEmail;
+	}
+
+
+	public void setTxtCompanyEmail(JTextField txtCompanyEmail) {
+		this.txtCompanyEmail = txtCompanyEmail;
+	}
+
+
+	public JTextField getTxtDate() {
+		return txtDate;
+	}
+
+
+	public void setTxtDate(JTextField txtDate) {
+		this.txtDate = txtDate;
+	}
+
+
+	public JTextField getTxtSiteName() {
+		return txtSiteName;
+	}
+
+
+	public void setTxtSiteName(JTextField txtSiteName) {
+		this.txtSiteName = txtSiteName;
+	}
+
+
+	public JTextField getTxtCompanyCity() {
+		return txtCompanyCity;
+	}
+
+
+	public void setTxtCompanyCity(JTextField txtCompanyCity) {
+		this.txtCompanyCity = txtCompanyCity;
+	}
+
+
+	public JTextField getTxtCompanyPhone() {
+		return txtCompanyPhone;
+	}
+
+
+	public void setTxtCompanyPhone(JTextField txtCompanyPhone) {
+		this.txtCompanyPhone = txtCompanyPhone;
+	}
+
+
+	public JTextField getTxtOrderNumber() {
+		return txtOrderNumber;
+	}
+
+
+	public void setTxtOrderNumber(JTextField txtOrderNumber) {
+		this.txtOrderNumber = txtOrderNumber;
+	}
+
+
+	public JTextPane getTxtContents() {
+		return txtContents;
+	}
+
+
+	public void setTxtContents(JTextPane txtContents) {
+		this.txtContents = txtContents;
+	}
+
+
+	public JTextArea getTxtBillTo() {
+		return txtBillTo;
+	}
+
+
+	public void setTxtBillTo(JTextArea txtBillTo) {
+		this.txtBillTo = txtBillTo;
+	}
+
+
+	public JTextArea getTxtShipTo() {
+		return txtShipTo;
+	}
+
+
+	public void setTxtShipTo(JTextArea txtShipTo) {
+		this.txtShipTo = txtShipTo;
+	}
+
+
+	public JTextField getTxtTrackingNumber() {
+		return txtTrackingNumber;
+	}
+
+
+	public void setTxtTrackingNumber(JTextField txtTrackingNumber) {
+		this.txtTrackingNumber = txtTrackingNumber;
+	}
+	
+	
+	
+	
 
 }
