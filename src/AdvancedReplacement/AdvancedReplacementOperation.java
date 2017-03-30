@@ -1,5 +1,12 @@
+package AdvancedReplacement;
+
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -8,31 +15,42 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.Socket;
 import java.nio.channels.FileChannel;
+import java.util.ArrayList;
 
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
+import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.JTextComponent;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
-public class AdvancedReplacementOperation implements ActionListener, DocumentListener {
+import Default.ServerInformation;
 
-	GUIadvancedRepalcementPanel guiAdvancedRepalcementPanel;
+public class AdvancedReplacementOperation implements ActionListener {
+
+	GUIadvancedRepalcementPanel guiAdvancedRepalcementPanel = GUIadvancedRepalcementPanel
+			.getGUIadvancedReplecementPanel();
 
 	PrintStream printStream;
 	BufferedReader bufferedReader;
 	Socket client;
 
-	public AdvancedReplacementOperation() {
+	DefaultComboBoxModel defaultComboBoxModel = new DefaultComboBoxModel<>();
 
-		guiAdvancedRepalcementPanel = new GUIadvancedRepalcementPanel();
+	public AdvancedReplacementOperation() {
 
 		guiAdvancedRepalcementPanel.getSaveBtn().addActionListener(this);
 		guiAdvancedRepalcementPanel.getAttachFileBtn().addActionListener(this);
-		guiAdvancedRepalcementPanel.getTxtCompanyName().getDocument().addDocumentListener(this);
 
+		setTabAdaptor();
+		setComboBoxListener();
+
+		// 클라이언트가 서버와 연결이 되면 제일 먼저 RMAnumber를 preserve해서 가지고 온다.
 		try {
 			connectServer();
 			getRMAindexFromDataBase();
@@ -44,6 +62,49 @@ public class AdvancedReplacementOperation implements ActionListener, DocumentLis
 			closeConnection();
 		}
 
+	}
+
+	private void setComboBoxListener() {
+		JComboBox siteName = guiAdvancedRepalcementPanel.getTxtSiteName();
+
+		if (siteName.getEditor().getEditorComponent() instanceof JTextComponent) {
+			JTextComponent siteNameComponent = (JTextComponent) siteName.getEditor().getEditorComponent();
+			siteNameComponent.getDocument().putProperty("owner", "siteName");
+			siteNameComponent.getDocument().addDocumentListener(new ComboBoxListener());
+
+		}
+
+		JComboBox companyName = guiAdvancedRepalcementPanel.getTxtCompanyName();
+
+		if (companyName.getEditor().getEditorComponent() instanceof JTextComponent) {
+			JTextComponent companyNameComponent = (JTextComponent) companyName.getEditor().getEditorComponent();
+			companyNameComponent.getDocument().putProperty("owner", "companyName");
+			companyNameComponent.getDocument().addDocumentListener(new ComboBoxListener());
+			
+
+		}
+
+	}
+
+	private void setTabAdaptor() {
+		// overriding TextArea's Tab Key function.
+		KeyAdapter tabAdapter = new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_TAB) {
+					if (e.getModifiers() > 0) {
+						((JTextArea) e.getSource()).transferFocusBackward();
+					} else {
+						((JTextArea) e.getSource()).transferFocus();
+					}
+					e.consume();
+				}
+			}
+		};
+
+		guiAdvancedRepalcementPanel.getTxtContents().addKeyListener(tabAdapter);
+		guiAdvancedRepalcementPanel.getTxtBillTo().addKeyListener(tabAdapter);
+		guiAdvancedRepalcementPanel.getTxtShipTo().addKeyListener(tabAdapter);
 	}
 
 	public GUIadvancedRepalcementPanel getGUIadvancedReplacementPanel() {
@@ -105,19 +166,22 @@ public class AdvancedReplacementOperation implements ActionListener, DocumentLis
 	}
 
 	// save RMA Information To Database
-	private void saveRMAInformation() {
+	private void saveRMAInformationToDatabase() {
 
 		JSONObject obj = new JSONObject();
 
 		obj.put("Action", "requestSaveRMAData");
 
-		obj.put("companyName", guiAdvancedRepalcementPanel.getTxtCompanyName().getText());
+		// company detail informatil. update로 변경사항이있을시에 업데이트 해줘야한다.
+		obj.put("companyName", guiAdvancedRepalcementPanel.getTxtCompanyName().getEditor().getItem().toString());
 		obj.put("companyAddress", guiAdvancedRepalcementPanel.getTxtCompanyAddress().getText());
 		obj.put("companyCity", guiAdvancedRepalcementPanel.getTxtCompanyCity().getText());
 		obj.put("companyZipCode", guiAdvancedRepalcementPanel.getTxtCompanyZipCode().getText());
 		obj.put("companyPhone", guiAdvancedRepalcementPanel.getTxtCompanyPhone().getText());
 		obj.put("companyEmail", guiAdvancedRepalcementPanel.getTxtCompanyEmail().getText());
-		obj.put("companySiteName", guiAdvancedRepalcementPanel.getTxtSiteName().getText());
+
+		// company에 종속적. 없으면 추가해야함.
+		obj.put("siteName", guiAdvancedRepalcementPanel.getTxtSiteName().getEditor().getItem().toString());
 
 		System.out.println("0,0 : " + guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(0, 0));
 
@@ -129,11 +193,7 @@ public class AdvancedReplacementOperation implements ActionListener, DocumentLis
 		obj.put("rmaShipTo", guiAdvancedRepalcementPanel.getTxtShipTo().getText());
 		obj.put("rmaTrackingNumber", guiAdvancedRepalcementPanel.getTxtTrackingNumber().getText());
 
-		System.out.println("rmaContents " + guiAdvancedRepalcementPanel.getTxtContents().getText());
-		System.out.println("rmaBillTo " + guiAdvancedRepalcementPanel.getTxtBillTo().getText());
-		System.out.println("rmaShipTo " + guiAdvancedRepalcementPanel.getTxtShipTo().getText());
-		System.out.println("rmaTrackingNumber " + guiAdvancedRepalcementPanel.getTxtTrackingNumber().getText());
-
+		// RMA ITEM TABLE 저장
 		obj.put("itemCount", guiAdvancedRepalcementPanel.get_RMAitemTable().getRowCount());
 
 		for (int i = 0; i < guiAdvancedRepalcementPanel.get_RMAitemTable().getRowCount(); i++) {
@@ -146,49 +206,6 @@ public class AdvancedReplacementOperation implements ActionListener, DocumentLis
 
 	}
 
-	private void readRelatedRMAfromDataBase() {
-		
-		System.out.println("readRelatedRMAfromDataBase");
-		
-		guiAdvancedRepalcementPanel.clearHistoryPanel();
-
-		JSONObject obj = new JSONObject();
-
-		obj.put("Action", "requestSearchRelatedRMA");
-		obj.put("companyName", guiAdvancedRepalcementPanel.getTxtCompanyName().getText());
-		
-		System.out.println(guiAdvancedRepalcementPanel.getTxtCompanyName().getText());
-
-		printStream.println(obj.toJSONString());
-
-		while (true) {
-
-			try {
-				String input = bufferedReader.readLine();
-
-				if (input == null) {
-					break;
-				}
-
-				JSONParser jsonParser = new JSONParser();
-
-				JSONObject jsonObject = (JSONObject) jsonParser.parse(input);
-
-				String rmaNumber = jsonObject.get("RMAnumber").toString();
-				String rmaDate = jsonObject.get("RMAdate").toString();
-				String rmaContents = jsonObject.get("RMAcontents").toString();
-
-				guiAdvancedRepalcementPanel.setRelatedRMAInformation(rmaNumber, rmaDate, rmaContents);
-
-				System.out.println("rmaNumber : " + rmaNumber + " rmaContents : " + rmaContents);
-
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-
-		}
-	}
-
 	@Override
 	public void actionPerformed(ActionEvent actionEvent) {
 
@@ -197,7 +214,7 @@ public class AdvancedReplacementOperation implements ActionListener, DocumentLis
 
 			try {
 				connectServer();
-				saveRMAInformation();
+				saveRMAInformationToDatabase();
 				closeConnection();
 				connectServer();
 				getRMAindexFromDataBase();
@@ -250,49 +267,6 @@ public class AdvancedReplacementOperation implements ActionListener, DocumentLis
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
-	}
-
-	@Override
-	public void insertUpdate(DocumentEvent e) {
-		// TODO Auto-generated method stub
-
-		System.out.println("insertUpdate?");
-		if (e.getDocument() == guiAdvancedRepalcementPanel.getTxtCompanyName().getDocument()) {
-			try {
-				connectServer();
-				readRelatedRMAfromDataBase();
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			} finally {
-				closeConnection();
-			}
-
-		}
-
-	}
-
-	@Override
-	public void removeUpdate(DocumentEvent e) {
-		// TODO Auto-generated method stub
-		System.out.println("removeUpdate?");
-		if (e.getDocument() == guiAdvancedRepalcementPanel.getTxtCompanyName().getDocument()) {
-			try {
-				connectServer();
-				readRelatedRMAfromDataBase();
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			} finally {
-				closeConnection();
-			}
-
-		}
-	}
-
-	@Override
-	public void changedUpdate(DocumentEvent e) {
-		// TODO Auto-generated method stub
-		System.out.println("changedUpdate?");
 
 	}
 

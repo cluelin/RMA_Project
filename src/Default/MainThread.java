@@ -1,3 +1,4 @@
+package Default;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Toolkit;
@@ -28,6 +29,9 @@ import javax.swing.JTable;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import org.eclipse.wb.swing.FocusTraversalOnArray;
+
+import AdvancedReplacement.AdvancedReplacementOperation;
+
 import java.awt.Component;
 import javax.swing.border.EmptyBorder;
 
@@ -93,6 +97,8 @@ public class MainThread extends JFrame {
 
 		
 		layout.setLocation(ScreenSize.width / 2 - layout.getSize().width / 2, ScreenSize.height / 2 - layout.getSize().height / 2);
+		
+		
 	}
 
 }

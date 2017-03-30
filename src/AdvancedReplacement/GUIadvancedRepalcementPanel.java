@@ -1,3 +1,5 @@
+package AdvancedReplacement;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -15,6 +17,7 @@ import java.util.Calendar;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -26,6 +29,7 @@ import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
+import org.json.simple.JSONObject;
 import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
 import javax.swing.BoxLayout;
@@ -34,14 +38,15 @@ import javax.swing.border.LineBorder;
 public class GUIadvancedRepalcementPanel extends JPanel {
 
 	private static String FILE_NAME = "ReplacementInformation.txt";
+	private static GUIadvancedRepalcementPanel instance = null;
 
 	private JTextField txtRMAnumber;
-	private JTextField txtCompanyName;
+	private JComboBox txtCompanyName;
 	private JTextField txtCompanyAddress;
 	private JTextField txtCompanyZipCode;
 	private JTextField txtCompanyEmail;
 	private JTextField txtDate;
-	private JTextField txtSiteName;
+	private JComboBox txtSiteName;
 	private JTextField txtCompanyCity;
 	private JTextField txtCompanyPhone;
 	private JTextField txtOrderNumber;
@@ -89,10 +94,10 @@ public class GUIadvancedRepalcementPanel extends JPanel {
 	private JLabel lblNewLabel;
 	private JScrollPane scrollPane;
 	private JPanel previousRMApanel;
-	private JPanel panel_2;
+	private JPanel relatedRMAPanel;
 	private JPanel panel_3;
 
-	public GUIadvancedRepalcementPanel() {
+	private GUIadvancedRepalcementPanel() {
 
 		setLayout(new BorderLayout(0, 0));
 
@@ -138,8 +143,9 @@ public class GUIadvancedRepalcementPanel extends JPanel {
 		JLabel lblCompanyName = new JLabel("Company Name");
 		leftCompanyInformationPanel.add(lblCompanyName);
 
-		txtCompanyName = new JTextField();
-		txtCompanyName.setColumns(10);
+		txtCompanyName = new JComboBox();
+		txtCompanyName.setEditable(true);
+
 		leftCompanyInformationPanel.add(txtCompanyName);
 
 		JLabel label_2 = new JLabel("Address");
@@ -182,8 +188,9 @@ public class GUIadvancedRepalcementPanel extends JPanel {
 		label_17 = new JLabel("Site Name");
 		rightCompanyInformationPanel.add(label_17);
 
-		txtSiteName = new JTextField();
-		txtSiteName.setColumns(10);
+		txtSiteName = new JComboBox<>();
+		txtSiteName.setEditable(true);
+
 		rightCompanyInformationPanel.add(txtSiteName);
 
 		lblCity = new JLabel("City");
@@ -260,30 +267,64 @@ public class GUIadvancedRepalcementPanel extends JPanel {
 
 	}
 
+	public static GUIadvancedRepalcementPanel getGUIadvancedReplecementPanel() {
+		if (instance == null) {
+			instance = new GUIadvancedRepalcementPanel();
+		}
+		return instance;
+
+	}
+
 	public void setRelatedRMAInformation(String rmaNumber, String rmaDate, String rmaContents) {
 
 		System.out.println("history panel ¼¼ÆÃ");
-		panel_2 = new JPanel();
-		panel_2.setBorder(new LineBorder(new Color(0, 0, 0)));
-		panel_2.setMaximumSize(new Dimension(32767, 50));
+		relatedRMAPanel = new JPanel();
+		relatedRMAPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
+		relatedRMAPanel.setMaximumSize(new Dimension(32767, 50));
 
-		panel_2.add(new JLabel(rmaNumber));
-		panel_2.add(new JLabel(rmaDate));
-		panel_2.add(new JLabel(rmaContents));
+		relatedRMAPanel.add(new JLabel(rmaNumber));
+		relatedRMAPanel.add(new JLabel(rmaDate));
+		relatedRMAPanel.add(new JLabel(rmaContents));
+		relatedRMAPanel.addMouseListener(new HistoryPanelClickListener(rmaNumber));
 
 		System.out.println("rmaNumber : " + rmaNumber + " rmaContents : " + rmaContents);
 
-		previousRMApanel.add(panel_2);
+		previousRMApanel.add(relatedRMAPanel);
 
-		previousRMApanel.validate();
+		previousRMApanel.revalidate();
+		previousRMApanel.repaint();
 
 	}
 	
-	public void clearHistoryPanel(){
+	public void setRMADetail(JSONObject RMADetailJSON){
 		
+		String rmaNumber = RMADetailJSON.get("rmaNumber").toString();
+		String rmaDate = RMADetailJSON.get("rmaDate").toString();
+		String rmaOrderNumber = RMADetailJSON.get("rmaOrderNumber").toString();
+		String rmaContents = RMADetailJSON.get("rmaContents").toString();
+		String rmaBillTo = RMADetailJSON.get("rmaBillTo").toString();
+		String rmaShipTo = RMADetailJSON.get("rmaShipTo").toString();
+		String rmaTrackingNumber = RMADetailJSON.get("rmaTrackingNumber").toString();
+
+		
+		txtRMAnumber.setText(rmaNumber);
+		txtDate.setText(rmaDate);
+		txtOrderNumber.setText(rmaOrderNumber);
+		txtContents.setText(rmaContents);
+		txtBillTo.setText(rmaBillTo);
+		txtShipTo.setText(rmaShipTo);
+		txtTrackingNumber.setText(rmaTrackingNumber);
+		
+//		previousRMApanel.revalidate();
+//		previousRMApanel.repaint();
+		
+	}
+
+	public void clearHistoryPanel() {
+
 		System.out.println("clearHistoryPanel");
 		previousRMApanel.removeAll();
-		
+
 		previousRMApanel.revalidate();
 		previousRMApanel.repaint();
 	}
@@ -379,140 +420,91 @@ public class GUIadvancedRepalcementPanel extends JPanel {
 		txtTrackingNumber.setColumns(20);
 	}
 
-	public JTable get_RMAitemTable() {
-		return _RMAitemTable;
+	public void setCompanyDetail(String address, String city, String zipCode, String phone, String email) {
+		
+		txtCompanyAddress.setText(address);
+		txtCompanyCity.setText(city);
+		txtCompanyZipCode.setText(zipCode);
+		txtCompanyPhone.setText(phone);
+		txtCompanyEmail.setText(email);
+	}
+	
+	public void clearCompanyDetail(){
+		
+		txtCompanyAddress.setText("");
+		txtCompanyCity.setText("");
+		txtCompanyZipCode.setText("");
+		txtCompanyPhone.setText("");
+		txtCompanyEmail.setText("");
+		
 	}
 
-	public void set_RMAitemTable(JTable _RMAitemTable) {
-		this._RMAitemTable = _RMAitemTable;
+	public JTable get_RMAitemTable() {
+		return _RMAitemTable;
 	}
 
 	public JButton getAttachFileBtn() {
 		return attachFileBtn;
 	}
 
-	public void setAttachFileBtn(JButton attachFileBtn) {
-		this.attachFileBtn = attachFileBtn;
-	}
-
 	public JButton getSaveBtn() {
 		return SaveBtn;
-	}
-
-	public void setSaveBtn(JButton saveBtn) {
-		SaveBtn = saveBtn;
 	}
 
 	public JTextField getTxtRMAnumber() {
 		return txtRMAnumber;
 	}
 
-	public void setTxtRMAnumber(JTextField txtRMAnumber) {
-		this.txtRMAnumber = txtRMAnumber;
-	}
-
-	public JTextField getTxtCompanyName() {
+	public JComboBox getTxtCompanyName() {
 		return txtCompanyName;
-	}
-
-	public void setTxtCompanyName(JTextField txtCompanyName) {
-		this.txtCompanyName = txtCompanyName;
 	}
 
 	public JTextField getTxtCompanyAddress() {
 		return txtCompanyAddress;
 	}
 
-	public void setTxtCompanyAddress(JTextField txtCompanyAddress) {
-		this.txtCompanyAddress = txtCompanyAddress;
-	}
-
 	public JTextField getTxtCompanyZipCode() {
 		return txtCompanyZipCode;
-	}
-
-	public void setTxtCompanyZipCode(JTextField txtCompanyZipCode) {
-		this.txtCompanyZipCode = txtCompanyZipCode;
 	}
 
 	public JTextField getTxtCompanyEmail() {
 		return txtCompanyEmail;
 	}
 
-	public void setTxtCompanyEmail(JTextField txtCompanyEmail) {
-		this.txtCompanyEmail = txtCompanyEmail;
-	}
-
 	public JTextField getTxtDate() {
 		return txtDate;
 	}
 
-	public void setTxtDate(JTextField txtDate) {
-		this.txtDate = txtDate;
-	}
-
-	public JTextField getTxtSiteName() {
+	public JComboBox getTxtSiteName() {
 		return txtSiteName;
-	}
-
-	public void setTxtSiteName(JTextField txtSiteName) {
-		this.txtSiteName = txtSiteName;
 	}
 
 	public JTextField getTxtCompanyCity() {
 		return txtCompanyCity;
 	}
 
-	public void setTxtCompanyCity(JTextField txtCompanyCity) {
-		this.txtCompanyCity = txtCompanyCity;
-	}
-
 	public JTextField getTxtCompanyPhone() {
 		return txtCompanyPhone;
-	}
-
-	public void setTxtCompanyPhone(JTextField txtCompanyPhone) {
-		this.txtCompanyPhone = txtCompanyPhone;
 	}
 
 	public JTextField getTxtOrderNumber() {
 		return txtOrderNumber;
 	}
 
-	public void setTxtOrderNumber(JTextField txtOrderNumber) {
-		this.txtOrderNumber = txtOrderNumber;
-	}
-
 	public JTextArea getTxtContents() {
 		return txtContents;
-	}
-
-	public void setTxtContents(JTextArea txtContents) {
-		this.txtContents = txtContents;
 	}
 
 	public JTextArea getTxtBillTo() {
 		return txtBillTo;
 	}
 
-	public void setTxtBillTo(JTextArea txtBillTo) {
-		this.txtBillTo = txtBillTo;
-	}
-
 	public JTextArea getTxtShipTo() {
 		return txtShipTo;
 	}
 
-	public void setTxtShipTo(JTextArea txtShipTo) {
-		this.txtShipTo = txtShipTo;
-	}
-
 	public JTextField getTxtTrackingNumber() {
 		return txtTrackingNumber;
-	}
-
-	public void setTxtTrackingNumber(JTextField txtTrackingNumber) {
-		this.txtTrackingNumber = txtTrackingNumber;
 	}
 
 }
