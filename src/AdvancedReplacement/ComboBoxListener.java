@@ -444,12 +444,15 @@ public class ComboBoxListener implements DocumentListener {
 	}
 
 	private void showRecommendItemList() {
+		
+		여기막 수정했음.ComboBoxListener 
 
 		JComboBox owner = guiAdvancedRepalcementPanel.getItemComboBox();
 		Component component = owner.getEditor().getEditorComponent();
 		JTextComponent textComponent = (JTextComponent) component;
 
-		String partialOfItemName = textComponent.getText();
+		이거 지움 
+//		String partialOfItemName = textComponent.getText();
 		
 		// Keyword Result list
 		List<String> founds = getItemNameFromServer(partialOfItemName);
