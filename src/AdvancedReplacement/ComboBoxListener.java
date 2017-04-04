@@ -1,18 +1,20 @@
 package AdvancedReplacement;
 
 import java.awt.Component;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
+import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import javax.swing.text.JTextComponent;
 
 import org.json.simple.JSONObject;
@@ -25,96 +27,167 @@ public class ComboBoxListener implements DocumentListener {
 	GUIadvancedRepalcementPanel guiAdvancedRepalcementPanel = GUIadvancedRepalcementPanel
 			.getGUIadvancedReplecementPanel();
 
-	// DefaultComboBoxModel defaultComboBoxModel = new DefaultComboBoxModel<>();
-
-	List<String> founds = null;
-
-	JComboBox owner;
-	JTextComponent tc;
-	List<String> resultArryList = null;
-
 	public ComboBoxListener() {
+
+		companyUpdate();
+
+		// guiAdvancedRepalcementPanel.getItemComboBox().requestFocus();
+
+		// itemUpdate();
 
 	}
 
 	// CompanyName으로 검색해서 해당 company에서 신청한 RMA를 검색해서 뿌려줌.
-	private void readRelatedRMAfromDataBase() {
+	private void showPreviousRMAList(String targetName) {
 
-		System.out.println("readRelatedRMAfromDataBase");
+		try {
+			Client.connectServer();
 
-		guiAdvancedRepalcementPanel.clearHistoryPanel();
+			guiAdvancedRepalcementPanel.clearHistoryPanel();
 
-		JSONObject obj = new JSONObject();
+			JSONObject obj = new JSONObject();
 
-		obj.put("Action", "requestSearchRelatedRMA");
-		obj.put("companyName", tc.getText());
+			obj.put("Action", "requestSearchRelatedRMA");
+			obj.put("companyName", targetName);
 
-		Client.printStream.println(obj.toJSONString());
+			Client.printStream.println(obj.toJSONString());
 
-		while (true) {
+			while (true) {
 
-			try {
-				String input = Client.bufferedReader.readLine();
+				try {
+					String input = Client.bufferedReader.readLine();
 
-				if (input == null) {
-					break;
+					if (input == null) {
+						break;
+					}
+
+					JSONParser jsonParser = new JSONParser();
+
+					JSONObject jsonObject = (JSONObject) jsonParser.parse(input);
+
+					String rmaNumber = jsonObject.get("RMAnumber").toString();
+					String rmaDate = jsonObject.get("RMAdate").toString();
+					String rmaContents = jsonObject.get("RMAcontents").toString();
+
+					// history panel에 결과 출력.
+					guiAdvancedRepalcementPanel.setRelatedRMAInformation(rmaNumber, rmaDate, rmaContents);
+
+					System.out.println("rmaNumber : " + rmaNumber + " rmaContents : " + rmaContents);
+
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
 
-				JSONParser jsonParser = new JSONParser();
-
-				JSONObject jsonObject = (JSONObject) jsonParser.parse(input);
-
-				String rmaNumber = jsonObject.get("RMAnumber").toString();
-				String rmaDate = jsonObject.get("RMAdate").toString();
-				String rmaContents = jsonObject.get("RMAcontents").toString();
-
-				// history panel에 결과 출력.
-				guiAdvancedRepalcementPanel.setRelatedRMAInformation(rmaNumber, rmaDate, rmaContents);
-
-				System.out.println("rmaNumber : " + rmaNumber + " rmaContents : " + rmaContents);
-
-			} catch (Exception e) {
-				e.printStackTrace();
 			}
 
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		} finally {
+			Client.closeConnection();
 		}
+
 	}
 
 	// 서버로부터 siteName에 대한 정보를 검색해 가지고 옴.
 	private List<String> getSiteNameFromServer(String keyword, String companyName) {
 
-		JSONObject obj = new JSONObject();
+		List<String> resultArryList = null;
 
-		obj.put("Action", "requestSiteName");
+		try {
+			Client.connectServer();
 
-		obj.put("companyName", companyName);
-		obj.put("siteName", keyword);
+			JSONObject obj = new JSONObject();
 
-		Client.printStream.println(obj.toJSONString());
+			obj.put("Action", "requestSiteName");
 
-		JSONParser jsonParser = new JSONParser();
+			obj.put("companyName", companyName);
+			obj.put("siteName", keyword);
 
-		String input;
+			Client.printStream.println(obj.toJSONString());
 
-		resultArryList = new ArrayList<>();
+			JSONParser jsonParser = new JSONParser();
 
-		while (true) {
+			String input;
 
-			try {
+			resultArryList = new ArrayList<>();
 
-				input = Client.bufferedReader.readLine();
+			while (true) {
 
-				if (input == null) {
-					break;
+				try {
+
+					input = Client.bufferedReader.readLine();
+
+					if (input == null) {
+						break;
+					}
+
+					JSONObject jsonObject = (JSONObject) jsonParser.parse(input);
+
+					resultArryList.add(jsonObject.get("siteName").toString());
+
+				} catch (Exception ex) {
+					ex.printStackTrace();
 				}
-
-				JSONObject jsonObject = (JSONObject) jsonParser.parse(input);
-
-				resultArryList.add(jsonObject.get("siteName").toString());
-
-			} catch (Exception ex) {
-				ex.printStackTrace();
 			}
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		} finally {
+			Client.closeConnection();
+		}
+
+		return resultArryList;
+
+	}
+
+	// 서버로 부터 keyword에 해당하는 Item 검색
+	private List<String> getItemNameFromServer(String keyword) {
+
+		ArrayList resultArryList = new ArrayList<String>();
+
+		try {
+			Client.connectServer();
+
+			JSONObject obj = new JSONObject();
+
+			obj.put("Action", "requestItemName");
+			obj.put("itemName", keyword);
+
+			Client.printStream.println(obj.toJSONString());
+
+			JSONParser jsonParser = new JSONParser();
+
+			String input;
+
+			while (true) {
+
+				try {
+
+					input = Client.bufferedReader.readLine();
+
+					if (input == null) {
+						break;
+					}
+
+					JSONObject jsonObject = (JSONObject) jsonParser.parse(input);
+
+					// Integer itemCode =
+					// Integer.parseInt(jsonObject.get("itemCode").toString());
+					String itemName = jsonObject.get("itemName").toString();
+					String itemDescription = jsonObject.get("itemDescription").toString();
+					Integer itemPrice = Integer.parseInt(jsonObject.get("itemPrice").toString());
+
+					resultArryList.add(itemName);
+
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+			}
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		} finally {
+			Client.closeConnection();
 		}
 
 		return resultArryList;
@@ -123,37 +196,47 @@ public class ComboBoxListener implements DocumentListener {
 
 	private List<String> getCompanyNameFromServer(String keyword) {
 
-		JSONObject obj = new JSONObject();
+		List<String> resultArryList = null;
+		try {
+			Client.connectServer();
 
-		obj.put("Action", "requestCompanyName");
+			JSONObject obj = new JSONObject();
 
-		obj.put("companyName", keyword);
+			obj.put("Action", "requestCompanyName");
 
-		Client.printStream.println(obj.toJSONString());
+			obj.put("companyName", keyword);
 
-		JSONParser jsonParser = new JSONParser();
+			Client.printStream.println(obj.toJSONString());
 
-		String input;
+			JSONParser jsonParser = new JSONParser();
 
-		resultArryList = new ArrayList<>();
+			String input;
 
-		while (true) {
+			resultArryList = new ArrayList<>();
 
-			try {
+			while (true) {
 
-				input = Client.bufferedReader.readLine();
+				try {
 
-				if (input == null) {
-					break;
+					input = Client.bufferedReader.readLine();
+
+					if (input == null) {
+						break;
+					}
+
+					JSONObject jsonObject = (JSONObject) jsonParser.parse(input);
+
+					resultArryList.add(jsonObject.get("companyName").toString());
+
+				} catch (Exception ex) {
+					ex.printStackTrace();
 				}
-
-				JSONObject jsonObject = (JSONObject) jsonParser.parse(input);
-
-				resultArryList.add(jsonObject.get("companyName").toString());
-
-			} catch (Exception ex) {
-				ex.printStackTrace();
 			}
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		} finally {
+			Client.closeConnection();
 		}
 
 		return resultArryList;
@@ -161,13 +244,13 @@ public class ComboBoxListener implements DocumentListener {
 
 	private JSONObject getCompanyDetail(String companyName) {
 
-		JSONObject obj = new JSONObject();
+		JSONObject sendJSONobj = new JSONObject();
 
-		obj.put("Action", "requestCompanyDetail");
+		sendJSONobj.put("Action", "requestCompanyDetail");
 
-		obj.put("companyName", companyName);
+		sendJSONobj.put("companyName", companyName);
 
-		Client.printStream.println(obj.toJSONString());
+		Client.printStream.println(sendJSONobj.toJSONString());
 
 		JSONParser jsonParser = new JSONParser();
 
@@ -190,126 +273,13 @@ public class ComboBoxListener implements DocumentListener {
 
 	private void companyUpdate() {
 
-		try {
-			Client.connectServer();
-
-			founds = getCompanyNameFromServer(tc.getText());
-
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		} finally {
-			Client.closeConnection();
-		}
-
-		try {
-			Client.connectServer();
-			readRelatedRMAfromDataBase();
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		} finally {
-			Client.closeConnection();
-		}
-
-		// perform separately, as listener conflicts between the
-		// editing component
-
-		// and JComboBox will result in an IllegalStateException due
-		// to editing
-
-		// the component when it is locked.
-
 		SwingUtilities.invokeLater(new Runnable() {
 
 			@Override
 
 			public void run() {
 
-				Set<String> foundSet = new HashSet<String>();
-
-				for (String s : founds) {
-
-					foundSet.add(s.toLowerCase());
-
-				}
-
-				// Collections.sort(founds);// sort alphabetically
-
-				owner.setEditable(false);
-
-				owner.removeAllItems();
-
-				// if founds contains the search text, then only add
-				// once.
-
-				if (!foundSet.contains(tc.getText().toLowerCase())) {
-
-					owner.addItem(tc.getText());
-					// guiAdvancedRepalcementPanel.clearCompanyDetail();
-
-				} else {
-
-					try {
-						Client.connectServer();
-
-						System.out.println("tc.getText() : " + tc.getText());
-
-						JSONObject companyDetailObject = getCompanyDetail(tc.getText());
-
-						String address = companyDetailObject.get("companyAddress").toString();
-						String city = companyDetailObject.get("companyCity").toString();
-						String zipCode = companyDetailObject.get("companyZipCode").toString();
-						String phone = companyDetailObject.get("companyPhone").toString();
-						String email = companyDetailObject.get("companyEmail").toString();
-
-						guiAdvancedRepalcementPanel.setCompanyDetail(address, city, zipCode, phone, email);
-
-					} catch (Exception ex) {
-						ex.printStackTrace();
-					} finally {
-						Client.closeConnection();
-					}
-
-				}
-
-				for (String s : founds) {
-
-					owner.addItem(s);
-
-				}
-				owner.setPopupVisible(true);
-				owner.setEditable(true);
-				owner.requestFocus();
-
-			}
-
-		});
-
-		// When the text component changes, focus is gained
-
-		// and the menu disappears. To account for this, whenever the focus
-
-		// is gained by the JTextComponent and it has searchable values, we
-		// show the popup.
-
-		tc.addFocusListener(new FocusListener() {
-
-			@Override
-
-			public void focusGained(FocusEvent arg0) {
-
-				// companyUpdate();
-
-				if (tc.getText().length() > 0) {
-
-					owner.setPopupVisible(true);
-
-				}
-
-			}
-
-			@Override
-
-			public void focusLost(FocusEvent arg0) {
+				showRecommendCompanyList();
 
 			}
 
@@ -319,25 +289,21 @@ public class ComboBoxListener implements DocumentListener {
 
 	private void siteUpdate() {
 
-		try {
-			Client.connectServer();
+		SwingUtilities.invokeLater(new Runnable() {
 
-			founds = getSiteNameFromServer(tc.getText(),
-					guiAdvancedRepalcementPanel.getTxtCompanyName().getEditor().getItem().toString());
+			@Override
 
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		} finally {
-			Client.closeConnection();
-		}
+			public void run() {
 
-		// perform separately, as listener conflicts between the
-		// editing component
+				showRecommendSiteList();
 
-		// and JComboBox will result in an IllegalStateException due
-		// to editing
+			}
 
-		// the component when it is locked.
+		});
+
+	}
+
+	private void itemUpdate() {
 
 		SwingUtilities.invokeLater(new Runnable() {
 
@@ -345,81 +311,187 @@ public class ComboBoxListener implements DocumentListener {
 
 			public void run() {
 
-				Set<String> foundSet = new HashSet<String>();
-
-				for (String s : founds) {
-
-					foundSet.add(s.toLowerCase());
-
-				}
-
-				
-				Collections.sort(founds);// sort alphabetically
-
-				owner.setEditable(false);
-
-				owner.removeAllItems();
-
-				// if founds contains the search text, then only add
-				// once.
-				
-				
-
-				if (!foundSet.contains(tc.getText().toLowerCase())) {
-
-					owner.addItem(tc.getText());
-
-				} else {
-
-				}
-
-				for (String s : founds) {
-
-					owner.addItem(s);
-
-				}
-				
-				
-				
-				owner.setPopupVisible(true);
-				
-				System.out.println("여기서 바뀜? tc.getText() : " + tc.getText());
-				owner.setEditable(true);
-				owner.requestFocus();
-
-				
-			}
-
-		});
-
-		// When the text component changes, focus is gained
-
-		// and the menu disappears. To account for this, whenever the focus
-
-		// is gained by the JTextComponent and it has searchable values, we
-		// show the popup.
-
-		tc.addFocusListener(new FocusListener() {
-
-			@Override
-			public void focusGained(FocusEvent arg0) {
-
-				// companyUpdate();
-
-				if (tc.getText().length() > 0) {
-
-					owner.setPopupVisible(true);
-
-				}
-
-			}
-
-			@Override
-			public void focusLost(FocusEvent arg0) {
+				showRecommendItemList();
 
 			}
 
 		});
+
+	}
+
+	private void showRecommendCompanyList() {
+
+		// 이벤트 발생지를 Company로 조정한다.
+		JComboBox owner = guiAdvancedRepalcementPanel.getTxtCompanyName();
+		Component component = owner.getEditor().getEditorComponent();
+		JTextComponent textComponent = (JTextComponent) component;
+
+		String targetName = textComponent.getText();
+
+		// 현재 입력창에 입력된 값(targetName)을 기준으로 추천단어를 검색해서 리스트에 등록.
+		List<String> targetList = getCompanyNameFromServer(targetName);
+
+		// targetName과 같은 회사의 이전 RMA정보를 출력.
+		showPreviousRMAList(targetName);
+
+		Set<String> foundSet = new HashSet<String>();
+
+		for (String temp : targetList) {
+
+			foundSet.add(temp.toLowerCase());
+
+		}
+
+		Collections.sort(targetList);// sort alphabetically
+
+		owner.setEditable(false);
+
+		owner.removeAllItems();
+
+		// if founds contains the search text, then only add
+		// once.
+
+		if (!foundSet.contains(targetName.toLowerCase())) {
+
+			owner.addItem(targetName);
+			// guiAdvancedRepalcementPanel.clearCompanyDetail();
+
+		} else {
+
+			// 검색어와 일치하는 회사가 있을경우 정보를 가져옴.
+
+			try {
+				Client.connectServer();
+
+				JSONObject companyDetailObject = getCompanyDetail(targetName);
+
+				String address = companyDetailObject.get("companyAddress").toString();
+				String city = companyDetailObject.get("companyCity").toString();
+				String zipCode = companyDetailObject.get("companyZipCode").toString();
+				String phone = companyDetailObject.get("companyPhone").toString();
+				String email = companyDetailObject.get("companyEmail").toString();
+
+				guiAdvancedRepalcementPanel.setCompanyDetail(address, city, zipCode, phone, email);
+
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			} finally {
+				Client.closeConnection();
+			}
+
+		}
+
+		for (String temp : targetList) {
+
+			owner.addItem(temp);
+
+		}
+
+		showRecommendSiteList();
+
+		owner.setPopupVisible(true);
+		owner.setEditable(true);
+		owner.requestFocus();
+
+	}
+
+	private void showRecommendSiteList() {
+
+		JComboBox owner = guiAdvancedRepalcementPanel.getTxtSiteName();
+
+		Component component = owner.getEditor().getEditorComponent();
+		JTextComponent textComponent = (JTextComponent) component;
+
+		String siteName = textComponent.getText();
+
+		List<String> founds = getSiteNameFromServer(siteName,
+				guiAdvancedRepalcementPanel.getTxtCompanyName().getEditor().getItem().toString());
+
+		Set<String> foundSet = new HashSet<String>();
+
+		for (String s : founds) {
+
+			foundSet.add(s.toLowerCase());
+
+		}
+
+		Collections.sort(founds);// sort alphabetically
+
+		owner.setEditable(false);
+
+		owner.removeAllItems();
+
+		// if founds contains the search text, then only add
+		// once.
+
+		if (!foundSet.contains(siteName.toLowerCase())) {
+
+			owner.addItem(siteName);
+
+		} else {
+
+		}
+
+		for (String s : founds) {
+
+			owner.addItem(s);
+
+		}
+
+		owner.setPopupVisible(true);
+		owner.setEditable(true);
+		owner.requestFocus();
+	}
+
+	private void showRecommendItemList() {
+
+		JComboBox owner = guiAdvancedRepalcementPanel.getItemComboBox();
+		Component component = owner.getEditor().getEditorComponent();
+		JTextComponent textComponent = (JTextComponent) component;
+
+		String partialOfItemName = textComponent.getText();
+		
+		// Keyword Result list
+		List<String> founds = getItemNameFromServer(partialOfItemName);
+		
+		Set<String> foundSet = new HashSet<String>();
+
+		for (String temp : founds) {
+
+			foundSet.add(temp.toLowerCase());
+
+		}
+
+		Collections.sort(founds);// sort alphabetically
+
+		DefaultComboBoxModel boxModel = new DefaultComboBoxModel();
+
+		if (!foundSet.contains(partialOfItemName.toLowerCase())) {
+
+			boxModel.addElement(partialOfItemName);
+
+		} else {
+
+		}
+
+		for (String temp : founds) {
+
+			boxModel.addElement(temp);
+
+		}
+		
+		
+//		owner.setEditable(false);
+
+		owner.setModel(boxModel);
+
+		
+
+//		owner.addPopupMenuListener(new ItemPopupListener(founds));
+
+		owner.setPopupVisible(true);
+		owner.setEditable(true);
+		owner.requestFocus();
 
 	}
 
@@ -430,20 +502,14 @@ public class ComboBoxListener implements DocumentListener {
 
 		if (e.getDocument().getProperty("owner").equals("companyName")) {
 
-			owner = guiAdvancedRepalcementPanel.getTxtCompanyName();
-			Component c = owner.getEditor().getEditorComponent();
-			tc = (JTextComponent) c;
-
 			companyUpdate();
 
 		} else if (e.getDocument().getProperty("owner").equals("siteName")) {
-			owner = guiAdvancedRepalcementPanel.getTxtSiteName();
 
-			Component c = owner.getEditor().getEditorComponent();
-			tc = (JTextComponent) c;
-			
-			System.out.println("tc.getText() : " + tc.getText());
 			siteUpdate();
+		} else if (e.getDocument().getProperty("owner").equals("itemName")) {
+
+			itemUpdate();
 		}
 
 	}
@@ -455,20 +521,14 @@ public class ComboBoxListener implements DocumentListener {
 
 		if (e.getDocument().getProperty("owner").equals("companyName")) {
 
-			owner = guiAdvancedRepalcementPanel.getTxtCompanyName();
-			Component c = owner.getEditor().getEditorComponent();
-			tc = (JTextComponent) c;
-
 			companyUpdate();
 
 		} else if (e.getDocument().getProperty("owner").equals("siteName")) {
-			owner = guiAdvancedRepalcementPanel.getTxtSiteName();
 
-			Component c = owner.getEditor().getEditorComponent();
-			tc = (JTextComponent) c;
-			
-			System.out.println("tc.getText() : " + tc.getText());
 			siteUpdate();
+		} else if (e.getDocument().getProperty("owner").equals("itemName")) {
+
+			itemUpdate();
 		}
 
 	}

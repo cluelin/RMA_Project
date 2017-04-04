@@ -15,11 +15,11 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 import javax.swing.BorderFactory;
-import javax.swing.DefaultListModel;
+import javax.swing.BoxLayout;
+import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -27,13 +27,11 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
 
 import org.json.simple.JSONObject;
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
-
-import javax.swing.BoxLayout;
-import javax.swing.border.LineBorder;
 
 public class GUIadvancedRepalcementPanel extends JPanel {
 
@@ -80,7 +78,6 @@ public class GUIadvancedRepalcementPanel extends JPanel {
 
 	private JPanel historyPanel;
 	private JLabel historyLabel;
-	private JList historyList;
 	private JPanel panel;
 	private JPanel panel_4;
 	private JButton attachFileBtn;
@@ -96,6 +93,8 @@ public class GUIadvancedRepalcementPanel extends JPanel {
 	private JPanel previousRMApanel;
 	private JPanel relatedRMAPanel;
 	private JPanel panel_3;
+
+	private JComboBox itemComboBox;
 
 	private GUIadvancedRepalcementPanel() {
 
@@ -229,6 +228,13 @@ public class GUIadvancedRepalcementPanel extends JPanel {
 
 		_RMAitemTable = new JTable(defaultTableModel);
 		_RMAitemTable.setRowHeight(50);
+
+		TableColumn sportColumn = _RMAitemTable.getColumnModel().getColumn(0);
+
+		itemComboBox = new JComboBox();
+		itemComboBox.setEditable(true);
+		sportColumn.setCellEditor(new DefaultCellEditor(itemComboBox));
+
 		_RMAitemInformationScrollPanel.setViewportView(_RMAitemTable);
 
 		loadContentsPanel();
@@ -248,22 +254,6 @@ public class GUIadvancedRepalcementPanel extends JPanel {
 		previousRMApanel = new JPanel();
 		historyPanel.add(previousRMApanel, BorderLayout.CENTER);
 		previousRMApanel.setLayout(new BoxLayout(previousRMApanel, BoxLayout.PAGE_AXIS));
-
-		// DefaultListModel model = new DefaultListModel();
-		// model.addElement(new JPanel().add(new JLabel("라벨")));
-		// model.addElement(new JLabel("라벨"));
-		//
-		// historyList = new JList();
-		// historyList.setPreferredSize(new Dimension(200, 10));
-		//
-		//
-		// historyList.setModel(model);
-		//
-		//
-		// scrollPane = new JScrollPane();
-		// scrollPane.setViewportView(historyList);
-		// scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		// historyPanel.add(scrollPane, BorderLayout.CENTER);
 
 	}
 
@@ -295,9 +285,9 @@ public class GUIadvancedRepalcementPanel extends JPanel {
 		previousRMApanel.repaint();
 
 	}
-	
-	public void setRMADetail(JSONObject RMADetailJSON){
-		
+
+	public void setRMADetail(JSONObject RMADetailJSON) {
+
 		String rmaNumber = RMADetailJSON.get("rmaNumber").toString();
 		String rmaDate = RMADetailJSON.get("rmaDate").toString();
 		String rmaOrderNumber = RMADetailJSON.get("rmaOrderNumber").toString();
@@ -306,7 +296,6 @@ public class GUIadvancedRepalcementPanel extends JPanel {
 		String rmaShipTo = RMADetailJSON.get("rmaShipTo").toString();
 		String rmaTrackingNumber = RMADetailJSON.get("rmaTrackingNumber").toString();
 
-		
 		txtRMAnumber.setText(rmaNumber);
 		txtDate.setText(rmaDate);
 		txtOrderNumber.setText(rmaOrderNumber);
@@ -314,10 +303,10 @@ public class GUIadvancedRepalcementPanel extends JPanel {
 		txtBillTo.setText(rmaBillTo);
 		txtShipTo.setText(rmaShipTo);
 		txtTrackingNumber.setText(rmaTrackingNumber);
-		
-//		previousRMApanel.revalidate();
-//		previousRMApanel.repaint();
-		
+
+		// previousRMApanel.revalidate();
+		// previousRMApanel.repaint();
+
 	}
 
 	public void clearHistoryPanel() {
@@ -421,22 +410,22 @@ public class GUIadvancedRepalcementPanel extends JPanel {
 	}
 
 	public void setCompanyDetail(String address, String city, String zipCode, String phone, String email) {
-		
+
 		txtCompanyAddress.setText(address);
 		txtCompanyCity.setText(city);
 		txtCompanyZipCode.setText(zipCode);
 		txtCompanyPhone.setText(phone);
 		txtCompanyEmail.setText(email);
 	}
-	
-	public void clearCompanyDetail(){
-		
+
+	public void clearCompanyDetail() {
+
 		txtCompanyAddress.setText("");
 		txtCompanyCity.setText("");
 		txtCompanyZipCode.setText("");
 		txtCompanyPhone.setText("");
 		txtCompanyEmail.setText("");
-		
+
 	}
 
 	public JTable get_RMAitemTable() {
@@ -506,5 +495,11 @@ public class GUIadvancedRepalcementPanel extends JPanel {
 	public JTextField getTxtTrackingNumber() {
 		return txtTrackingNumber;
 	}
+
+	public JComboBox getItemComboBox() {
+		return itemComboBox;
+	}
+	
+	
 
 }
