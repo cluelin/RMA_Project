@@ -29,25 +29,25 @@ import javax.swing.text.JTextComponent;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
+import Default.Client;
 import Default.ServerInformation;
 
 public class AdvancedReplacementOperation implements ActionListener {
 
 	GUIadvancedRepalcementPanel guiAdvancedRepalcementPanel;
 
-	PrintStream printStream;
-	BufferedReader bufferedReader;
-	Socket client;
-
 	public AdvancedReplacementOperation() {
-		
-		guiAdvancedRepalcementPanel = GUIadvancedRepalcementPanel
-					.getGUIadvancedReplecementPanel();
 
+		// GUI 생성
+		guiAdvancedRepalcementPanel = GUIadvancedRepalcementPanel.getGUIadvancedReplecementPanel();
+
+		// GUI에 Action Listener 추가.
 		guiAdvancedRepalcementPanel.getSaveBtn().addActionListener(this);
 		guiAdvancedRepalcementPanel.getAttachFileBtn().addActionListener(this);
 
+		// Change Tab key function in GUI TextArea
 		setTabAdaptor();
+
 		setComboBoxListener();
 
 		// 클라이언트가 서버와 연결이 되면 제일 먼저 RMAnumber를 preserve해서 가지고 온다.
@@ -57,43 +57,14 @@ public class AdvancedReplacementOperation implements ActionListener {
 
 	private void setComboBoxListener() {
 
-		JComboBox siteName = guiAdvancedRepalcementPanel.getTxtSiteName();
-
-		if (siteName.getEditor().getEditorComponent() instanceof JTextComponent) {
-			JTextComponent siteNameComponent = (JTextComponent) siteName.getEditor().getEditorComponent();
-			siteNameComponent.getDocument().putProperty("owner", "siteName");
-			siteNameComponent.getDocument().addDocumentListener(new ComboBoxListener());
-
-			siteNameComponent.addFocusListener(new FocusListener() {
-
-				@Override
-
-				public void focusGained(FocusEvent arg0) {
-
-					if (siteNameComponent.getText().length() >= 0) {
-
-						siteName.setPopupVisible(true);
-
-					}
-
-				}
-
-				@Override
-
-				public void focusLost(FocusEvent arg0) {
-
-				}
-
-			});
-
-		}
+		ComboBoxListener comboBoxListener = new ComboBoxListener();
 
 		JComboBox companyName = guiAdvancedRepalcementPanel.getTxtCompanyName();
 
 		if (companyName.getEditor().getEditorComponent() instanceof JTextComponent) {
 			JTextComponent companyNameComponent = (JTextComponent) companyName.getEditor().getEditorComponent();
 			companyNameComponent.getDocument().putProperty("owner", "companyName");
-			companyNameComponent.getDocument().addDocumentListener(new ComboBoxListener());
+			companyNameComponent.getDocument().addDocumentListener(comboBoxListener);
 
 			companyNameComponent.addFocusListener(new FocusListener() {
 
@@ -119,12 +90,43 @@ public class AdvancedReplacementOperation implements ActionListener {
 
 		}
 
+		JComboBox siteName = guiAdvancedRepalcementPanel.getTxtSiteName();
+
+		if (siteName.getEditor().getEditorComponent() instanceof JTextComponent) {
+			JTextComponent siteNameComponent = (JTextComponent) siteName.getEditor().getEditorComponent();
+			siteNameComponent.getDocument().putProperty("owner", "siteName");
+			siteNameComponent.getDocument().addDocumentListener(comboBoxListener);
+
+			siteNameComponent.addFocusListener(new FocusListener() {
+
+				@Override
+
+				public void focusGained(FocusEvent arg0) {
+
+					if (siteNameComponent.getText().length() >= 0) {
+
+						siteName.setPopupVisible(true);
+
+					}
+
+				}
+
+				@Override
+
+				public void focusLost(FocusEvent arg0) {
+
+				}
+
+			});
+
+		}
+
 		JComboBox itemComboBox = guiAdvancedRepalcementPanel.getItemComboBox();
 
 		if (itemComboBox.getEditor().getEditorComponent() instanceof JTextComponent) {
 			JTextComponent itemNameComponent = (JTextComponent) itemComboBox.getEditor().getEditorComponent();
 			itemNameComponent.getDocument().putProperty("owner", "itemName");
-			itemNameComponent.getDocument().addDocumentListener(new ComboBoxListener());
+			itemNameComponent.getDocument().addDocumentListener(comboBoxListener);
 
 			itemNameComponent.addFocusListener(new FocusListener() {
 
@@ -180,67 +182,37 @@ public class AdvancedReplacementOperation implements ActionListener {
 	// rma number setting
 	private void getRMAindexFromDataBase() {
 
+		Client.connectServer();
+
+		System.out.println("RMA번호");
+
+		JSONObject obj = new JSONObject();
+		obj.put("Action", "requestRMAindex");
+
+		// send request to serever
+		Client.printStream.println(obj.toJSONString());
+
+		JSONParser jsonParser = new JSONParser();
+
 		try {
-			connectServer();
 
-			System.out.println("RMA번호");
+			// 받아온 RMA number 설정.
+			String input = Client.bufferedReader.readLine();
 
-			JSONObject obj = new JSONObject();
-			obj.put("Action", "requestRMAindex");
+			if (input != null) {
+				JSONObject jsonObject = (JSONObject) jsonParser.parse(input);
+				String RMAnumber = "DA" + jsonObject.get("RMAindex").toString();
+				System.out.println("RMA index : " + RMAnumber);
 
-			// send request to serever
-			printStream.println(obj.toJSONString());
+				guiAdvancedRepalcementPanel.getTxtRMAnumber().setText(RMAnumber);
 
-			JSONParser jsonParser = new JSONParser();
-
-			try {
-
-				// 받아온 RMA number 설정.
-				String input = bufferedReader.readLine();
-
-				if (input != null) {
-					JSONObject jsonObject = (JSONObject) jsonParser.parse(input);
-					String RMAnumber = "DA" + jsonObject.get("RMAindex").toString();
-					System.out.println("RMA index : " + RMAnumber);
-
-					guiAdvancedRepalcementPanel.getTxtRMAnumber().setText(RMAnumber);
-
-				}
-
-			} catch (Exception e) {
-				e.printStackTrace();
 			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.out.println("서버 연결 에러");
-			System.exit(0);
-		} finally {
-			closeConnection();
 		}
 
-	}
-
-	private void connectServer() throws Exception {
-
-		// 서버로 전송
-
-		System.out.println("Client : connecting...");
-		client = new Socket(ServerInformation.SERVER_IP, ServerInformation.SERVER_PORT);
-		System.out.println("Client : connected");
-		printStream = new PrintStream(client.getOutputStream());
-		bufferedReader = new BufferedReader(new InputStreamReader(client.getInputStream()));
-
-	}
-
-	private void closeConnection() {
-
-		try {
-			client.close();
-			System.out.println("Client : close");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		Client.closeConnection();
 
 	}
 
@@ -248,7 +220,7 @@ public class AdvancedReplacementOperation implements ActionListener {
 	private void saveRMAInformationToDatabase() {
 
 		try {
-			connectServer();
+			// Client.connectServer();
 
 			JSONObject obj = new JSONObject();
 
@@ -283,7 +255,7 @@ public class AdvancedReplacementOperation implements ActionListener {
 				obj.put("serialNumber" + i, guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 1));
 			}
 
-			printStream.println(obj.toJSONString());
+			Client.printStream.println(obj.toJSONString());
 			System.out.println("Update RMA 수행");
 
 		} catch (Exception e) {
@@ -291,7 +263,7 @@ public class AdvancedReplacementOperation implements ActionListener {
 			System.out.println("서버 연결 에러");
 			System.exit(0);
 		} finally {
-			closeConnection();
+			// Client.closeConnection();
 		}
 
 	}

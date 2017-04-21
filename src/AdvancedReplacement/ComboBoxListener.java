@@ -29,11 +29,7 @@ public class ComboBoxListener implements DocumentListener {
 
 	public ComboBoxListener() {
 
-		companyUpdate();
-
-		// guiAdvancedRepalcementPanel.getItemComboBox().requestFocus();
-
-		// itemUpdate();
+//		companyUpdate();
 
 	}
 
@@ -41,7 +37,7 @@ public class ComboBoxListener implements DocumentListener {
 	private void showPreviousRMAList(String targetName) {
 
 		try {
-			Client.connectServer();
+//			Client.connectServer();
 
 			guiAdvancedRepalcementPanel.clearHistoryPanel();
 
@@ -57,7 +53,7 @@ public class ComboBoxListener implements DocumentListener {
 				try {
 					String input = Client.bufferedReader.readLine();
 
-					if (input == null) {
+					if (input.equals("end")) {
 						break;
 					}
 
@@ -83,18 +79,18 @@ public class ComboBoxListener implements DocumentListener {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		} finally {
-			Client.closeConnection();
+//			Client.closeConnection();
 		}
 
 	}
 
-	// 서버로부터 siteName에 대한 정보를 검색해 가지고 옴.
+	// 서버로부터 siteName에 대한 정보를 검색해 가지고 와서 결과를 return.
 	private List<String> getSiteNameFromServer(String keyword, String companyName) {
 
 		List<String> resultArryList = null;
 
 		try {
-			Client.connectServer();
+//			Client.connectServer();
 
 			JSONObject obj = new JSONObject();
 
@@ -117,11 +113,13 @@ public class ComboBoxListener implements DocumentListener {
 
 					input = Client.bufferedReader.readLine();
 
-					if (input == null) {
+					if (input.equals("end")) {
 						break;
 					}
 
+					System.out.println("input : " + input);
 					JSONObject jsonObject = (JSONObject) jsonParser.parse(input);
+					
 
 					resultArryList.add(jsonObject.get("siteName").toString());
 
@@ -133,7 +131,7 @@ public class ComboBoxListener implements DocumentListener {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		} finally {
-			Client.closeConnection();
+//			Client.closeConnection();
 		}
 
 		return resultArryList;
@@ -146,7 +144,7 @@ public class ComboBoxListener implements DocumentListener {
 		ArrayList resultArryList = new ArrayList<String>();
 
 		try {
-			Client.connectServer();
+//			Client.connectServer();
 
 			JSONObject obj = new JSONObject();
 
@@ -165,7 +163,7 @@ public class ComboBoxListener implements DocumentListener {
 
 					input = Client.bufferedReader.readLine();
 
-					if (input == null) {
+					if (input.equals("end")) {
 						break;
 					}
 
@@ -187,18 +185,22 @@ public class ComboBoxListener implements DocumentListener {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		} finally {
-			Client.closeConnection();
+//			Client.closeConnection();
 		}
 
 		return resultArryList;
 
 	}
 
+	
+	//keyword 로 시작하는 Company Name을 가져오고.
+	//해당 company의 이전 RMA 내역을 조회한 결과를 return 한다. 
+	
 	private List<String> getCompanyNameFromServer(String keyword) {
 
 		List<String> resultArryList = null;
 		try {
-			Client.connectServer();
+//			Client.connectServer();
 
 			JSONObject obj = new JSONObject();
 
@@ -218,9 +220,11 @@ public class ComboBoxListener implements DocumentListener {
 
 				try {
 
+					System.out.println("company Name 입력 받기 전 ");
 					input = Client.bufferedReader.readLine();
 
-					if (input == null) {
+					System.out.println("company Name 입력 받기 후 ");
+					if (input.equals("end")) {
 						break;
 					}
 
@@ -236,7 +240,7 @@ public class ComboBoxListener implements DocumentListener {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		} finally {
-			Client.closeConnection();
+//			Client.closeConnection();
 		}
 
 		return resultArryList;
@@ -278,9 +282,9 @@ public class ComboBoxListener implements DocumentListener {
 			@Override
 
 			public void run() {
-
+				System.out.println("before showRecommendCompanyList");
 				showRecommendCompanyList();
-
+				System.out.println("after showRecommendCompanyList");
 			}
 
 		});
@@ -360,24 +364,20 @@ public class ComboBoxListener implements DocumentListener {
 
 			// 검색어와 일치하는 회사가 있을경우 정보를 가져옴.
 
-			try {
-				Client.connectServer();
+//			Client.connectServer();
+			System.out.println("in combobox listener");
 
-				JSONObject companyDetailObject = getCompanyDetail(targetName);
+			JSONObject companyDetailObject = getCompanyDetail(targetName);
 
-				String address = companyDetailObject.get("companyAddress").toString();
-				String city = companyDetailObject.get("companyCity").toString();
-				String zipCode = companyDetailObject.get("companyZipCode").toString();
-				String phone = companyDetailObject.get("companyPhone").toString();
-				String email = companyDetailObject.get("companyEmail").toString();
+			String address = companyDetailObject.get("companyAddress").toString();
+			String city = companyDetailObject.get("companyCity").toString();
+			String zipCode = companyDetailObject.get("companyZipCode").toString();
+			String phone = companyDetailObject.get("companyPhone").toString();
+			String email = companyDetailObject.get("companyEmail").toString();
 
-				guiAdvancedRepalcementPanel.setCompanyDetail(address, city, zipCode, phone, email);
-
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			} finally {
-				Client.closeConnection();
-			}
+			guiAdvancedRepalcementPanel.setCompanyDetail(address, city, zipCode, phone, email);
+			System.out.println("in combobox listener");
+//			Client.closeConnection();
 
 		}
 
@@ -450,10 +450,10 @@ public class ComboBoxListener implements DocumentListener {
 		JTextComponent textComponent = (JTextComponent) component;
 
 		String partialOfItemName = textComponent.getText();
-		
+
 		// Keyword Result list
 		List<String> founds = getItemNameFromServer(partialOfItemName);
-		
+
 		Set<String> foundSet = new HashSet<String>();
 
 		for (String temp : founds) {
@@ -479,17 +479,14 @@ public class ComboBoxListener implements DocumentListener {
 			boxModel.addElement(temp);
 
 		}
-		
-		
-//		owner.setEditable(false);
+
+		// owner.setEditable(false);
 
 		owner.setModel(boxModel);
 
-		
+		// owner.addPopupMenuListener(new ItemPopupListener(founds));
 
-//		owner.addPopupMenuListener(new ItemPopupListener(founds));
-
-		owner.setPopupVisible(true);
+		// owner.setPopupVisible(true);
 		owner.setEditable(true);
 		owner.requestFocus();
 

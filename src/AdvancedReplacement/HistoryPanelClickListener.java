@@ -55,7 +55,7 @@ public class HistoryPanelClickListener implements MouseListener {
 	private JSONObject getRMAdetailFromServer() {
 
 		try {
-			Client.connectServer();
+//			Client.connectServer();
 
 			JSONObject obj = new JSONObject();
 
@@ -84,7 +84,7 @@ public class HistoryPanelClickListener implements MouseListener {
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			Client.closeConnection();
+//			Client.closeConnection();
 		}
 
 		return null;

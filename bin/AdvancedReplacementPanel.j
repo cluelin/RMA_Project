@@ -1,5 +1,3 @@
-package AdvancedReplacement;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -8,44 +6,56 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.beans.Statement;
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.net.Socket;
+import java.nio.channels.FileChannel;
+import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
 
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 
-public class GUIadvancedRepalcementPanel extends JPanel {
+public class AdvancedReplacementPanel extends JPanel implements ActionListener {
 
 	private static String FILE_NAME = "ReplacementInformation.txt";
-	private static GUIadvancedRepalcementPanel instance = null;
 
 	private JTextField txtRMAnumber;
-	private JComboBox txtCompanyName;
+	private JTextField txtCompanyName;
 	private JTextField txtCompanyAddress;
 	private JTextField txtCompanyZipCode;
 	private JTextField txtCompanyEmail;
 	private JTextField txtDate;
-	private JComboBox txtSiteName;
+	private JTextField txtSiteName;
 	private JTextField txtCompanyCity;
 	private JTextField txtCompanyPhone;
 	private JTextField txtOrderNumber;
@@ -63,7 +73,7 @@ public class GUIadvancedRepalcementPanel extends JPanel {
 	private JLabel lblShipTo;
 	private JLabel label_5;
 
-	private JTextArea txtContents;
+	private JTextPane txtContents;
 	private JTextArea txtBillTo;
 	private JTextArea txtShipTo;
 
@@ -79,6 +89,7 @@ public class GUIadvancedRepalcementPanel extends JPanel {
 
 	private JPanel historyPanel;
 	private JLabel historyLabel;
+	private JList historyList;
 	private JPanel panel;
 	private JPanel panel_4;
 	private JButton attachFileBtn;
@@ -89,30 +100,28 @@ public class GUIadvancedRepalcementPanel extends JPanel {
 	PrintStream printStream;
 	BufferedReader bufferedReader;
 	Socket client;
-	private JLabel lblNewLabel;
-	private JScrollPane scrollPane;
-	private JPanel previousRMApanel;
-	private JPanel relatedRMAPanel;
-	private JPanel panel_3;
 
-	private JComboBox itemComboBox;
-	MyTableModel myTableModel;
-
-	private GUIadvancedRepalcementPanel() {
-		
-		String[] columnNames = { "Item Name", "Serial number", "Description", "Price" };
+	public AdvancedReplacementPanel() {
 
 		setLayout(new BorderLayout(0, 0));
 
-		// 확장성을 위한 Scroll Panel.
+		//확장성을 위한 Scroll Panel. 
 		advancedReplacementScrollPane = new JScrollPane(null);
 
-		// 실질적인 기능을 수행 하는 패널.
+		String[] columnNames = { "Item Name", "Serial number", "Description", "Price" };
+
+//		Object[][] data = { { "PM-COS4-U", "1", "Snowboarding", new Integer(5), new Boolean(false) },
+//				{ "PM-COS4-U", "2", "Rowing", new Integer(3), new Boolean(true) },
+//				{ "PM-HOS4-U", "3", "Knitting", new Integer(2), new Boolean(false) },
+//				{ "PM-COS4-U", "4", "Speed reading", new Integer(20), new Boolean(true) },
+//				{ "PM-HOS4-U", "5", "Pool", new Integer(10), new Boolean(false) } };
+
+		//실질적인 기능을 수행 하는 패널. 
 		advancedReplacementPanel = new JPanel();
 		advancedReplacementPanel.setBorder(new EmptyBorder(15, 15, 15, 15));
 
 		advancedReplacementScrollPane.setViewportView(advancedReplacementPanel);
-		// advancedReplacementPanel.setPreferredSize(new Dimension(697, 619));
+//		advancedReplacementPanel.setPreferredSize(new Dimension(697, 619));
 		advancedReplacementPanel.setLayout(new BorderLayout(0, 0));
 
 		companyInformationPanel = new JPanel();
@@ -136,9 +145,8 @@ public class GUIadvancedRepalcementPanel extends JPanel {
 		JLabel lblCompanyName = new JLabel("Company Name");
 		leftCompanyInformationPanel.add(lblCompanyName);
 
-		txtCompanyName = new JComboBox();
-		txtCompanyName.setEditable(true);
-
+		txtCompanyName = new JTextField();
+		txtCompanyName.setColumns(10);
 		leftCompanyInformationPanel.add(txtCompanyName);
 
 		JLabel label_2 = new JLabel("Address");
@@ -181,9 +189,8 @@ public class GUIadvancedRepalcementPanel extends JPanel {
 		label_17 = new JLabel("Site Name");
 		rightCompanyInformationPanel.add(label_17);
 
-		txtSiteName = new JComboBox<>();
-		txtSiteName.setEditable(true);
-
+		txtSiteName = new JTextField();
+		txtSiteName.setColumns(10);
 		rightCompanyInformationPanel.add(txtSiteName);
 
 		lblCity = new JLabel("City");
@@ -217,25 +224,14 @@ public class GUIadvancedRepalcementPanel extends JPanel {
 		_RMAitemInformationScrollPanel.setMaximumSize(new Dimension(100, 100));
 		itemAndOtherPanel.add(_RMAitemInformationScrollPanel, BorderLayout.NORTH);
 
-		myTableModel = new MyTableModel();
-//		DefaultTableModel myTableModel = new DefaultTableModel(5, columnNames.length);
-//		myTableModel.setColumnIdentifiers(columnNames);
 		
-
-		_RMAitemTable = new JTable(myTableModel);
+		DefaultTableModel defaultTableModel = new DefaultTableModel(5,columnNames.length);
+		defaultTableModel.setColumnIdentifiers(columnNames);
+		
+		_RMAitemTable = new JTable(defaultTableModel);
+		_RMAitemTable.setPreferredSize(new Dimension(0, 0));
+		_RMAitemTable.setPreferredScrollableViewportSize(new Dimension(0, 0));
 		_RMAitemTable.setRowHeight(50);
-		_RMAitemTable.setFillsViewportHeight(true);
-
-		TableColumn sportColumn = _RMAitemTable.getColumnModel().getColumn(0);
-
-		// Set up tool tips for the sport cells.
-		DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
-		sportColumn.setCellRenderer(renderer);
-
-		itemComboBox = new JComboBox();
-		itemComboBox.setEditable(true);
-		sportColumn.setCellEditor(new DefaultCellEditor(itemComboBox));
-
 		_RMAitemInformationScrollPanel.setViewportView(_RMAitemTable);
 
 		loadContentsPanel();
@@ -252,71 +248,39 @@ public class GUIadvancedRepalcementPanel extends JPanel {
 		historyPanel.add(historyLabel, BorderLayout.NORTH);
 		historyPanel.setBorder(BorderFactory.createLineBorder(Color.black));
 
-		previousRMApanel = new JPanel();
-		historyPanel.add(previousRMApanel, BorderLayout.CENTER);
-		previousRMApanel.setLayout(new BoxLayout(previousRMApanel, BoxLayout.PAGE_AXIS));
+		historyList = new JList();
+		historyList.setPreferredSize(new Dimension(200, 10));
+		historyPanel.add(historyList, BorderLayout.CENTER);
+
+		// RMA number seting.
+		connectServer();
+		getRMANumberFromDataBase();
+		closeConnection();
 
 	}
 
-	public static GUIadvancedRepalcementPanel getGUIadvancedReplecementPanel() {
-		if (instance == null) {
-			instance = new GUIadvancedRepalcementPanel();
+	
+	//rma number setting
+	private void getRMANumberFromDataBase() {
+
+		JSONObject obj = new JSONObject();
+		obj.put("Action", "requestRMANumber");
+
+		printStream.println(obj.toJSONString());
+
+		JSONParser jsonParser = new JSONParser();
+
+		try {
+			JSONObject jsonObject = (JSONObject) jsonParser.parse(bufferedReader.readLine());
+
+			System.out.println("RMA number : " + jsonObject.get("RMANumber").toString());
+
+			txtRMAnumber.setText(jsonObject.get("RMANumber").toString());
+
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		return instance;
 
-	}
-
-	public void setRelatedRMAInformation(String rmaNumber, String rmaDate, String rmaContents) {
-
-		System.out.println("history panel 세팅");
-		relatedRMAPanel = new JPanel();
-		relatedRMAPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
-		relatedRMAPanel.setMaximumSize(new Dimension(32767, 50));
-
-		relatedRMAPanel.add(new JLabel(rmaNumber));
-		relatedRMAPanel.add(new JLabel(rmaDate));
-		relatedRMAPanel.add(new JLabel(rmaContents));
-		relatedRMAPanel.addMouseListener(new HistoryPanelClickListener(rmaNumber));
-
-		System.out.println("rmaNumber : " + rmaNumber + " rmaContents : " + rmaContents);
-
-		previousRMApanel.add(relatedRMAPanel);
-
-		previousRMApanel.revalidate();
-		previousRMApanel.repaint();
-
-	}
-
-	public void setRMADetail(JSONObject RMADetailJSON) {
-
-		String rmaNumber = RMADetailJSON.get("rmaNumber").toString();
-		String rmaDate = RMADetailJSON.get("rmaDate").toString();
-		String rmaOrderNumber = RMADetailJSON.get("rmaOrderNumber").toString();
-		String rmaContents = RMADetailJSON.get("rmaContents").toString();
-		String rmaBillTo = RMADetailJSON.get("rmaBillTo").toString();
-		String rmaShipTo = RMADetailJSON.get("rmaShipTo").toString();
-		String rmaTrackingNumber = RMADetailJSON.get("rmaTrackingNumber").toString();
-
-		txtRMAnumber.setText(rmaNumber);
-		txtDate.setText(rmaDate);
-		txtOrderNumber.setText(rmaOrderNumber);
-		txtContents.setText(rmaContents);
-		txtBillTo.setText(rmaBillTo);
-		txtShipTo.setText(rmaShipTo);
-		txtTrackingNumber.setText(rmaTrackingNumber);
-
-		// previousRMApanel.revalidate();
-		// previousRMApanel.repaint();
-
-	}
-
-	public void clearHistoryPanel() {
-
-		System.out.println("clearHistoryPanel");
-		previousRMApanel.removeAll();
-
-		previousRMApanel.revalidate();
-		previousRMApanel.repaint();
 	}
 
 	private void loadContentsPanel() {
@@ -342,10 +306,9 @@ public class GUIadvancedRepalcementPanel extends JPanel {
 		rmaContentsAndShipToPanel.add(_RMAcontentsPanel, gbc__RMAcontentsPanel);
 		_RMAcontentsPanel.setLayout(new BorderLayout(0, 0));
 
-		txtContents = new JTextArea();
+		txtContents = new JTextPane();
 		_RMAcontentsPanel.add(txtContents, BorderLayout.CENTER);
-		// txtContents.setPreferredSize(new Dimension(10, 100));
-		txtContents.setLineWrap(true);
+		txtContents.setPreferredSize(new Dimension(10, 100));
 
 		label_5 = new JLabel("Contents");
 		_RMAcontentsPanel.add(label_5, BorderLayout.NORTH);
@@ -363,7 +326,6 @@ public class GUIadvancedRepalcementPanel extends JPanel {
 		_RMAbillTo.setLayout(new BorderLayout(0, 0));
 
 		txtBillTo = new JTextArea();
-		txtBillTo.setLineWrap(true);
 		_RMAbillTo.add(txtBillTo, BorderLayout.CENTER);
 
 		lblBillTo = new JLabel("Bill to");
@@ -384,125 +346,334 @@ public class GUIadvancedRepalcementPanel extends JPanel {
 
 		txtShipTo = new JTextArea();
 		_RMAshipTo.add(txtShipTo, BorderLayout.CENTER);
-		txtShipTo.setLineWrap(true);
 
 		panel_4 = new JPanel();
 		panel.add(panel_4, BorderLayout.SOUTH);
 		panel_4.setLayout(new BorderLayout(0, 0));
 
 		attachFileBtn = new JButton("Attach File");
-
+		attachFileBtn.addActionListener(this);
 		panel_4.add(attachFileBtn, BorderLayout.WEST);
 
 		SaveBtn = new JButton("save");
-
+		SaveBtn.addActionListener(this);
 		panel_4.add(SaveBtn, BorderLayout.EAST);
 
 		panel_5 = new JPanel();
 		panel_4.add(panel_5, BorderLayout.CENTER);
 		panel_5.setLayout(new FlowLayout(FlowLayout.RIGHT));
 
-		lblNewLabel = new JLabel("Tracking Number");
-		panel_5.add(lblNewLabel);
-
 		txtTrackingNumber = new JTextField();
 		panel_5.add(txtTrackingNumber);
 		txtTrackingNumber.setColumns(20);
 	}
 
-	public void setCompanyDetail(String address, String city, String zipCode, String phone, String email) {
+	private void connectServer() {
 
-		txtCompanyAddress.setText(address);
-		txtCompanyCity.setText(city);
-		txtCompanyZipCode.setText(zipCode);
-		txtCompanyPhone.setText(phone);
-		txtCompanyEmail.setText(email);
+		// 서버로 전송
+		try {
+
+			System.out.println("Client : connecting...");
+			client = new Socket(ServerInformation.SERVER_IP, ServerInformation.SERVER_PORT);
+			System.out.println("Client : connected");
+
+			try {
+
+				printStream = new PrintStream(client.getOutputStream());
+				bufferedReader = new BufferedReader(new InputStreamReader(client.getInputStream()));
+
+			} catch (Exception e) {
+				e.printStackTrace();
+			} finally {
+
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+
+		}
+
 	}
 
-	public void clearCompanyDetail() {
+	private void closeConnection() {
 
-		txtCompanyAddress.setText("");
-		txtCompanyCity.setText("");
-		txtCompanyZipCode.setText("");
-		txtCompanyPhone.setText("");
-		txtCompanyEmail.setText("");
+		try {
+			client.close();
+			System.out.println("Client : close");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 	}
 
-	public JTable get_RMAitemTable() {
-		return _RMAitemTable;
+	private void saveFile() {
+
+		try {
+			File file = new File(FILE_NAME);
+			BufferedWriter fileWriter = new BufferedWriter(new FileWriter(file, true));
+
+			// 모든필드 내보내기.
+			fileWriter.write(txtTrackingNumber.getText());
+
+			fileWriter.flush();
+			fileWriter.close();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 	}
 
-	public JButton getAttachFileBtn() {
-		return attachFileBtn;
+	// save RMA Information To Database
+	private void saveRMAInformation() {
+
+		JSONObject obj = new JSONObject();
+
+		obj.put("Action", "requestSaveRMAData");
+
+		obj.put("companyName", txtCompanyName.getText());
+		obj.put("companyAddress", txtCompanyAddress.getText());
+		obj.put("companyCity", txtCompanyCity.getText());
+		obj.put("companyZipCode", txtCompanyZipCode.getText());
+		obj.put("companyPhone", txtCompanyPhone.getText());
+		obj.put("companyEmail", txtCompanyEmail.getText());
+		obj.put("companySiteName", txtSiteName.getText());
+		
+		System.out.println("0,0 : " + _RMAitemTable.getValueAt(0, 0));
+
+		obj.put("rmaNumber", txtRMAnumber.getText());
+		obj.put("rmaDate", txtDate.getText());
+		obj.put("rmaOrderNumber", txtOrderNumber.getText());
+		obj.put("rmaContents", txtContents.getText());
+		obj.put("rmaBillTo", txtBillTo.getText());
+		obj.put("rmaShipTo", txtShipTo.getText());
+		obj.put("rmaTrackingNumber", txtTrackingNumber.getText());
+
+		System.out.println("rmaContents " + txtContents.getText());
+		System.out.println("rmaBillTo " + txtBillTo.getText());
+		System.out.println("rmaShipTo " + txtShipTo.getText());
+		System.out.println("rmaTrackingNumber " + txtTrackingNumber.getText());
+		
+		
+		obj.put("itemCount", _RMAitemTable.getRowCount());
+		
+		for(int i = 0 ; i < _RMAitemTable.getRowCount() ; i++){
+			obj.put("itemName" + i, _RMAitemTable.getValueAt(i, 0));
+			obj.put("serialNumber" + i, _RMAitemTable.getValueAt(i, 1));
+		}
+
+		printStream.println(obj.toJSONString());
+
 	}
 
-	public JButton getSaveBtn() {
-		return SaveBtn;
+	@Override
+	public void actionPerformed(ActionEvent e) {
+
+		if (e.getSource() == SaveBtn) {
+			// save 버튼
+			connectServer();
+			saveRMAInformation();
+			closeConnection();
+			connectServer();
+			getRMANumberFromDataBase();
+			closeConnection();
+
+		} else if (e.getSource() == attachFileBtn) {
+
+			// 파일 첨부 버튼
+			JFileChooser jFileChooser = new JFileChooser();
+			int returnVal = jFileChooser.showOpenDialog(null);
+			if (returnVal == JFileChooser.APPROVE_OPTION) {
+				System.out.println("You chose to open this file: " + jFileChooser.getSelectedFile().getName());
+				File selectedFile = jFileChooser.getSelectedFile();
+				// selectedFile.renameTo(new File("copiedFIle." +
+				// getFileExtension(selectedFile)));
+				copyFile(selectedFile);
+
+			}
+		}
+
 	}
+
+	// Copy selected File to Default Location With Same File name.
+	private void copyFile(File orignalFile) {
+
+		try {
+			FileInputStream fileInputStream = new FileInputStream(orignalFile);
+			FileOutputStream fileOutputStream = new FileOutputStream(new File(orignalFile.getName()));
+
+			// using FileChannel improve performance
+			FileChannel fileChannelIn = fileInputStream.getChannel();
+			FileChannel fileChannelOut = fileOutputStream.getChannel();
+
+			long size = fileChannelIn.size();
+			fileChannelIn.transferTo(0, size, fileChannelOut);
+
+			fileChannelOut.close();
+			fileChannelIn.close();
+
+			fileOutputStream.close();
+			fileInputStream.close();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	// get given File's extension
+	private static String getFileExtension(File file) {
+
+		String fileName = file.getName();
+		if (fileName.lastIndexOf(".") != -1 && fileName.lastIndexOf(".") != 0)
+			return fileName.substring(fileName.lastIndexOf(".") + 1);
+		else
+			return "";
+	}
+
 
 	public JTextField getTxtRMAnumber() {
 		return txtRMAnumber;
 	}
 
-	public JComboBox getTxtCompanyName() {
+
+	public void setTxtRMAnumber(JTextField txtRMAnumber) {
+		this.txtRMAnumber = txtRMAnumber;
+	}
+
+
+	public JTextField getTxtCompanyName() {
 		return txtCompanyName;
 	}
+
+
+	public void setTxtCompanyName(JTextField txtCompanyName) {
+		this.txtCompanyName = txtCompanyName;
+	}
+
 
 	public JTextField getTxtCompanyAddress() {
 		return txtCompanyAddress;
 	}
 
+
+	public void setTxtCompanyAddress(JTextField txtCompanyAddress) {
+		this.txtCompanyAddress = txtCompanyAddress;
+	}
+
+
 	public JTextField getTxtCompanyZipCode() {
 		return txtCompanyZipCode;
 	}
+
+
+	public void setTxtCompanyZipCode(JTextField txtCompanyZipCode) {
+		this.txtCompanyZipCode = txtCompanyZipCode;
+	}
+
 
 	public JTextField getTxtCompanyEmail() {
 		return txtCompanyEmail;
 	}
 
+
+	public void setTxtCompanyEmail(JTextField txtCompanyEmail) {
+		this.txtCompanyEmail = txtCompanyEmail;
+	}
+
+
 	public JTextField getTxtDate() {
 		return txtDate;
 	}
 
-	public JComboBox getTxtSiteName() {
+
+	public void setTxtDate(JTextField txtDate) {
+		this.txtDate = txtDate;
+	}
+
+
+	public JTextField getTxtSiteName() {
 		return txtSiteName;
 	}
+
+
+	public void setTxtSiteName(JTextField txtSiteName) {
+		this.txtSiteName = txtSiteName;
+	}
+
 
 	public JTextField getTxtCompanyCity() {
 		return txtCompanyCity;
 	}
 
+
+	public void setTxtCompanyCity(JTextField txtCompanyCity) {
+		this.txtCompanyCity = txtCompanyCity;
+	}
+
+
 	public JTextField getTxtCompanyPhone() {
 		return txtCompanyPhone;
 	}
+
+
+	public void setTxtCompanyPhone(JTextField txtCompanyPhone) {
+		this.txtCompanyPhone = txtCompanyPhone;
+	}
+
 
 	public JTextField getTxtOrderNumber() {
 		return txtOrderNumber;
 	}
 
-	public JTextArea getTxtContents() {
+
+	public void setTxtOrderNumber(JTextField txtOrderNumber) {
+		this.txtOrderNumber = txtOrderNumber;
+	}
+
+
+	public JTextPane getTxtContents() {
 		return txtContents;
 	}
+
+
+	public void setTxtContents(JTextPane txtContents) {
+		this.txtContents = txtContents;
+	}
+
 
 	public JTextArea getTxtBillTo() {
 		return txtBillTo;
 	}
 
+
+	public void setTxtBillTo(JTextArea txtBillTo) {
+		this.txtBillTo = txtBillTo;
+	}
+
+
 	public JTextArea getTxtShipTo() {
 		return txtShipTo;
 	}
+
+
+	public void setTxtShipTo(JTextArea txtShipTo) {
+		this.txtShipTo = txtShipTo;
+	}
+
 
 	public JTextField getTxtTrackingNumber() {
 		return txtTrackingNumber;
 	}
 
-	public JComboBox getItemComboBox() {
-		return itemComboBox;
+
+	public void setTxtTrackingNumber(JTextField txtTrackingNumber) {
+		this.txtTrackingNumber = txtTrackingNumber;
 	}
 	
-	public MyTableModel getTableModel(){
-		return myTableModel;
-	}
+	
+	
+	
 
 }

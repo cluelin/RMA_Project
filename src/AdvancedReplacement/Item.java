@@ -7,6 +7,10 @@ public class Item {
 	String itemDescription;
 	Integer itemPrice;
 	
+	public Item(){
+		
+	}
+	
 	public Item(Integer itemCode,  String itemName, String itemDescription, Integer itemPrice){
 		this.itemCode = itemCode;
 		this.itemName = itemName;
@@ -29,5 +33,23 @@ public class Item {
 	public Integer getItemPrice() {
 		return itemPrice;
 	}
+
+	public void setItemCode(Integer itemCode) {
+		this.itemCode = itemCode;
+	}
+
+	public void setItemName(String itemName) {
+		this.itemName = itemName;
+	}
+
+	public void setItemDescription(String itemDescription) {
+		this.itemDescription = itemDescription;
+	}
+
+	public void setItemPrice(Integer itemPrice) {
+		this.itemPrice = itemPrice;
+	}
+	
+	
 
 }
