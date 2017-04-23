@@ -105,6 +105,13 @@ public class MainThread extends JFrame {
 	}
 
 	public static void main(String[] args) {
+		
+		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+		    public void run() {
+		    	System.out.println("종료 이벤트");
+		    	Client.closeConnection();
+		    }
+		}));
 
 		MainThread layout = getMainThread();
 		

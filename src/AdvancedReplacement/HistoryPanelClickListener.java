@@ -25,6 +25,7 @@ public class HistoryPanelClickListener implements MouseListener {
 
 		JSONObject RMADetailJSON = getRMAdetailFromServer();
 
+		//set RMA information on GUI. 
 		GUIadvancedRepalcementPanel.getGUIadvancedReplecementPanel().setRMADetail(RMADetailJSON);
 	}
 
@@ -52,39 +53,33 @@ public class HistoryPanelClickListener implements MouseListener {
 
 	}
 
+	// 2017.04.21
+	// get all of RMA information from server
+	// and Return that information
 	private JSONObject getRMAdetailFromServer() {
 
+		JSONObject obj = new JSONObject();
+
+		obj.put("Action", "requestRMADetail");
+
+		obj.put("rmaNumber", rmaNumber);
+
+		Client.printStream.println(obj.toJSONString());
+
+		JSONParser jsonParser = new JSONParser();
+
+		String input;
+
 		try {
-//			Client.connectServer();
 
-			JSONObject obj = new JSONObject();
+			input = Client.bufferedReader.readLine();
 
-			obj.put("Action", "requestRMADetail");
+			JSONObject RMADetailObject = (JSONObject) jsonParser.parse(input);
 
-			obj.put("rmaNumber", rmaNumber);
+			return RMADetailObject;
 
-			Client.printStream.println(obj.toJSONString());
-
-			JSONParser jsonParser = new JSONParser();
-
-			String input;
-
-			try {
-
-				input = Client.bufferedReader.readLine();
-
-				JSONObject RMADetailObject = (JSONObject) jsonParser.parse(input);
-
-				return RMADetailObject;
-
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-//			Client.closeConnection();
+		} catch (Exception ex) {
+			ex.printStackTrace();
 		}
 
 		return null;

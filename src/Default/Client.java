@@ -45,12 +45,12 @@ public class Client extends Thread {
 
 	public static void closeConnection() {
 
-//		try {
-//			client.close();
-//			System.out.println("Client : close");
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
+		try {
+			client.close();
+			System.out.println("Client : close");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 	}
 
