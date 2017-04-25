@@ -262,7 +262,7 @@ public class GUIadvancedRepalcementPanel extends JPanel {
 
 	}
 
-	public static GUIadvancedRepalcementPanel getGUIadvancedReplecementPanel() {
+	public static GUIadvancedRepalcementPanel getInstance() {
 		if (instance == null) {
 			instance = new GUIadvancedRepalcementPanel();
 		}

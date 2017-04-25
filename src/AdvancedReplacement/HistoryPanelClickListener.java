@@ -6,6 +6,7 @@ import java.awt.event.MouseListener;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
+import Communication.Communication;
 import Default.ConnectionSocket;
 
 public class HistoryPanelClickListener implements MouseListener {
@@ -23,10 +24,10 @@ public class HistoryPanelClickListener implements MouseListener {
 		// TODO Auto-generated method stub
 		System.out.println("마우스 클릭됨 : " + rmaNumber);
 
-		JSONObject RMADetailJSON = getRMAdetailFromServer();
+		JSONObject RMADetailJSON = Communication.getInstance().getRMAdetailFromServer(rmaNumber);
 
 		//set RMA information on GUI. 
-		GUIadvancedRepalcementPanel.getGUIadvancedReplecementPanel().setRMADetail(RMADetailJSON);
+		GUIadvancedRepalcementPanel.getInstance().setRMADetail(RMADetailJSON);
 	}
 
 	@Override
@@ -53,36 +54,6 @@ public class HistoryPanelClickListener implements MouseListener {
 
 	}
 
-	// 2017.04.21
-	// get all of RMA information from server
-	// and Return that information
-	private JSONObject getRMAdetailFromServer() {
-
-		JSONObject obj = new JSONObject();
-
-		obj.put("Action", "requestRMADetail");
-
-		obj.put("rmaNumber", rmaNumber);
-
-		ConnectionSocket.printStream.println(obj.toJSONString());
-
-		JSONParser jsonParser = new JSONParser();
-
-		String input;
-
-		try {
-
-			input = ConnectionSocket.bufferedReader.readLine();
-
-			JSONObject RMADetailObject = (JSONObject) jsonParser.parse(input);
-
-			return RMADetailObject;
-
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-
-		return null;
-	}
+	
 
 }

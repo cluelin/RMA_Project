@@ -20,255 +20,20 @@ import javax.swing.text.JTextComponent;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
+import Communication.Communication;
 import Default.ConnectionSocket;
 
 public class ComboBoxListener implements DocumentListener {
 
-	GUIadvancedRepalcementPanel guiAdvancedRepalcementPanel = GUIadvancedRepalcementPanel
-			.getGUIadvancedReplecementPanel();
+	GUIadvancedRepalcementPanel guiAdvancedRepalcementPanel = GUIadvancedRepalcementPanel.getInstance();
 
 	public ComboBoxListener() {
 
-//		companyUpdate();
+		// companyUpdate();
 
 	}
 
-	// CompanyName으로 검색해서 해당 company에서 신청한 RMA를 검색해서 뿌려줌.
-	private void showPreviousRMAList(String targetName) {
 
-		try {
-
-			guiAdvancedRepalcementPanel.clearHistoryPanel();
-
-			JSONObject obj = new JSONObject();
-
-			obj.put("Action", "requestSearchRelatedRMA");
-			obj.put("companyName", targetName);
-
-			ConnectionSocket.printStream.println(obj.toJSONString());
-
-			while (true) {
-
-				try {
-					String input = ConnectionSocket.bufferedReader.readLine();
-
-					if (input.equals("end")) {
-						break;
-					}
-
-					JSONParser jsonParser = new JSONParser();
-
-					JSONObject jsonObject = (JSONObject) jsonParser.parse(input);
-
-					String rmaNumber = jsonObject.get("RMAnumber").toString();
-					String rmaDate = jsonObject.get("RMAdate").toString();
-					String rmaContents = jsonObject.get("RMAcontents").toString();
-
-					// history panel에 결과 출력.
-					guiAdvancedRepalcementPanel.setRelatedRMAInformation(rmaNumber, rmaDate, rmaContents);
-
-					System.out.println("rmaNumber : " + rmaNumber + " rmaContents : " + rmaContents);
-
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-
-			}
-
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		} finally {
-		}
-
-	}
-
-	// 서버로부터 siteName에 대한 정보를 검색해 가지고 와서 결과를 return.
-	private List<String> getSiteNameFromServer(String keyword, String companyName) {
-
-		List<String> resultArryList = null;
-
-		try {
-
-			JSONObject obj = new JSONObject();
-
-			obj.put("Action", "requestSiteName");
-
-			obj.put("companyName", companyName);
-			obj.put("siteName", keyword);
-
-			ConnectionSocket.printStream.println(obj.toJSONString());
-
-			JSONParser jsonParser = new JSONParser();
-
-			String input;
-
-			resultArryList = new ArrayList<>();
-
-			while (true) {
-
-				try {
-
-					input = ConnectionSocket.bufferedReader.readLine();
-
-					if (input.equals("end") || input == null) {
-						break;
-					}
-
-					System.out.println("input : " + input);
-					JSONObject jsonObject = (JSONObject) jsonParser.parse(input);
-					
-
-					resultArryList.add(jsonObject.get("siteName").toString());
-
-				} catch (Exception ex) {
-					ex.printStackTrace();
-				}
-			}
-
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		} finally {
-		}
-
-		return resultArryList;
-
-	}
-
-	// 서버로 부터 keyword에 해당하는 Item 검색
-	private List<String> getItemNameFromServer(String keyword) {
-
-		ArrayList resultArryList = new ArrayList<String>();
-
-		try {
-//			Client.connectServer();
-
-			JSONObject obj = new JSONObject();
-
-			obj.put("Action", "requestItemName");
-			obj.put("itemName", keyword);
-
-			ConnectionSocket.printStream.println(obj.toJSONString());
-
-			JSONParser jsonParser = new JSONParser();
-
-			String input;
-
-			while (true) {
-
-				try {
-
-					input = ConnectionSocket.bufferedReader.readLine();
-
-					if (input.equals("end")) {
-						break;
-					}
-
-					JSONObject jsonObject = (JSONObject) jsonParser.parse(input);
-
-					// Integer itemCode =
-					// Integer.parseInt(jsonObject.get("itemCode").toString());
-					String itemName = jsonObject.get("itemName").toString();
-					String itemDescription = jsonObject.get("itemDescription").toString();
-					Integer itemPrice = Integer.parseInt(jsonObject.get("itemPrice").toString());
-
-					resultArryList.add(itemName);
-
-				} catch (Exception ex) {
-					ex.printStackTrace();
-				}
-			}
-
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		} finally {
-//			Client.closeConnection();
-		}
-
-		return resultArryList;
-
-	}
-
-	
-	//keyword 로 시작하는 Company Name을 가져오고.
-	//해당 company의 이전 RMA 내역을 조회한 결과를 return 한다. 
-	
-	private List<String> getCompanyNameFromServer(String keyword) {
-
-		List<String> resultArryList = null;
-		try {
-
-			JSONObject obj = new JSONObject();
-
-			obj.put("Action", "requestCompanyName");
-
-			obj.put("companyName", keyword);
-
-			ConnectionSocket.printStream.println(obj.toJSONString());
-
-			JSONParser jsonParser = new JSONParser();
-
-			String input;
-
-			resultArryList = new ArrayList<>();
-
-			while (true) {
-
-				try {
-
-					System.out.println("company Name 입력 받기 전 ");
-					input = ConnectionSocket.bufferedReader.readLine();
-
-					System.out.println("input : " + input);
-					System.out.println("company Name 입력 받기 후 ");
-					if (input.equals("end") || input == null) {
-						break;
-					}
-
-					JSONObject jsonObject = (JSONObject) jsonParser.parse(input);
-
-					resultArryList.add(jsonObject.get("companyName").toString());
-
-				} catch (Exception ex) {
-					ex.printStackTrace();
-				}
-			}
-
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		} finally {
-		}
-
-		return resultArryList;
-	}
-
-	private JSONObject getCompanyDetail(String companyName) {
-
-		JSONObject sendJSONobj = new JSONObject();
-
-		sendJSONobj.put("Action", "requestCompanyDetail");
-
-		sendJSONobj.put("companyName", companyName);
-
-		ConnectionSocket.printStream.println(sendJSONobj.toJSONString());
-
-		JSONParser jsonParser = new JSONParser();
-
-		String input;
-
-		try {
-
-			input = ConnectionSocket.bufferedReader.readLine();
-
-			JSONObject companyDetailObject = (JSONObject) jsonParser.parse(input);
-
-			return companyDetailObject;
-
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-
-		return null;
-	}
 
 	private void companyUpdate() {
 
@@ -326,13 +91,18 @@ public class ComboBoxListener implements DocumentListener {
 		JTextComponent textComponent = (JTextComponent) component;
 
 		String targetName = textComponent.getText();
+		
+		System.out.println("targetName : " + targetName);
 
 		// 현재 입력창에 입력된 값(targetName)을 기준으로 추천단어를 검색해서 리스트에 등록.
-		List<String> targetList = getCompanyNameFromServer(targetName);
+		List<String> targetList = Communication.getInstance().getCompanyNameListFromServer(targetName);
 
 		// targetName과 같은 회사의 이전 RMA정보를 출력.
-		showPreviousRMAList(targetName);
+		System.out.println("previousRMAList 출력전");
+		Communication.getInstance().showPreviousRMAList(targetName);
 
+		System.out.println("previousRMAList 출력후");
+		
 		Set<String> foundSet = new HashSet<String>();
 
 		for (String temp : targetList) {
@@ -361,7 +131,7 @@ public class ComboBoxListener implements DocumentListener {
 
 			System.out.println("before getcompany Detail in showRecommendCompanyList");
 
-			JSONObject companyDetailObject = getCompanyDetail(targetName);
+			JSONObject companyDetailObject = Communication.getInstance().getCompanyDetailJSON(targetName);
 
 			String address = companyDetailObject.get("companyAddress").toString();
 			String city = companyDetailObject.get("companyCity").toString();
@@ -381,9 +151,9 @@ public class ComboBoxListener implements DocumentListener {
 		}
 
 		System.out.println("before showRecommendSiteList");
-		
+
 		showRecommendSiteList();
-		
+
 		System.out.println("after showRecommendSiteList");
 
 		owner.setPopupVisible(true);
@@ -402,12 +172,12 @@ public class ComboBoxListener implements DocumentListener {
 		String siteName = textComponent.getText();
 
 		System.out.println("before getSiteNameFromServer");
-		
-		List<String> founds = getSiteNameFromServer(siteName,
+
+		List<String> founds = Communication.getInstance().getSiteNameListFromServer(siteName,
 				guiAdvancedRepalcementPanel.getTxtCompanyName().getEditor().getItem().toString());
-		
+
 		System.out.println("after getSiteNameFromServer");
-		
+
 		Set<String> foundSet = new HashSet<String>();
 
 		for (String s : founds) {
@@ -453,7 +223,7 @@ public class ComboBoxListener implements DocumentListener {
 		String partialOfItemName = textComponent.getText();
 
 		// Keyword Result list
-		List<String> founds = getItemNameFromServer(partialOfItemName);
+		List<String> founds = Communication.getInstance().getItemNameFromServer(partialOfItemName);
 
 		Set<String> foundSet = new HashSet<String>();
 

@@ -26,7 +26,7 @@ public class ItemPopupListener implements PopupMenuListener {
 	public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
 		// TODO Auto-generated method stub
 
-		JComboBox owner = GUIadvancedRepalcementPanel.getGUIadvancedReplecementPanel().getItemComboBox();
+		JComboBox owner = GUIadvancedRepalcementPanel.getInstance().getItemComboBox();
 		Component component = owner.getEditor().getEditorComponent();
 		JTextComponent textComponent = (JTextComponent) component;
 

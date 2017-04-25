@@ -17,9 +17,8 @@ import Default.ConnectionSocket;
 
 public class AdvancedReplacementOperation {
 
-	static GUIadvancedRepalcementPanel guiAdvancedRepalcementPanel = GUIadvancedRepalcementPanel
-			.getGUIadvancedReplecementPanel();
-	
+	static GUIadvancedRepalcementPanel guiAdvancedRepalcementPanel = GUIadvancedRepalcementPanel.getInstance();
+
 	Communication commnunication = Communication.getInstance();
 
 	public static AdvancedReplacementOperation instance = null;
@@ -28,9 +27,8 @@ public class AdvancedReplacementOperation {
 
 	private AdvancedReplacementOperation() {
 
-		
 		SaveBtnListener saveBtnListener = new SaveBtnListener();
-		
+
 		// GUI에 Action Listener 추가.
 		guiAdvancedRepalcementPanel.getSaveBtn().addActionListener(saveBtnListener);
 		guiAdvancedRepalcementPanel.getAttachFileBtn().addActionListener(saveBtnListener);
@@ -56,35 +54,16 @@ public class AdvancedReplacementOperation {
 	}
 
 	public void clearField() {
-		
+
 		String rmaNumber = guiAdvancedRepalcementPanel.getTxtRMAnumber().getText().toString();
-		
-		JSONObject objToServer = new JSONObject();
-		objToServer.put("Action", "checkRMAnumber");
-		objToServer.put("rmaNumber", rmaNumber);
 
-		ConnectionSocket.printStream.println(objToServer.toJSONString());
-		
-		try {
+		boolean rmaNumberAlreadyUsed = Communication.getInstance().rmaNumberAlreadyUsed(rmaNumber);
 
-			// 받아온 RMA number 설정.
-			String input = ConnectionSocket.bufferedReader.readLine();
-
-			if (input != null) {
-				JSONObject jsonObject = (JSONObject) jsonParser.parse(input);
-				boolean rmaNumberAlreadyUsed = (boolean)jsonObject.get("rmaNumberAlreadyUsed");
-
-				if(rmaNumberAlreadyUsed){
-					rmaNumber = commnunication.getRMAnumberFromServer();
-					guiAdvancedRepalcementPanel.getTxtRMAnumber().setText(rmaNumber);
-				}
-			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
+		if (rmaNumberAlreadyUsed) {
+			rmaNumber = commnunication.getRMAnumberFromServer();
+			guiAdvancedRepalcementPanel.getTxtRMAnumber().setText(rmaNumber);
 		}
-		
-		
+
 		guiAdvancedRepalcementPanel.getTxtCompanyName().setSelectedItem("");
 		guiAdvancedRepalcementPanel.getTxtSiteName().setSelectedItem("");
 		guiAdvancedRepalcementPanel.clearCompanyDetail();
@@ -222,39 +201,87 @@ public class AdvancedReplacementOperation {
 		return guiAdvancedRepalcementPanel;
 	}
 
-//	// get RMA number from Server
-//	public String getRMAnumberFromServer() {
-//
-//		String rmaNumber = null;
-//
-//		JSONObject obj = new JSONObject();
-//		obj.put("Action", "requestRMAindex");
-//
-//		// send request to serever
-//		ConnectionSocket.printStream.println(obj.toJSONString());
-//
-//		try {
-//
-//			// 받아온 RMA number 설정.
-//			String input = ConnectionSocket.bufferedReader.readLine();
-//
-//			if (input != null) {
-//				JSONObject jsonObject = (JSONObject) jsonParser.parse(input);
-//				rmaNumber = "DA" + jsonObject.get("RMAindex").toString();
-//				System.out.println("RMA index : " + rmaNumber);
-//
-//			}
-//
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//
-//		return rmaNumber;
-//
-//	}
+	// get RMA number from Server
+	// public String getRMAnumberFromServer() {
+	//
+	// String rmaNumber = null;
+	//
+	// JSONObject obj = new JSONObject();
+	// obj.put("Action", "requestRMAindex");
+	//
+	// // send request to serever
+	// ConnectionSocket.printStream.println(obj.toJSONString());
+	//
+	// try {
+	//
+	// // 받아온 RMA number 설정.
+	// String input = ConnectionSocket.bufferedReader.readLine();
+	//
+	// if (input != null) {
+	// JSONObject jsonObject = (JSONObject) jsonParser.parse(input);
+	// rmaNumber = "DA" + jsonObject.get("RMAindex").toString();
+	// System.out.println("RMA index : " + rmaNumber);
+	//
+	// }
+	//
+	// } catch (Exception e) {
+	// e.printStackTrace();
+	// }
+	//
+	// return rmaNumber;
+	//
+	// }
 
 	public void setRMAnumber(String rmaNumber) {
 		guiAdvancedRepalcementPanel.getTxtRMAnumber().setText(rmaNumber);
 	}
 
+	
+
+	public void saveRMAdetailToServer(){
+		JSONObject objectToServer = new JSONObject();
+
+		objectToServer.put("Action", "requestSaveRMAData");
+
+		// company detail information.
+		objectToServer.put("companyName",
+				guiAdvancedRepalcementPanel.getTxtCompanyName().getEditor().getItem().toString());
+		objectToServer.put("companyAddress", guiAdvancedRepalcementPanel.getTxtCompanyAddress().getText());
+		objectToServer.put("companyCity", guiAdvancedRepalcementPanel.getTxtCompanyCity().getText());
+		objectToServer.put("companyZipCode", guiAdvancedRepalcementPanel.getTxtCompanyZipCode().getText());
+		objectToServer.put("companyPhone", guiAdvancedRepalcementPanel.getTxtCompanyPhone().getText());
+		objectToServer.put("companyEmail", guiAdvancedRepalcementPanel.getTxtCompanyEmail().getText());
+
+		// company에 종속적. 없으면 추가해야함.
+		objectToServer.put("siteName",
+				guiAdvancedRepalcementPanel.getTxtSiteName().getEditor().getItem().toString());
+
+		// Item information
+		System.out.println("0,0 : " + guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(0, 0));
+		System.out.println("itemCount : " + guiAdvancedRepalcementPanel.get_RMAitemTable().getRowCount());
+		// RMA ITEM TABLE 저장
+		objectToServer.put("itemCount", guiAdvancedRepalcementPanel.get_RMAitemTable().getRowCount());
+
+		for (int i = 0; i < guiAdvancedRepalcementPanel.get_RMAitemTable().getRowCount(); i++) {
+
+			System.out.println("guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 3) : "
+					+ guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 3));
+			objectToServer.put("itemName" + i, guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 0));
+			objectToServer.put("itemSerialNumber" + i,
+					guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 1));
+			objectToServer.put("itemDescription" + i,
+					guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 2));
+			objectToServer.put("itemPrice" + i, guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 3));
+		}
+
+		objectToServer.put("rmaNumber", guiAdvancedRepalcementPanel.getTxtRMAnumber().getText());
+		objectToServer.put("rmaDate", guiAdvancedRepalcementPanel.getTxtDate().getText());
+		objectToServer.put("rmaOrderNumber", guiAdvancedRepalcementPanel.getTxtOrderNumber().getText());
+		objectToServer.put("rmaContents", guiAdvancedRepalcementPanel.getTxtContents().getText());
+		objectToServer.put("rmaBillTo", guiAdvancedRepalcementPanel.getTxtBillTo().getText());
+		objectToServer.put("rmaShipTo", guiAdvancedRepalcementPanel.getTxtShipTo().getText());
+		objectToServer.put("rmaTrackingNumber", guiAdvancedRepalcementPanel.getTxtTrackingNumber().getText());
+		
+		Communication.getInstance().saveRMAInformationToDatabase(objectToServer);
+	}
 }
