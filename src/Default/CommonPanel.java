@@ -15,7 +15,7 @@ public class CommonPanel extends JPanel{
 		setLayout(new BorderLayout(0, 0));
 		
 		
-		tabPanel = new TabPanel();
+		tabPanel = new LeftTabPanel();
 		
 		
 		add(tabPanel, BorderLayout.WEST);
@@ -27,7 +27,7 @@ public class CommonPanel extends JPanel{
 		add(panel_6, BorderLayout.CENTER);
 		panel_6.setLayout(new BorderLayout(0, 0));
 		
-		documentControlPanel = new DocumentControlPanel();
+		documentControlPanel = DocumentControlPanel.getInstance();
 		panel_6.add(documentControlPanel, BorderLayout.NORTH);
 	}
 	

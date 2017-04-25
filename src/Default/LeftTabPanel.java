@@ -9,7 +9,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
-public class TabPanel extends JPanel implements ActionListener {
+public class LeftTabPanel extends JPanel implements ActionListener {
 
 	private JButton advancedReplacementBtn;
 	private JButton repairBtn;
@@ -18,7 +18,7 @@ public class TabPanel extends JPanel implements ActionListener {
 	private JButton caseNumberBtn;
 	private JButton backToStockBtn;
 
-	public TabPanel() {
+	public LeftTabPanel() {
 		setBorder(BorderFactory.createLineBorder(Color.black));
 		setLayout(new GridLayout(0, 1, 0, 0));
 
@@ -49,7 +49,7 @@ public class TabPanel extends JPanel implements ActionListener {
 		
 		if( e.getSource() == advancedReplacementBtn){
 			
-			MainThread.getMainThread().loadAdvancedReplacementPanel();
+			ClientMain.getInstance().loadAdvancedReplacementPanel();
 		}else if( e.getSource() == repairBtn){
 			//open repair Panel.
 		}else if( e.getSource() == _POReturnBtn){

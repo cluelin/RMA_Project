@@ -97,9 +97,10 @@ public class GUIadvancedRepalcementPanel extends JPanel {
 
 	private JComboBox itemComboBox;
 	MyTableModel myTableModel;
+	int initialTableRowCount = 10;
 
 	private GUIadvancedRepalcementPanel() {
-		
+
 		String[] columnNames = { "Item Name", "Serial number", "Description", "Price" };
 
 		setLayout(new BorderLayout(0, 0));
@@ -217,12 +218,13 @@ public class GUIadvancedRepalcementPanel extends JPanel {
 		_RMAitemInformationScrollPanel.setMaximumSize(new Dimension(100, 100));
 		itemAndOtherPanel.add(_RMAitemInformationScrollPanel, BorderLayout.NORTH);
 
-		myTableModel = new MyTableModel();
-//		DefaultTableModel myTableModel = new DefaultTableModel(5, columnNames.length);
-//		myTableModel.setColumnIdentifiers(columnNames);
-		
+		// myTableModel = new MyTableModel();
+		// _RMAitemTable = new JTable(myTableModel);
 
+		DefaultTableModel myTableModel = new DefaultTableModel(initialTableRowCount, columnNames.length);
+		myTableModel.setColumnIdentifiers(columnNames);
 		_RMAitemTable = new JTable(myTableModel);
+
 		_RMAitemTable.setRowHeight(50);
 		_RMAitemTable.setFillsViewportHeight(true);
 
@@ -255,6 +257,8 @@ public class GUIadvancedRepalcementPanel extends JPanel {
 		previousRMApanel = new JPanel();
 		historyPanel.add(previousRMApanel, BorderLayout.CENTER);
 		previousRMApanel.setLayout(new BoxLayout(previousRMApanel, BoxLayout.PAGE_AXIS));
+
+		
 
 	}
 
@@ -296,18 +300,17 @@ public class GUIadvancedRepalcementPanel extends JPanel {
 		String rmaBillTo = RMADetailJSON.get("rmaBillTo").toString();
 		String rmaShipTo = RMADetailJSON.get("rmaShipTo").toString();
 		String rmaTrackingNumber = RMADetailJSON.get("rmaTrackingNumber").toString();
-		
-		
-		//받아온 item 항목을 각각의 위치에 삽입하는 과정 필요 
-		//행추가하는 부분도 필요하겠다. 
+
+		// 받아온 item 항목을 각각의 위치에 삽입하는 과정 필요
+		// 행추가하는 부분도 필요하겠다.
 		int rmaItemCount = Integer.parseInt(RMADetailJSON.get("itemCount").toString());
-		
+
 		for (int i = 0; i < rmaItemCount; i++) {
 			String itemName = RMADetailJSON.get("itemName" + i).toString();
 			String serialNumber = RMADetailJSON.get("serialNumber" + i).toString();
 			String itemDescription = RMADetailJSON.get("itemDescription" + i).toString();
 			Integer itemPrice = Integer.parseInt(RMADetailJSON.get("itemPrice" + i).toString());
-			
+
 			_RMAitemTable.setValueAt(itemName, i, 0);
 			_RMAitemTable.setValueAt(serialNumber, i, 1);
 			_RMAitemTable.setValueAt(itemDescription, i, 2);
@@ -334,6 +337,15 @@ public class GUIadvancedRepalcementPanel extends JPanel {
 
 		previousRMApanel.revalidate();
 		previousRMApanel.repaint();
+	}
+
+	public void clearItemTable() {
+
+		System.out.println("clearItemTable");
+
+		((DefaultTableModel) _RMAitemTable.getModel()).setRowCount(0);
+		((DefaultTableModel) _RMAitemTable.getModel()).setRowCount(initialTableRowCount);
+
 	}
 
 	private void loadContentsPanel() {
@@ -517,8 +529,8 @@ public class GUIadvancedRepalcementPanel extends JPanel {
 	public JComboBox getItemComboBox() {
 		return itemComboBox;
 	}
-	
-	public MyTableModel getTableModel(){
+
+	public MyTableModel getTableModel() {
 		return myTableModel;
 	}
 

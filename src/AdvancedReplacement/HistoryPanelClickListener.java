@@ -6,7 +6,7 @@ import java.awt.event.MouseListener;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-import Default.Client;
+import Default.ConnectionSocket;
 
 public class HistoryPanelClickListener implements MouseListener {
 
@@ -64,7 +64,7 @@ public class HistoryPanelClickListener implements MouseListener {
 
 		obj.put("rmaNumber", rmaNumber);
 
-		Client.printStream.println(obj.toJSONString());
+		ConnectionSocket.printStream.println(obj.toJSONString());
 
 		JSONParser jsonParser = new JSONParser();
 
@@ -72,7 +72,7 @@ public class HistoryPanelClickListener implements MouseListener {
 
 		try {
 
-			input = Client.bufferedReader.readLine();
+			input = ConnectionSocket.bufferedReader.readLine();
 
 			JSONObject RMADetailObject = (JSONObject) jsonParser.parse(input);
 

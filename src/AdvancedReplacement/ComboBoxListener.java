@@ -20,7 +20,7 @@ import javax.swing.text.JTextComponent;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-import Default.Client;
+import Default.ConnectionSocket;
 
 public class ComboBoxListener implements DocumentListener {
 
@@ -37,7 +37,6 @@ public class ComboBoxListener implements DocumentListener {
 	private void showPreviousRMAList(String targetName) {
 
 		try {
-//			Client.connectServer();
 
 			guiAdvancedRepalcementPanel.clearHistoryPanel();
 
@@ -46,12 +45,12 @@ public class ComboBoxListener implements DocumentListener {
 			obj.put("Action", "requestSearchRelatedRMA");
 			obj.put("companyName", targetName);
 
-			Client.printStream.println(obj.toJSONString());
+			ConnectionSocket.printStream.println(obj.toJSONString());
 
 			while (true) {
 
 				try {
-					String input = Client.bufferedReader.readLine();
+					String input = ConnectionSocket.bufferedReader.readLine();
 
 					if (input.equals("end")) {
 						break;
@@ -79,7 +78,6 @@ public class ComboBoxListener implements DocumentListener {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		} finally {
-//			Client.closeConnection();
 		}
 
 	}
@@ -90,7 +88,6 @@ public class ComboBoxListener implements DocumentListener {
 		List<String> resultArryList = null;
 
 		try {
-//			Client.connectServer();
 
 			JSONObject obj = new JSONObject();
 
@@ -99,7 +96,7 @@ public class ComboBoxListener implements DocumentListener {
 			obj.put("companyName", companyName);
 			obj.put("siteName", keyword);
 
-			Client.printStream.println(obj.toJSONString());
+			ConnectionSocket.printStream.println(obj.toJSONString());
 
 			JSONParser jsonParser = new JSONParser();
 
@@ -111,9 +108,9 @@ public class ComboBoxListener implements DocumentListener {
 
 				try {
 
-					input = Client.bufferedReader.readLine();
+					input = ConnectionSocket.bufferedReader.readLine();
 
-					if (input.equals("end")) {
+					if (input.equals("end") || input == null) {
 						break;
 					}
 
@@ -131,7 +128,6 @@ public class ComboBoxListener implements DocumentListener {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		} finally {
-//			Client.closeConnection();
 		}
 
 		return resultArryList;
@@ -151,7 +147,7 @@ public class ComboBoxListener implements DocumentListener {
 			obj.put("Action", "requestItemName");
 			obj.put("itemName", keyword);
 
-			Client.printStream.println(obj.toJSONString());
+			ConnectionSocket.printStream.println(obj.toJSONString());
 
 			JSONParser jsonParser = new JSONParser();
 
@@ -161,7 +157,7 @@ public class ComboBoxListener implements DocumentListener {
 
 				try {
 
-					input = Client.bufferedReader.readLine();
+					input = ConnectionSocket.bufferedReader.readLine();
 
 					if (input.equals("end")) {
 						break;
@@ -200,7 +196,6 @@ public class ComboBoxListener implements DocumentListener {
 
 		List<String> resultArryList = null;
 		try {
-//			Client.connectServer();
 
 			JSONObject obj = new JSONObject();
 
@@ -208,7 +203,7 @@ public class ComboBoxListener implements DocumentListener {
 
 			obj.put("companyName", keyword);
 
-			Client.printStream.println(obj.toJSONString());
+			ConnectionSocket.printStream.println(obj.toJSONString());
 
 			JSONParser jsonParser = new JSONParser();
 
@@ -221,10 +216,11 @@ public class ComboBoxListener implements DocumentListener {
 				try {
 
 					System.out.println("company Name 입력 받기 전 ");
-					input = Client.bufferedReader.readLine();
+					input = ConnectionSocket.bufferedReader.readLine();
 
+					System.out.println("input : " + input);
 					System.out.println("company Name 입력 받기 후 ");
-					if (input.equals("end")) {
+					if (input.equals("end") || input == null) {
 						break;
 					}
 
@@ -240,7 +236,6 @@ public class ComboBoxListener implements DocumentListener {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		} finally {
-//			Client.closeConnection();
 		}
 
 		return resultArryList;
@@ -254,7 +249,7 @@ public class ComboBoxListener implements DocumentListener {
 
 		sendJSONobj.put("companyName", companyName);
 
-		Client.printStream.println(sendJSONobj.toJSONString());
+		ConnectionSocket.printStream.println(sendJSONobj.toJSONString());
 
 		JSONParser jsonParser = new JSONParser();
 
@@ -262,7 +257,7 @@ public class ComboBoxListener implements DocumentListener {
 
 		try {
 
-			input = Client.bufferedReader.readLine();
+			input = ConnectionSocket.bufferedReader.readLine();
 
 			JSONObject companyDetailObject = (JSONObject) jsonParser.parse(input);
 
@@ -364,8 +359,7 @@ public class ComboBoxListener implements DocumentListener {
 
 			// 검색어와 일치하는 회사가 있을경우 정보를 가져옴.
 
-//			Client.connectServer();
-			System.out.println("in combobox listener");
+			System.out.println("before getcompany Detail in showRecommendCompanyList");
 
 			JSONObject companyDetailObject = getCompanyDetail(targetName);
 
@@ -376,8 +370,7 @@ public class ComboBoxListener implements DocumentListener {
 			String email = companyDetailObject.get("companyEmail").toString();
 
 			guiAdvancedRepalcementPanel.setCompanyDetail(address, city, zipCode, phone, email);
-			System.out.println("in combobox listener");
-//			Client.closeConnection();
+			System.out.println("after getcompany Detail in showRecommendCompanyList");
 
 		}
 
@@ -387,7 +380,11 @@ public class ComboBoxListener implements DocumentListener {
 
 		}
 
+		System.out.println("before showRecommendSiteList");
+		
 		showRecommendSiteList();
+		
+		System.out.println("after showRecommendSiteList");
 
 		owner.setPopupVisible(true);
 		owner.setEditable(true);
@@ -404,9 +401,13 @@ public class ComboBoxListener implements DocumentListener {
 
 		String siteName = textComponent.getText();
 
+		System.out.println("before getSiteNameFromServer");
+		
 		List<String> founds = getSiteNameFromServer(siteName,
 				guiAdvancedRepalcementPanel.getTxtCompanyName().getEditor().getItem().toString());
-
+		
+		System.out.println("after getSiteNameFromServer");
+		
 		Set<String> foundSet = new HashSet<String>();
 
 		for (String s : founds) {

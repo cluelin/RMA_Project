@@ -37,16 +37,18 @@ import AdvancedReplacement.GUIadvancedRepalcementPanel;
 import java.awt.Component;
 import javax.swing.border.EmptyBorder;
 
-public class MainThread extends JFrame {
+public class ClientMain extends JFrame {
 
 	public static Dimension ScreenSize = Toolkit.getDefaultToolkit().getScreenSize();
-	public JPanel variablePanel;
+	private JPanel variablePanel;
 
-	private static MainThread mainThread = new MainThread();
+	private static ClientMain instance = null;
 	private CommonPanel commonPanel;
 
-	private MainThread() {
+	private ClientMain() {
 		super("RMA");
+		
+		
 		// setSize(new Dimension(1280, 800));
 		getContentPane().setLayout(new BorderLayout(0, 0));
 		
@@ -56,10 +58,9 @@ public class MainThread extends JFrame {
 		this.setSize(1280, 800);
 
 				
-
+		
 		// 공통 패널 소환.
 		loadCommonPanel();
-
 		// 첫번째 화면 출력.
 		loadAdvancedReplacementPanel();
 		
@@ -72,8 +73,13 @@ public class MainThread extends JFrame {
 
 	}
 
-	public static MainThread getMainThread() {
-		return mainThread;
+	public static ClientMain getInstance() {
+		
+		if(instance == null){
+			instance = new ClientMain();
+		}
+		
+		return instance;
 	}
 
 	public CommonPanel getCommonPanel() {
@@ -87,10 +93,14 @@ public class MainThread extends JFrame {
 		getContentPane().add(commonPanel, BorderLayout.CENTER);
 
 	}
+	
+	public JPanel getVariablePanel(){
+		return variablePanel;
+	}
 
 	public void loadAdvancedReplacementPanel() {
 
-		variablePanel = new AdvancedReplacementOperation().getGUIadvancedReplacementPanel();
+		variablePanel = AdvancedReplacementOperation.getInstance().getGUIadvancedReplacementPanel();
 //		variablePanel = GUIadvancedRepalcementPanel.getGUIadvancedReplecementPanel();
 		commonPanel.addVariablePanel(variablePanel);
 
@@ -106,14 +116,16 @@ public class MainThread extends JFrame {
 
 	public static void main(String[] args) {
 		
+		ConnectionSocket.connectServer();
+		
 		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
 		    public void run() {
 		    	System.out.println("종료 이벤트");
-		    	Client.closeConnection();
+		    	ConnectionSocket.closeConnection();
 		    }
 		}));
 
-		MainThread layout = getMainThread();
+		ClientMain layout = getInstance();
 		
 
 	}

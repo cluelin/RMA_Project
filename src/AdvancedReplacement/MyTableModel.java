@@ -12,9 +12,6 @@ public class MyTableModel extends AbstractTableModel {
 	
 	private Object[][] data = {{"","","",""} };
 
-	// ??
-	public final Object[] longValues = { "Jane", "Kathy", "None of the above", new Integer(20), Boolean.TRUE };
-
 	// ÄÃ·³°¹¼ö.
 	public int getColumnCount() {
 		return columnNames.length;
