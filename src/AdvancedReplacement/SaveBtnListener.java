@@ -12,8 +12,7 @@ import javax.swing.JFileChooser;
 import Communication.Communication;
 
 public class SaveBtnListener implements ActionListener {
-	
-	
+
 	GUIadvancedRepalcementPanel guiAdvancedRepalcementPanel = GUIadvancedRepalcementPanel.getInstance();
 
 	@Override
@@ -23,10 +22,16 @@ public class SaveBtnListener implements ActionListener {
 		if (actionEvent.getSource() == guiAdvancedRepalcementPanel.getSaveBtn()) {
 			// save 버튼
 
-			AdvancedReplacementOperation.getInstance().saveRMAdetailToServer();
-
-			String rmaNumber = Communication.getInstance().getRMAnumberFromServer();
-			AdvancedReplacementOperation.getInstance().setRMAnumber(rmaNumber);
+			//저장해도 되는지 여부에 따라 결정됨. 
+			if (AdvancedReplacementOperation.getInstance().validityCheck()) {
+				
+				//저장 수행
+				AdvancedReplacementOperation.getInstance().saveRMAdetailToServer();
+				
+				//저장되면 새로운 rma number를 할당받아야함. 
+				String rmaNumber = Communication.getInstance().getRMAnumberFromServer();
+				AdvancedReplacementOperation.getInstance().setRMAnumber(rmaNumber);
+			}
 
 		} else if (actionEvent.getSource() == guiAdvancedRepalcementPanel.getAttachFileBtn()) {
 

@@ -7,7 +7,6 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import AdvancedReplacement.GUIadvancedRepalcementPanel;
-import Default.ConnectionSocket;
 
 public class Communication {
 
@@ -93,7 +92,7 @@ public class Communication {
 	}
 
 	// save RMA Information To Database
-	public void saveRMAInformationToDatabase(JSONObject rmaDetailObj) {
+	public void saveRMAInformationToServer(JSONObject rmaDetailObj) {
 
 		try {
 
@@ -197,15 +196,10 @@ public class Communication {
 					input = ConnectionSocket.bufferedReader.readLine();
 
 					System.out.println("get site input : " + input);
-					if (input.equals("end") || input == null) {
+					if (input == null || input.equals("end")) {
 						break;
 					}
-					
-//					if (input.equals("end")) {
-//						break;
-//					}
 
-					
 					JSONObject jsonObject = (JSONObject) jsonParser.parse(input);
 
 					resultArryList.add(jsonObject.get("siteName").toString());
@@ -296,6 +290,8 @@ public class Communication {
 				try {
 					String input = ConnectionSocket.bufferedReader.readLine();
 
+					System.out.println("input : " + input);
+					
 					if (input.equals("end")) {
 						break;
 					}
@@ -354,13 +350,11 @@ public class Communication {
 					System.out.println("company Name 입력 받기 전 ");
 					input = ConnectionSocket.bufferedReader.readLine();
 
-					System.out.println("여기서 site가 입력받아지는거갖져? ");
 					System.out.println("input : " + input);
 					System.out.println("company Name 입력 받기 후 ");
-					if (input.equals("end") || input == null) {
+					if (input == null || input.equals("end")) {
 						break;
 					}
-					
 
 					JSONObject jsonObject = (JSONObject) jsonParser.parse(input);
 
@@ -373,7 +367,7 @@ public class Communication {
 
 		} catch (Exception ex) {
 			ex.printStackTrace();
-		} 
+		}
 
 		return resultArryList;
 	}

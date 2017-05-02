@@ -33,6 +33,7 @@ import org.eclipse.wb.swing.FocusTraversalOnArray;
 
 import AdvancedReplacement.AdvancedReplacementOperation;
 import AdvancedReplacement.GUIadvancedRepalcementPanel;
+import Communication.ConnectionSocket;
 
 import java.awt.Component;
 import javax.swing.border.EmptyBorder;

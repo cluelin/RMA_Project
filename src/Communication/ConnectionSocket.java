@@ -1,4 +1,4 @@
-package Default;
+package Communication;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -8,6 +8,7 @@ import java.net.Socket;
 
 import javax.swing.JOptionPane;
 
+import Default.ServerInformation;
 import Error.ConnectionFailed;
 
 public class ConnectionSocket extends Thread {

@@ -6,6 +6,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
 import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.text.JTextComponent;
 
@@ -13,7 +14,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import Communication.Communication;
-import Default.ConnectionSocket;
+import Communication.ConnectionSocket;
 
 public class AdvancedReplacementOperation {
 
@@ -94,7 +95,7 @@ public class AdvancedReplacementOperation {
 
 				public void focusGained(FocusEvent arg0) {
 
-					if (companyNameComponent.getText().length() >= 0) {
+					if (companyNameComponent.getText().length() > 0) {
 
 						companyName.setPopupVisible(true);
 
@@ -236,9 +237,7 @@ public class AdvancedReplacementOperation {
 		guiAdvancedRepalcementPanel.getTxtRMAnumber().setText(rmaNumber);
 	}
 
-	
-
-	public void saveRMAdetailToServer(){
+	public void saveRMAdetailToServer() {
 		JSONObject objectToServer = new JSONObject();
 
 		objectToServer.put("Action", "requestSaveRMAData");
@@ -253,8 +252,7 @@ public class AdvancedReplacementOperation {
 		objectToServer.put("companyEmail", guiAdvancedRepalcementPanel.getTxtCompanyEmail().getText());
 
 		// company에 종속적. 없으면 추가해야함.
-		objectToServer.put("siteName",
-				guiAdvancedRepalcementPanel.getTxtSiteName().getEditor().getItem().toString());
+		objectToServer.put("siteName", guiAdvancedRepalcementPanel.getTxtSiteName().getEditor().getItem().toString());
 
 		// Item information
 		System.out.println("0,0 : " + guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(0, 0));
@@ -267,10 +265,8 @@ public class AdvancedReplacementOperation {
 			System.out.println("guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 3) : "
 					+ guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 3));
 			objectToServer.put("itemName" + i, guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 0));
-			objectToServer.put("itemSerialNumber" + i,
-					guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 1));
-			objectToServer.put("itemDescription" + i,
-					guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 2));
+			objectToServer.put("itemSerialNumber" + i, guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 1));
+			objectToServer.put("itemDescription" + i, guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 2));
 			objectToServer.put("itemPrice" + i, guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 3));
 		}
 
@@ -281,7 +277,23 @@ public class AdvancedReplacementOperation {
 		objectToServer.put("rmaBillTo", guiAdvancedRepalcementPanel.getTxtBillTo().getText());
 		objectToServer.put("rmaShipTo", guiAdvancedRepalcementPanel.getTxtShipTo().getText());
 		objectToServer.put("rmaTrackingNumber", guiAdvancedRepalcementPanel.getTxtTrackingNumber().getText());
-		
-		Communication.getInstance().saveRMAInformationToDatabase(objectToServer);
+
+		Communication.getInstance().saveRMAInformationToServer(objectToServer);
+	}
+
+	public boolean validityCheck() {
+		boolean pass = true;
+
+		if (guiAdvancedRepalcementPanel.getTxtCompanyName().getSelectedItem() == null || 
+				guiAdvancedRepalcementPanel.getTxtCompanyName().getSelectedItem().toString().equals("")) {
+			JOptionPane.showMessageDialog(null, "컴퍼니 이름을 적어주세요");
+			pass = false;
+		} else if (guiAdvancedRepalcementPanel.getTxtSiteName().getSelectedItem() == null ||
+				guiAdvancedRepalcementPanel.getTxtSiteName().getSelectedItem().toString().equals("")) {
+			JOptionPane.showMessageDialog(null, "사이트 이름을 적어주세요");
+			pass = false;
+		}
+
+		return pass;
 	}
 }

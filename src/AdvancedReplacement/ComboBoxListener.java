@@ -21,7 +21,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import Communication.Communication;
-import Default.ConnectionSocket;
+import Communication.ConnectionSocket;
 
 public class ComboBoxListener implements DocumentListener {
 

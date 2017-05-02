@@ -25,6 +25,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
@@ -91,8 +92,9 @@ public class GUIadvancedRepalcementPanel extends JPanel {
 	Socket client;
 	private JLabel lblNewLabel;
 	private JScrollPane scrollPane;
-	private JPanel previousRMApanel;
-	private JPanel relatedRMAPanel;
+	private JPanel previousRMAListPanel;
+	private JPanel previousRMAitemPanel;
+	private JScrollPane previousRMAListScrollPanel;
 	private JPanel panel_3;
 
 	private JComboBox itemComboBox;
@@ -254,12 +256,22 @@ public class GUIadvancedRepalcementPanel extends JPanel {
 		historyPanel.add(historyLabel, BorderLayout.NORTH);
 		historyPanel.setBorder(BorderFactory.createLineBorder(Color.black));
 
-		previousRMApanel = new JPanel();
-		historyPanel.add(previousRMApanel, BorderLayout.CENTER);
-		previousRMApanel.setLayout(new BoxLayout(previousRMApanel, BoxLayout.PAGE_AXIS));
 
+		previousRMAListScrollPanel = new JScrollPane();
+
+		previousRMAListScrollPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+//		previousRMAListScrollPanel.setPreferredSize(new Dimension(50,50));
 		
+		previousRMAListPanel = new JPanel();
+//		previousRMAListPanel.setPreferredSize(new Dimension(10,5));
+		previousRMAListPanel.setLayout(new BoxLayout(previousRMAListPanel, BoxLayout.PAGE_AXIS));
 
+		previousRMAListScrollPanel.add(previousRMAListPanel);
+		previousRMAListScrollPanel.setViewportView(previousRMAListPanel);
+		historyPanel.add(previousRMAListScrollPanel, BorderLayout.CENTER);
+
+//		historyPanel.add(previousRMAListPanel, BorderLayout.CENTER);
+		
 	}
 
 	public static GUIadvancedRepalcementPanel getInstance() {
@@ -273,21 +285,40 @@ public class GUIadvancedRepalcementPanel extends JPanel {
 	public void setRelatedRMAInformation(String rmaNumber, String rmaDate, String rmaContents) {
 
 		System.out.println("history panel 세팅");
-		relatedRMAPanel = new JPanel();
-		relatedRMAPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
-		relatedRMAPanel.setMaximumSize(new Dimension(32767, 50));
+		previousRMAitemPanel = new JPanel();
+		previousRMAitemPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
+		previousRMAitemPanel.setPreferredSize(new Dimension(10, 50));
+		previousRMAitemPanel.setSize(50, 50);
+		previousRMAitemPanel.setBounds(0, 0, 50, 50);
 
-		relatedRMAPanel.add(new JLabel(rmaNumber));
-		relatedRMAPanel.add(new JLabel(rmaDate));
-		relatedRMAPanel.add(new JLabel(rmaContents));
-		relatedRMAPanel.addMouseListener(new HistoryPanelClickListener(rmaNumber));
+		JLabel rmaNumberLabel = new JLabel(rmaNumber);
+		JLabel rmaDateLabel = new JLabel(rmaDate);
+		JLabel rmaContentsLabel = new JLabel(rmaContents);
+
+//		previousRMAitemPanel.setBackground(new Color(55,55,55,55));
+
+		previousRMAitemPanel.add(rmaNumberLabel);
+		previousRMAitemPanel.add(rmaDateLabel);
+		previousRMAitemPanel.add(rmaContentsLabel);
+		previousRMAitemPanel.addMouseListener(new previousRMAitemPanelClickListener(rmaNumber));
 
 		System.out.println("rmaNumber : " + rmaNumber + " rmaContents : " + rmaContents);
 
-		previousRMApanel.add(relatedRMAPanel);
-
-		previousRMApanel.revalidate();
-		previousRMApanel.repaint();
+//		previousRMAListScrollPanel.add(previousRMAitemPanel);
+//		previousRMAListScrollPanel.setViewportView(previousRMAitemPanel);
+		previousRMAListPanel.add(previousRMAitemPanel);
+		previousRMAListPanel.validate();
+		previousRMAListPanel.invalidate();
+		previousRMAListPanel.repaint();
+		
+		previousRMAListScrollPanel.validate();
+		previousRMAListScrollPanel.invalidate();
+		previousRMAListScrollPanel.repaint();
+		
+		historyPanel.validate();
+		historyPanel.invalidate();
+		historyPanel.repaint();
+		
 
 	}
 
@@ -301,8 +332,8 @@ public class GUIadvancedRepalcementPanel extends JPanel {
 		String rmaShipTo = RMADetailJSON.get("rmaShipTo").toString();
 		String rmaTrackingNumber = RMADetailJSON.get("rmaTrackingNumber").toString();
 
+		clearItemTable();
 		// 받아온 item 항목을 각각의 위치에 삽입하는 과정 필요
-		// 행추가하는 부분도 필요하겠다.
 		int rmaItemCount = Integer.parseInt(RMADetailJSON.get("itemCount").toString());
 
 		for (int i = 0; i < rmaItemCount; i++) {
@@ -325,18 +356,15 @@ public class GUIadvancedRepalcementPanel extends JPanel {
 		txtShipTo.setText(rmaShipTo);
 		txtTrackingNumber.setText(rmaTrackingNumber);
 
-		// previousRMApanel.revalidate();
-		// previousRMApanel.repaint();
-
 	}
 
 	public void clearHistoryPanel() {
 
 		System.out.println("clearHistoryPanel");
-		previousRMApanel.removeAll();
+		previousRMAListPanel.removeAll();
 
-		previousRMApanel.revalidate();
-		previousRMApanel.repaint();
+		previousRMAListPanel.revalidate();
+		previousRMAListPanel.repaint();
 	}
 
 	public void clearItemTable() {
