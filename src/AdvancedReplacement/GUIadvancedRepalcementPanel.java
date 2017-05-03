@@ -290,12 +290,12 @@ public class GUIadvancedRepalcementPanel extends JPanel {
 		previousRMAitemPanel.setPreferredSize(new Dimension(10, 50));
 		previousRMAitemPanel.setSize(50, 50);
 		previousRMAitemPanel.setBounds(0, 0, 50, 50);
+		previousRMAitemPanel.setMaximumSize(new Dimension(32767, 50));
 
 		JLabel rmaNumberLabel = new JLabel(rmaNumber);
 		JLabel rmaDateLabel = new JLabel(rmaDate);
 		JLabel rmaContentsLabel = new JLabel(rmaContents);
 
-//		previousRMAitemPanel.setBackground(new Color(55,55,55,55));
 
 		previousRMAitemPanel.add(rmaNumberLabel);
 		previousRMAitemPanel.add(rmaDateLabel);
@@ -304,8 +304,6 @@ public class GUIadvancedRepalcementPanel extends JPanel {
 
 		System.out.println("rmaNumber : " + rmaNumber + " rmaContents : " + rmaContents);
 
-//		previousRMAListScrollPanel.add(previousRMAitemPanel);
-//		previousRMAListScrollPanel.setViewportView(previousRMAitemPanel);
 		previousRMAListPanel.add(previousRMAitemPanel);
 		previousRMAListPanel.validate();
 		previousRMAListPanel.invalidate();
@@ -333,8 +331,12 @@ public class GUIadvancedRepalcementPanel extends JPanel {
 		String rmaTrackingNumber = RMADetailJSON.get("rmaTrackingNumber").toString();
 
 		clearItemTable();
+		
+		
 		// 받아온 item 항목을 각각의 위치에 삽입하는 과정 필요
 		int rmaItemCount = Integer.parseInt(RMADetailJSON.get("itemCount").toString());
+		
+		System.out.println("rmaItemCount : " + rmaItemCount);
 
 		for (int i = 0; i < rmaItemCount; i++) {
 			String itemName = RMADetailJSON.get("itemName" + i).toString();
