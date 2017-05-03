@@ -75,6 +75,7 @@ public class AdvancedReplacementOperation {
 		guiAdvancedRepalcementPanel.getTxtBillTo().setText("");
 		guiAdvancedRepalcementPanel.getTxtShipTo().setText("");
 		guiAdvancedRepalcementPanel.getTxtTrackingNumber().setText("");
+		guiAdvancedRepalcementPanel.getTxtOrderNumber().setText("");
 
 	}
 
@@ -254,20 +255,35 @@ public class AdvancedReplacementOperation {
 		// company에 종속적. 없으면 추가해야함.
 		objectToServer.put("siteName", guiAdvancedRepalcementPanel.getTxtSiteName().getEditor().getItem().toString());
 
+		
+		int itemCount = guiAdvancedRepalcementPanel.get_RMAitemTable().getRowCount();
+		
 		// Item information
 		System.out.println("0,0 : " + guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(0, 0));
-		System.out.println("itemCount : " + guiAdvancedRepalcementPanel.get_RMAitemTable().getRowCount());
+		System.out.println("itemCount : " + itemCount);
+		
 		// RMA ITEM TABLE 저장
-		objectToServer.put("itemCount", guiAdvancedRepalcementPanel.get_RMAitemTable().getRowCount());
+		objectToServer.put("itemCount", itemCount);
+		
+		
 
-		for (int i = 0; i < guiAdvancedRepalcementPanel.get_RMAitemTable().getRowCount(); i++) {
+		for (int i = 0; i < itemCount; i++) {
 
-			System.out.println("guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 3) : "
-					+ guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 3));
 			objectToServer.put("itemName" + i, guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 0));
 			objectToServer.put("itemSerialNumber" + i, guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 1));
-			objectToServer.put("itemDescription" + i, guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 2));
-			objectToServer.put("itemPrice" + i, guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 3));
+			
+			if(guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 2) == null){
+				objectToServer.put("itemDescription" + i, "");
+			}else{
+				objectToServer.put("itemDescription" + i, guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 2));
+			}
+			
+			if(guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 3) == null){
+				objectToServer.put("itemPrice" + i, 0);
+			}else{
+				objectToServer.put("itemPrice" + i, guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 3));
+			}
+			
 		}
 
 		objectToServer.put("rmaNumber", guiAdvancedRepalcementPanel.getTxtRMAnumber().getText());

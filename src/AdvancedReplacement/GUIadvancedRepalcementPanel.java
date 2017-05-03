@@ -322,6 +322,7 @@ public class GUIadvancedRepalcementPanel extends JPanel {
 
 	public void setRMADetail(JSONObject RMADetailJSON) {
 
+		String rmaSiteName = RMADetailJSON.get("siteName").toString();
 		String rmaNumber = RMADetailJSON.get("rmaNumber").toString();
 		String rmaDate = RMADetailJSON.get("rmaDate").toString();
 		String rmaOrderNumber = RMADetailJSON.get("rmaOrderNumber").toString();
@@ -350,6 +351,7 @@ public class GUIadvancedRepalcementPanel extends JPanel {
 			_RMAitemTable.setValueAt(itemPrice, i, 3);
 		}
 
+		txtSiteName.setSelectedItem(rmaSiteName);
 		txtRMAnumber.setText(rmaNumber);
 		txtDate.setText(rmaDate);
 		txtOrderNumber.setText(rmaOrderNumber);

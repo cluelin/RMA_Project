@@ -31,6 +31,8 @@ public class SaveBtnListener implements ActionListener {
 				//저장되면 새로운 rma number를 할당받아야함. 
 				String rmaNumber = Communication.getInstance().getRMAnumberFromServer();
 				AdvancedReplacementOperation.getInstance().setRMAnumber(rmaNumber);
+				
+				Communication.getInstance().showPreviousRMAList(guiAdvancedRepalcementPanel.getTxtCompanyName().getSelectedItem().toString());
 			}
 
 		} else if (actionEvent.getSource() == guiAdvancedRepalcementPanel.getAttachFileBtn()) {
