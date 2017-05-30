@@ -348,13 +348,13 @@ public class AdvancedReplacementOperation {
 			return pass;
 		}
 
-		if (itemTableValidObject.get("itemSerialValidation") == null) {
-
-		} else if ((boolean) itemTableValidObject.get("itemSerialValidation") == false) {
-			JOptionPane.showMessageDialog(null, "SerialNumber가 중복됩니다.");
-			pass = false;
-			return pass;
-		}
+//		if (itemTableValidObject.get("itemSerialValidation") == null) {
+//
+//		} else if ((boolean) itemTableValidObject.get("itemSerialValidation") == false) {
+//			JOptionPane.showMessageDialog(null, "SerialNumber가 중복됩니다.");
+//			pass = false;
+//			return pass;
+//		}
 
 		// item, serial validate check. 추가해야함.
 
