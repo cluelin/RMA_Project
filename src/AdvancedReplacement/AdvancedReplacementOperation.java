@@ -54,6 +54,7 @@ public class AdvancedReplacementOperation {
 		return instance;
 	}
 
+	//저장되어있는 모든것을 지워버림. 
 	public void clearField() {
 
 		String rmaNumber = guiAdvancedRepalcementPanel.getTxtRMAnumber().getText().toString();
@@ -203,37 +204,6 @@ public class AdvancedReplacementOperation {
 		return guiAdvancedRepalcementPanel;
 	}
 
-	// get RMA number from Server
-	// public String getRMAnumberFromServer() {
-	//
-	// String rmaNumber = null;
-	//
-	// JSONObject obj = new JSONObject();
-	// obj.put("Action", "requestRMAindex");
-	//
-	// // send request to serever
-	// ConnectionSocket.printStream.println(obj.toJSONString());
-	//
-	// try {
-	//
-	// // 받아온 RMA number 설정.
-	// String input = ConnectionSocket.bufferedReader.readLine();
-	//
-	// if (input != null) {
-	// JSONObject jsonObject = (JSONObject) jsonParser.parse(input);
-	// rmaNumber = "DA" + jsonObject.get("RMAindex").toString();
-	// System.out.println("RMA index : " + rmaNumber);
-	//
-	// }
-	//
-	// } catch (Exception e) {
-	// e.printStackTrace();
-	// }
-	//
-	// return rmaNumber;
-	//
-	// }
-
 	public void setRMAnumber(String rmaNumber) {
 		guiAdvancedRepalcementPanel.getTxtRMAnumber().setText(rmaNumber);
 	}
@@ -255,35 +225,33 @@ public class AdvancedReplacementOperation {
 		// company에 종속적. 없으면 추가해야함.
 		objectToServer.put("siteName", guiAdvancedRepalcementPanel.getTxtSiteName().getEditor().getItem().toString());
 
-		
-		int itemCount = guiAdvancedRepalcementPanel.get_RMAitemTable().getRowCount();
-		
+		int itemCount = getValidItemRowCount();
+
 		// Item information
 		System.out.println("0,0 : " + guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(0, 0));
 		System.out.println("itemCount : " + itemCount);
-		
+
 		// RMA ITEM TABLE 저장
 		objectToServer.put("itemCount", itemCount);
-		
-		
 
 		for (int i = 0; i < itemCount; i++) {
 
 			objectToServer.put("itemName" + i, guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 0));
 			objectToServer.put("itemSerialNumber" + i, guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 1));
-			
-			if(guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 2) == null){
+
+			if (guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 2) == null) {
 				objectToServer.put("itemDescription" + i, "");
-			}else{
-				objectToServer.put("itemDescription" + i, guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 2));
+			} else {
+				objectToServer.put("itemDescription" + i,
+						guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 2));
 			}
-			
-			if(guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 3) == null){
+
+			if (guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 3) == null) {
 				objectToServer.put("itemPrice" + i, 0);
-			}else{
+			} else {
 				objectToServer.put("itemPrice" + i, guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 3));
 			}
-			
+
 		}
 
 		objectToServer.put("rmaNumber", guiAdvancedRepalcementPanel.getTxtRMAnumber().getText());
@@ -300,16 +268,104 @@ public class AdvancedReplacementOperation {
 	public boolean validityCheck() {
 		boolean pass = true;
 
-		if (guiAdvancedRepalcementPanel.getTxtCompanyName().getSelectedItem() == null || 
-				guiAdvancedRepalcementPanel.getTxtCompanyName().getSelectedItem().toString().equals("")) {
+		// Company Name 작성 여부 확인
+		if (guiAdvancedRepalcementPanel.getTxtCompanyName().getSelectedItem() == null
+				|| guiAdvancedRepalcementPanel.getTxtCompanyName().getSelectedItem().toString().equals("")) {
 			JOptionPane.showMessageDialog(null, "컴퍼니 이름을 적어주세요");
 			pass = false;
-		} else if (guiAdvancedRepalcementPanel.getTxtSiteName().getSelectedItem() == null ||
-				guiAdvancedRepalcementPanel.getTxtSiteName().getSelectedItem().toString().equals("")) {
+			return pass;
+
+			// Site Name 작성 여부 확인
+		} else if (guiAdvancedRepalcementPanel.getTxtSiteName().getSelectedItem() == null
+				|| guiAdvancedRepalcementPanel.getTxtSiteName().getSelectedItem().toString().equals("")) {
 			JOptionPane.showMessageDialog(null, "사이트 이름을 적어주세요");
 			pass = false;
+			return pass;
 		}
 
+		// item table 검증
+		JSONObject itemTableObjectToServer = new JSONObject();
+		int rowCount = getValidItemRowCount();
+
+		itemTableObjectToServer.put("Action", "validate");
+		itemTableObjectToServer.put("itemCount", rowCount);
+
+		for (int i = 0; i < rowCount; i++) {
+
+			if (guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 1) == null
+					|| guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 1).toString().equals("")) {
+				JOptionPane.showMessageDialog(null, "시리얼 넘버가 유효하지 않습니다. ");
+				pass = false;
+				return pass;
+			}
+
+			// item table price check.
+			try {
+				System.out.println(guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 3).toString());
+				Integer.parseInt(guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 3).toString());
+			} catch (NumberFormatException e) {
+
+				if (guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 3).toString() != null) {
+
+					// null 일때는 0으로 설정.
+					JOptionPane.showMessageDialog(null, "Price가 숫자가 아닙니다.");
+					pass = false;
+					return pass;
+				}
+
+			} catch (NullPointerException e) {
+				// price의 값이 없을때는 0으로 기본 설정
+				guiAdvancedRepalcementPanel.get_RMAitemTable().setValueAt(0, i, 3);
+			}
+
+			itemTableObjectToServer.put("itemName" + i,
+					guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 0));
+			itemTableObjectToServer.put("itemSerialNumber" + i,
+					guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 1));
+
+		}
+
+		JSONObject itemTableValidObject = commnunication.getItemTableValidObject(itemTableObjectToServer);
+
+		if (itemTableValidObject.get("itemNameValidation") == null) {
+
+		} else if ((boolean) itemTableValidObject.get("itemNameValidation") == false) {
+			JOptionPane.showMessageDialog(null, "item Name이 list에 존재하지않습니다.");
+			pass = false;
+			return pass;
+		}
+
+		if (itemTableValidObject.get("itemSerialValidation") == null) {
+
+		} else if ((boolean) itemTableValidObject.get("itemSerialValidation") == false) {
+			JOptionPane.showMessageDialog(null, "SerialNumber가 중복됩니다.");
+			pass = false;
+			return pass;
+		}
+
+		// item, serial validate check. 추가해야함.
+
 		return pass;
+	}
+
+	// Item Name 이 채워져있는 행 수를 return
+	public int getValidItemRowCount() {
+
+		int rowCount = 0;
+
+		for (int i = 0; i < guiAdvancedRepalcementPanel.get_RMAitemTable().getRowCount(); i++) {
+
+			if (guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 0) == null) {
+
+				rowCount = i;
+				break;
+			}
+
+		}
+
+		System.out.println("행 수 : " + rowCount);
+
+		return rowCount;
+
 	}
 }

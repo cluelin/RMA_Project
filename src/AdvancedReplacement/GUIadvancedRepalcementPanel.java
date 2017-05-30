@@ -13,11 +13,13 @@ import java.io.PrintStream;
 import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -103,7 +105,7 @@ public class GUIadvancedRepalcementPanel extends JPanel {
 
 	private GUIadvancedRepalcementPanel() {
 
-		String[] columnNames = { "Item Name", "Serial number", "Description", "Price" };
+		String[] columnNames = { "Item Name", "Serial number", "Description", "Price", "Receive" };
 
 		setLayout(new BorderLayout(0, 0));
 
@@ -230,15 +232,26 @@ public class GUIadvancedRepalcementPanel extends JPanel {
 		_RMAitemTable.setRowHeight(50);
 		_RMAitemTable.setFillsViewportHeight(true);
 
-		TableColumn sportColumn = _RMAitemTable.getColumnModel().getColumn(0);
+		TableColumn itemNameColumn = _RMAitemTable.getColumnModel().getColumn(0);
+		TableColumn itemReceiveColumn = _RMAitemTable.getColumnModel().getColumn(4);
+		
+		
+		_RMAitemTable.getColumnModel().getColumn(3).setMaxWidth(100);
+		_RMAitemTable.getColumnModel().getColumn(4).setMaxWidth(50);
 
 		// Set up tool tips for the sport cells.
 		DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
-		sportColumn.setCellRenderer(renderer);
-
+		itemNameColumn.setCellRenderer(renderer);
+		itemReceiveColumn.setCellRenderer(renderer);
+		
+		
 		itemComboBox = new JComboBox();
 		itemComboBox.setEditable(true);
-		sportColumn.setCellEditor(new DefaultCellEditor(itemComboBox));
+		itemNameColumn.setCellEditor(new DefaultCellEditor(itemComboBox));
+		
+		JCheckBox checkBox = new JCheckBox();
+		
+		itemReceiveColumn.setCellEditor(new DefaultCellEditor(checkBox));
 
 		_RMAitemInformationScrollPanel.setViewportView(_RMAitemTable);
 
@@ -256,22 +269,17 @@ public class GUIadvancedRepalcementPanel extends JPanel {
 		historyPanel.add(historyLabel, BorderLayout.NORTH);
 		historyPanel.setBorder(BorderFactory.createLineBorder(Color.black));
 
-
 		previousRMAListScrollPanel = new JScrollPane();
 
 		previousRMAListScrollPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-//		previousRMAListScrollPanel.setPreferredSize(new Dimension(50,50));
-		
+
 		previousRMAListPanel = new JPanel();
-//		previousRMAListPanel.setPreferredSize(new Dimension(10,5));
 		previousRMAListPanel.setLayout(new BoxLayout(previousRMAListPanel, BoxLayout.PAGE_AXIS));
 
 		previousRMAListScrollPanel.add(previousRMAListPanel);
 		previousRMAListScrollPanel.setViewportView(previousRMAListPanel);
 		historyPanel.add(previousRMAListScrollPanel, BorderLayout.CENTER);
 
-//		historyPanel.add(previousRMAListPanel, BorderLayout.CENTER);
-		
 	}
 
 	public static GUIadvancedRepalcementPanel getInstance() {
@@ -296,6 +304,27 @@ public class GUIadvancedRepalcementPanel extends JPanel {
 		JLabel rmaDateLabel = new JLabel(rmaDate);
 		JLabel rmaContentsLabel = new JLabel(rmaContents);
 
+		// 날짜 체크\
+
+		SimpleDateFormat format = new SimpleDateFormat("MM-dd-yyyy");
+
+		try {
+			Date rmaDateDate = format.parse(rmaDate);
+			Date todayDate = Calendar.getInstance().getTime();
+
+			long diff = todayDate.getTime() - rmaDateDate.getTime();
+			long dayDiff = diff / (24 * 60 * 60 * 1000);
+
+			System.out.println("dayDiff : " + dayDiff);
+
+			if (dayDiff >= 10) {
+				previousRMAitemPanel.setBackground(new Color(255, 100, 100));
+
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		previousRMAitemPanel.add(rmaNumberLabel);
 		previousRMAitemPanel.add(rmaDateLabel);
@@ -308,15 +337,14 @@ public class GUIadvancedRepalcementPanel extends JPanel {
 		previousRMAListPanel.validate();
 		previousRMAListPanel.invalidate();
 		previousRMAListPanel.repaint();
-		
+
 		previousRMAListScrollPanel.validate();
 		previousRMAListScrollPanel.invalidate();
 		previousRMAListScrollPanel.repaint();
-		
+
 		historyPanel.validate();
 		historyPanel.invalidate();
 		historyPanel.repaint();
-		
 
 	}
 
@@ -332,11 +360,10 @@ public class GUIadvancedRepalcementPanel extends JPanel {
 		String rmaTrackingNumber = RMADetailJSON.get("rmaTrackingNumber").toString();
 
 		clearItemTable();
-		
-		
+
 		// 받아온 item 항목을 각각의 위치에 삽입하는 과정 필요
 		int rmaItemCount = Integer.parseInt(RMADetailJSON.get("itemCount").toString());
-		
+
 		System.out.println("rmaItemCount : " + rmaItemCount);
 
 		for (int i = 0; i < rmaItemCount; i++) {
@@ -360,6 +387,17 @@ public class GUIadvancedRepalcementPanel extends JPanel {
 		txtShipTo.setText(rmaShipTo);
 		txtTrackingNumber.setText(rmaTrackingNumber);
 
+	}
+	
+	public void clearRMADetail(){
+		clearItemTable();
+		
+		getTxtContents().setText("");
+		getTxtBillTo().setText("");
+		getTxtShipTo().setText("");
+		getTxtTrackingNumber().setText("");
+		getTxtOrderNumber().setText("");
+		
 	}
 
 	public void clearHistoryPanel() {

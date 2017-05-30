@@ -15,6 +15,7 @@ public class previousRMAitemPanelClickListener implements MouseListener {
 
 	String rmaNumber;
 	static JPanel previousSelected = null;
+	static Color previousBackground = null;
 
 	public previousRMAitemPanelClickListener(String rmaNumber) {
 		// TODO Auto-generated constructor stub
@@ -29,12 +30,16 @@ public class previousRMAitemPanelClickListener implements MouseListener {
 		
 		System.out.println("클릭된 위치 :  " + e.getSource());
 		
+		
+		
 		if(previousSelected != null){
-			previousSelected.setBackground(null);
+			previousSelected.setBackground(previousBackground);
 		}
 		
 		previousSelected = (JPanel)e.getSource();
+		previousBackground = previousSelected.getBackground();
 
+		
 		previousSelected.setBackground(new Color(205,205,205));
 				
 

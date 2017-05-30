@@ -291,7 +291,7 @@ public class Communication {
 					String input = ConnectionSocket.bufferedReader.readLine();
 
 					System.out.println("input : " + input);
-					
+
 					if (input.equals("end")) {
 						break;
 					}
@@ -370,5 +370,24 @@ public class Communication {
 		}
 
 		return resultArryList;
+	}
+
+	public JSONObject getItemTableValidObject(JSONObject validationObject) {
+
+		JSONObject itemValidationObject = null;
+
+		ConnectionSocket.printStream.println(validationObject);
+
+		try {
+
+			String input = ConnectionSocket.bufferedReader.readLine();
+
+			itemValidationObject = (JSONObject) jsonParser.parse(input);
+
+		} catch (Exception e) {													
+			e.printStackTrace();
+		}												
+
+		return itemValidationObject;
 	}
 }

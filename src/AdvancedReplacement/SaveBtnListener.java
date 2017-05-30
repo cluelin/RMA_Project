@@ -32,7 +32,11 @@ public class SaveBtnListener implements ActionListener {
 				String rmaNumber = Communication.getInstance().getRMAnumberFromServer();
 				AdvancedReplacementOperation.getInstance().setRMAnumber(rmaNumber);
 				
+				//이전 RMA 히스토리 갱신.
 				Communication.getInstance().showPreviousRMAList(guiAdvancedRepalcementPanel.getTxtCompanyName().getSelectedItem().toString());
+				
+				//RMA detail 초기화 
+				guiAdvancedRepalcementPanel.clearRMADetail();
 			}
 
 		} else if (actionEvent.getSource() == guiAdvancedRepalcementPanel.getAttachFileBtn()) {
@@ -59,7 +63,7 @@ public class SaveBtnListener implements ActionListener {
 			FileInputStream fileInputStream = new FileInputStream(orignalFile);
 			FileOutputStream fileOutputStream = new FileOutputStream(new File(orignalFile.getName()));
 
-			// using FileChannel improve performance
+			// using FileChannel improve performance	
 			FileChannel fileChannelIn = fileInputStream.getChannel();
 			FileChannel fileChannelOut = fileOutputStream.getChannel();
 
