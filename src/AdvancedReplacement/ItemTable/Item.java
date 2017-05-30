@@ -1,4 +1,4 @@
-package AdvancedReplacement;
+package AdvancedReplacement.ItemTable;
 
 public class Item {
 

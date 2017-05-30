@@ -39,6 +39,8 @@ import javax.swing.table.TableColumn;
 
 import org.json.simple.JSONObject;
 
+import AdvancedReplacement.ItemTable.MyTableModel;
+
 public class GUIadvancedRepalcementPanel extends JPanel implements ActionListener {
 
 	private static String FILE_NAME = "ReplacementInformation.txt";
@@ -376,11 +378,18 @@ public class GUIadvancedRepalcementPanel extends JPanel implements ActionListene
 			String serialNumber = RMADetailJSON.get("serialNumber" + i).toString();
 			String itemDescription = RMADetailJSON.get("itemDescription" + i).toString();
 			Integer itemPrice = Integer.parseInt(RMADetailJSON.get("itemPrice" + i).toString());
+			Boolean itemReceive = false;
+			
+			if(Integer.parseInt(RMADetailJSON.get("itemReceive" + i).toString()) == 1){
+				itemReceive = true;
+			}
+			
 
 			_RMAitemTable.setValueAt(itemName, i, 0);
 			_RMAitemTable.setValueAt(serialNumber, i, 1);
 			_RMAitemTable.setValueAt(itemDescription, i, 2);
 			_RMAitemTable.setValueAt(itemPrice, i, 3);
+			_RMAitemTable.setValueAt(itemReceive, i, 4);
 		}
 
 		txtSiteName.setSelectedItem(rmaSiteName);

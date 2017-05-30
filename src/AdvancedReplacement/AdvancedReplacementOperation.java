@@ -13,6 +13,7 @@ import javax.swing.text.JTextComponent;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
+import AdvancedReplacement.ItemTable.MyTableModel;
 import Communication.Communication;
 import Communication.ConnectionSocket;
 
@@ -255,6 +256,8 @@ public class AdvancedReplacementOperation {
 							guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 3));
 				}
 
+				
+				System.out.println("treu? : " + guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 4));
 				if ((boolean) guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 4)) {
 					objectToServer.put("itemReceive" + i, true);
 				} else {
@@ -360,22 +363,26 @@ public class AdvancedReplacementOperation {
 
 	// Item Name 이 채워져있는 행 수를 return
 	public int getValidItemRowCount() {
-
-		int rowCount = 0;
-
-		for (int i = 0; i < guiAdvancedRepalcementPanel.get_RMAitemTable().getRowCount(); i++) {
-
-			if (guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 0) == null) {
-
-				rowCount = i;
-				break;
-			}
-
-		}
-
-		System.out.println("행 수 : " + rowCount);
-
-		return rowCount;
+//
+//		int rowCount = 0;
+//
+//		for (int i = 0; i < guiAdvancedRepalcementPanel.get_RMAitemTable().getRowCount(); i++) {
+//
+//			if (guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 0) == null) {
+//
+//				rowCount = i;
+//				break;
+//			}
+//
+//		}
+//
+//		System.out.println("행 수 : " + rowCount);
+//
+//		return rowCount;
+		
+		return ((MyTableModel)guiAdvancedRepalcementPanel.get_RMAitemTable().getModel()).getValidRowCount();
+		
+		
 
 	}
 }

@@ -1,4 +1,4 @@
-package AdvancedReplacement;
+package AdvancedReplacement.ItemTable;
 
 import java.awt.Component;
 import java.util.Collections;
@@ -11,6 +11,8 @@ import javax.swing.JComboBox;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.text.JTextComponent;
+
+import AdvancedReplacement.GUIadvancedRepalcementPanel;
 
 public class ItemPopupListener implements PopupMenuListener {
 

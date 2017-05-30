@@ -1,4 +1,4 @@
-package AdvancedReplacement;
+package AdvancedReplacement.ItemTable;
 
 import java.util.ArrayList;
 
@@ -42,6 +42,24 @@ public class MyTableModel extends AbstractTableModel {
 	public int getRowCount() {
 
 		return dataArray.size();
+	}
+	
+	public int getValidRowCount(){
+		
+		Object[] row;
+		
+		for(int i = 0 ; i < dataArray.size() ; i++){
+			
+			row = dataArray.get(i);
+			
+			if(row[0] == ""){
+				return i ;
+			}
+			
+		}
+		
+		return dataArray.size();
+		
 	}
 
 	public void clearData() {
