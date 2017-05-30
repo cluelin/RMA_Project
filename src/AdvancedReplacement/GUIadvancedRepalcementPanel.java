@@ -8,6 +8,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.PrintStream;
 import java.net.Socket;
@@ -37,7 +39,7 @@ import javax.swing.table.TableColumn;
 
 import org.json.simple.JSONObject;
 
-public class GUIadvancedRepalcementPanel extends JPanel {
+public class GUIadvancedRepalcementPanel extends JPanel implements ActionListener {
 
 	private static String FILE_NAME = "ReplacementInformation.txt";
 	private static GUIadvancedRepalcementPanel instance = null;
@@ -100,8 +102,6 @@ public class GUIadvancedRepalcementPanel extends JPanel {
 	private JPanel panel_3;
 
 	private JComboBox itemComboBox;
-	MyTableModel myTableModel;
-	int initialTableRowCount = 10;
 
 	private GUIadvancedRepalcementPanel() {
 
@@ -222,38 +222,41 @@ public class GUIadvancedRepalcementPanel extends JPanel {
 		_RMAitemInformationScrollPanel.setMaximumSize(new Dimension(100, 100));
 		itemAndOtherPanel.add(_RMAitemInformationScrollPanel, BorderLayout.NORTH);
 
-		// myTableModel = new MyTableModel();
-		// _RMAitemTable = new JTable(myTableModel);
+		MyTableModel myTableModel = new MyTableModel();
 
-		DefaultTableModel myTableModel = new DefaultTableModel(initialTableRowCount, columnNames.length);
-		myTableModel.setColumnIdentifiers(columnNames);
 		_RMAitemTable = new JTable(myTableModel);
 
 		_RMAitemTable.setRowHeight(50);
 		_RMAitemTable.setFillsViewportHeight(true);
 
 		TableColumn itemNameColumn = _RMAitemTable.getColumnModel().getColumn(0);
-		TableColumn itemReceiveColumn = _RMAitemTable.getColumnModel().getColumn(4);
-		
-		
+
 		_RMAitemTable.getColumnModel().getColumn(3).setMaxWidth(100);
 		_RMAitemTable.getColumnModel().getColumn(4).setMaxWidth(50);
 
 		// Set up tool tips for the sport cells.
 		DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
 		itemNameColumn.setCellRenderer(renderer);
-		itemReceiveColumn.setCellRenderer(renderer);
-		
-		
+		// itemReceiveColumn.setCellRenderer(renderer);
+
 		itemComboBox = new JComboBox();
 		itemComboBox.setEditable(true);
 		itemNameColumn.setCellEditor(new DefaultCellEditor(itemComboBox));
-		
-		JCheckBox checkBox = new JCheckBox();
-		
-		itemReceiveColumn.setCellEditor(new DefaultCellEditor(checkBox));
 
-		_RMAitemInformationScrollPanel.setViewportView(_RMAitemTable);
+		JCheckBox checkBox = new JCheckBox();
+
+		JPanel tablePanel = new JPanel();
+
+		tablePanel.setLayout(new BoxLayout(tablePanel, BoxLayout.PAGE_AXIS));
+		JButton addRowBtn = new JButton("+");
+		addRowBtn.addActionListener(this);
+
+		tablePanel.add(_RMAitemTable.getTableHeader());
+		tablePanel.add(_RMAitemTable);
+		tablePanel.add(addRowBtn);
+
+		_RMAitemInformationScrollPanel.getVerticalScrollBar().setUnitIncrement(16);
+		_RMAitemInformationScrollPanel.setViewportView(tablePanel);
 
 		loadContentsPanel();
 
@@ -277,6 +280,8 @@ public class GUIadvancedRepalcementPanel extends JPanel {
 		previousRMAListPanel.setLayout(new BoxLayout(previousRMAListPanel, BoxLayout.PAGE_AXIS));
 
 		previousRMAListScrollPanel.add(previousRMAListPanel);
+		previousRMAListScrollPanel.getVerticalScrollBar().setUnitIncrement(16);
+
 		previousRMAListScrollPanel.setViewportView(previousRMAListPanel);
 		historyPanel.add(previousRMAListScrollPanel, BorderLayout.CENTER);
 
@@ -388,16 +393,16 @@ public class GUIadvancedRepalcementPanel extends JPanel {
 		txtTrackingNumber.setText(rmaTrackingNumber);
 
 	}
-	
-	public void clearRMADetail(){
+
+	public void clearRMADetail() {
 		clearItemTable();
-		
+
 		getTxtContents().setText("");
 		getTxtBillTo().setText("");
 		getTxtShipTo().setText("");
 		getTxtTrackingNumber().setText("");
 		getTxtOrderNumber().setText("");
-		
+
 	}
 
 	public void clearHistoryPanel() {
@@ -409,12 +414,14 @@ public class GUIadvancedRepalcementPanel extends JPanel {
 		previousRMAListPanel.repaint();
 	}
 
+	// 모델 내부에서 구현
+	//
 	public void clearItemTable() {
 
 		System.out.println("clearItemTable");
 
-		((DefaultTableModel) _RMAitemTable.getModel()).setRowCount(0);
-		((DefaultTableModel) _RMAitemTable.getModel()).setRowCount(initialTableRowCount);
+		((MyTableModel) get_RMAitemTable().getModel()).clearData();
+		get_RMAitemTable().repaint();
 
 	}
 
@@ -600,8 +607,16 @@ public class GUIadvancedRepalcementPanel extends JPanel {
 		return itemComboBox;
 	}
 
-	public MyTableModel getTableModel() {
-		return myTableModel;
+
+	@Override
+	public void actionPerformed(ActionEvent arg0) {
+		// TODO Auto-generated method stub
+
+		((MyTableModel)get_RMAitemTable().getModel()).addRow();
+		get_RMAitemTable().repaint();
+		get_RMAitemTable().invalidate();
+		get_RMAitemTable().validate();
+
 	}
 
 }

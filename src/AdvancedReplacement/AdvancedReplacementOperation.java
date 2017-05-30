@@ -54,7 +54,7 @@ public class AdvancedReplacementOperation {
 		return instance;
 	}
 
-	//저장되어있는 모든것을 지워버림. 
+	// 저장되어있는 모든것을 지워버림.
 	public void clearField() {
 
 		String rmaNumber = guiAdvancedRepalcementPanel.getTxtRMAnumber().getText().toString();
@@ -232,26 +232,36 @@ public class AdvancedReplacementOperation {
 		System.out.println("itemCount : " + itemCount);
 
 		// RMA ITEM TABLE 저장
-		objectToServer.put("itemCount", itemCount);
+		{
+			objectToServer.put("itemCount", itemCount);
 
-		for (int i = 0; i < itemCount; i++) {
+			for (int i = 0; i < itemCount; i++) {
 
-			objectToServer.put("itemName" + i, guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 0));
-			objectToServer.put("itemSerialNumber" + i, guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 1));
+				objectToServer.put("itemName" + i, guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 0));
+				objectToServer.put("itemSerialNumber" + i,
+						guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 1));
 
-			if (guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 2) == null) {
-				objectToServer.put("itemDescription" + i, "");
-			} else {
-				objectToServer.put("itemDescription" + i,
-						guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 2));
+				if (guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 2) == null) {
+					objectToServer.put("itemDescription" + i, "");
+				} else {
+					objectToServer.put("itemDescription" + i,
+							guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 2));
+				}
+
+				if (guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 3) == null) {
+					objectToServer.put("itemPrice" + i, 0);
+				} else {
+					objectToServer.put("itemPrice" + i,
+							guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 3));
+				}
+
+				if ((boolean) guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 4)) {
+					objectToServer.put("itemReceive" + i, true);
+				} else {
+					objectToServer.put("itemReceive" + i, false);
+				}
+
 			}
-
-			if (guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 3) == null) {
-				objectToServer.put("itemPrice" + i, 0);
-			} else {
-				objectToServer.put("itemPrice" + i, guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 3));
-			}
-
 		}
 
 		objectToServer.put("rmaNumber", guiAdvancedRepalcementPanel.getTxtRMAnumber().getText());
