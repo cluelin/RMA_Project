@@ -40,6 +40,7 @@ import javax.swing.table.TableColumn;
 import org.json.simple.JSONObject;
 
 import AdvancedReplacement.ItemTable.MyTableModel;
+import AdvancedReplacement.PreviousRMA.previousRMAitemPanelClickListener;
 
 public class GUIadvancedRepalcementPanel extends JPanel implements ActionListener {
 
@@ -297,7 +298,7 @@ public class GUIadvancedRepalcementPanel extends JPanel implements ActionListene
 
 	}
 
-	public void setRelatedRMAInformation(String rmaNumber, String rmaDate, String rmaContents) {
+	public void setRelatedRMAInformation(String rmaNumber, String rmaDate, String rmaContents, Boolean rmaDelivered) {
 
 		System.out.println("history panel 세팅");
 		previousRMAitemPanel = new JPanel();
@@ -324,7 +325,8 @@ public class GUIadvancedRepalcementPanel extends JPanel implements ActionListene
 
 			System.out.println("dayDiff : " + dayDiff);
 
-			if (dayDiff >= 10) {
+			//모든 아이템이 돌아오지 않음 & 기한 초과
+			if (dayDiff >= Default.ConstInterFace.DeliverLimitDay && !rmaDelivered) {
 				previousRMAitemPanel.setBackground(new Color(255, 100, 100));
 
 			}

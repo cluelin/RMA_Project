@@ -303,9 +303,16 @@ public class Communication {
 					String rmaNumber = jsonObject.get("RMAnumber").toString();
 					String rmaDate = jsonObject.get("RMAdate").toString();
 					String rmaContents = jsonObject.get("RMAcontents").toString();
+					String rmaDelivered = jsonObject.get("RMAdelivered").toString();
+					
+					boolean rmaDeliveredBool = false;
+					
+					if(rmaDelivered != null && rmaDelivered.equals("true")){
+						rmaDeliveredBool = true;
+					}
 
 					// history panel에 결과 출력.
-					guiAdvancedRepalcementPanel.setRelatedRMAInformation(rmaNumber, rmaDate, rmaContents);
+					guiAdvancedRepalcementPanel.setRelatedRMAInformation(rmaNumber, rmaDate, rmaContents, rmaDeliveredBool);
 
 					System.out.println("rmaNumber : " + rmaNumber + " rmaContents : " + rmaContents);
 
@@ -384,9 +391,9 @@ public class Communication {
 
 			itemValidationObject = (JSONObject) jsonParser.parse(input);
 
-		} catch (Exception e) {													
+		} catch (Exception e) {
 			e.printStackTrace();
-		}												
+		}
 
 		return itemValidationObject;
 	}

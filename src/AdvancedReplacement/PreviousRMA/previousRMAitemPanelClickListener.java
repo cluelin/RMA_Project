@@ -1,4 +1,4 @@
-package AdvancedReplacement;
+package AdvancedReplacement.PreviousRMA;
 
 import java.awt.Color;
 import java.awt.event.MouseEvent;
@@ -9,6 +9,7 @@ import javax.swing.SwingUtilities;
 
 import org.json.simple.JSONObject;
 
+import AdvancedReplacement.GUIadvancedRepalcementPanel;
 import Communication.Communication;
 
 public class previousRMAitemPanelClickListener implements MouseListener {
