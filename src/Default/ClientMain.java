@@ -24,6 +24,8 @@ import javax.swing.BoxLayout;
 import java.awt.CardLayout;
 import net.miginfocom.swing.MigLayout;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
+
 import java.awt.BorderLayout;
 import javax.swing.JTextArea;
 import javax.swing.JTable;
@@ -34,6 +36,7 @@ import org.eclipse.wb.swing.FocusTraversalOnArray;
 import AdvancedReplacement.AdvancedReplacementOperation;
 import AdvancedReplacement.GUIadvancedRepalcementPanel;
 import Communication.ConnectionSocket;
+import JavaSignInAndUpTemplate.GUISignIn;
 
 import java.awt.Component;
 import javax.swing.border.EmptyBorder;
@@ -46,26 +49,20 @@ public class ClientMain extends JFrame {
 	private static ClientMain instance = null;
 	private CommonPanel commonPanel;
 
-	private ClientMain() {
-		super("RMA");
-		
-		
-		// setSize(new Dimension(1280, 800));
+	public void setMainFrame() {
+
 		getContentPane().setLayout(new BorderLayout(0, 0));
-		
+
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		// 크기 지정.
 		this.setSize(1280, 800);
 
-				
-		
 		// 공통 패널 소환.
 		loadCommonPanel();
 		// 첫번째 화면 출력.
 		loadAdvancedReplacementPanel();
-		
-		
+
 		this.setLocation(ScreenSize.width / 2 - this.getSize().width / 2,
 				ScreenSize.height / 2 - this.getSize().height / 2);
 		// 사이즈 변경하는건 나중에 하도록..
@@ -75,11 +72,11 @@ public class ClientMain extends JFrame {
 	}
 
 	public static ClientMain getInstance() {
-		
-		if(instance == null){
+
+		if (instance == null) {
 			instance = new ClientMain();
 		}
-		
+
 		return instance;
 	}
 
@@ -94,15 +91,16 @@ public class ClientMain extends JFrame {
 		getContentPane().add(commonPanel, BorderLayout.CENTER);
 
 	}
-	
-	public JPanel getVariablePanel(){
+
+	public JPanel getVariablePanel() {
 		return variablePanel;
 	}
 
 	public void loadAdvancedReplacementPanel() {
 
 		variablePanel = AdvancedReplacementOperation.getInstance().getGUIadvancedReplacementPanel();
-//		variablePanel = GUIadvancedRepalcementPanel.getGUIadvancedReplecementPanel();
+		// variablePanel =
+		// GUIadvancedRepalcementPanel.getGUIadvancedReplecementPanel();
 		commonPanel.addVariablePanel(variablePanel);
 
 	}
@@ -116,19 +114,43 @@ public class ClientMain extends JFrame {
 	}
 
 	public static void main(String[] args) {
-		
+
 		ConnectionSocket.connectServer();
-		
+
 		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-		    public void run() {
-		    	System.out.println("종료 이벤트");
-		    	ConnectionSocket.closeConnection();
-		    }
+			public void run() {
+				System.out.println("종료 이벤트");
+				ConnectionSocket.closeConnection();
+			}
 		}));
 
-		ClientMain layout = getInstance();
+		// 로그인 패널.
+		GUISignIn guiSignIn = GUISignIn.getInstance();
+
+		guiSignIn.setElement();
+
 		
 
+	}
+
+	public boolean trySignIn(String stringID, char[] password) {
+
+		boolean result = false;
+		
+		
+		
+		
+		if(result){
+			ClientMain clientMain = new ClientMain();
+
+			clientMain.setMainFrame();
+		}else{
+			
+			JOptionPane.showMessageDialog(null, "ID / Password 불일치");
+			
+		}
+
+		return result;
 	}
 
 }

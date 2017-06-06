@@ -538,11 +538,14 @@ public class GUIadvancedRepalcementPanel extends JPanel implements ActionListene
 
 	public void clearCompanyDetail() {
 
+		txtSiteName.setSelectedItem("");
 		txtCompanyAddress.setText("");
 		txtCompanyCity.setText("");
 		txtCompanyZipCode.setText("");
 		txtCompanyPhone.setText("");
 		txtCompanyEmail.setText("");
+		
+		
 
 	}
 

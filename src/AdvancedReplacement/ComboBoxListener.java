@@ -33,8 +33,6 @@ public class ComboBoxListener implements DocumentListener {
 
 	}
 
-
-
 	private void companyUpdate() {
 
 		SwingUtilities.invokeLater(new Runnable() {
@@ -42,9 +40,7 @@ public class ComboBoxListener implements DocumentListener {
 			@Override
 
 			public void run() {
-				System.out.println("before showRecommendCompanyList");
 				showRecommendCompanyList();
-				System.out.println("after showRecommendCompanyList");
 			}
 
 		});
@@ -91,7 +87,7 @@ public class ComboBoxListener implements DocumentListener {
 		JTextComponent textComponent = (JTextComponent) component;
 
 		String targetName = textComponent.getText();
-		
+
 		System.out.println("targetName : " + targetName);
 
 		// 현재 입력창에 입력된 값(targetName)을 기준으로 추천단어를 검색해서 리스트에 등록.
@@ -102,7 +98,7 @@ public class ComboBoxListener implements DocumentListener {
 		Communication.getInstance().showPreviousRMAList(targetName);
 
 		System.out.println("previousRMAList 출력후");
-		
+
 		Set<String> foundSet = new HashSet<String>();
 
 		for (String temp : targetList) {
@@ -123,7 +119,7 @@ public class ComboBoxListener implements DocumentListener {
 		if (!foundSet.contains(targetName.toLowerCase())) {
 
 			owner.addItem(targetName);
-			// guiAdvancedRepalcementPanel.clearCompanyDetail();
+			guiAdvancedRepalcementPanel.clearCompanyDetail();
 
 		} else {
 
