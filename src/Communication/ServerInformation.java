@@ -1,4 +1,4 @@
-package Default;
+package Communication;
 
 public interface ServerInformation {
 	

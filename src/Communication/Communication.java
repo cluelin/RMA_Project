@@ -1,5 +1,9 @@
 package Communication;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -396,5 +400,58 @@ public class Communication {
 		}
 
 		return itemValidationObject;
+	}
+	
+	public void saveAttachFile(String rmaNumber, File selectedFile){
+		
+		JSONObject attachFileObj = new JSONObject();
+		
+		attachFileObj.put("Action", "attachFile");
+		attachFileObj.put("rmaNumber", rmaNumber);
+		attachFileObj.put("attachFileName", selectedFile.getName());
+		
+		ConnectionSocket.printStream.println(attachFileObj);
+		
+		try {
+
+			FileInputStream fileInputStream = new FileInputStream(selectedFile);
+
+			BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream);
+
+			OutputStream outputStream = ConnectionSocket.getInstance().getOutputStream();
+			byte[] contents;
+			long fileSize = selectedFile.length();
+			long current = 0;
+
+			while (current != fileSize) {
+				int size = 10000;
+
+				if (fileSize - current >= size) {
+
+					current += size;
+				} else {
+					size = (int) (fileSize - current);
+					current = fileSize;
+
+				}
+				contents = new byte[size];
+				bufferedInputStream.read(contents, 0, size);
+				outputStream.write(contents);
+
+				System.out.print("Sending file ... " + (current * 100) / fileSize + "% complete!");
+
+			}
+
+			outputStream.flush();
+
+			fileInputStream.close();
+			bufferedInputStream.close();
+			outputStream.close();
+
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 	}
 }

@@ -8,8 +8,7 @@ import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
-import Default.ClientMain;
-import Default.UserInfo;
+import Default.MainFrame;
 
 public class BtnClickListener implements ActionListener {
 
@@ -33,10 +32,12 @@ public class BtnClickListener implements ActionListener {
 			boolean result = UserInfo.getInterface().signInUser(guiSignIn.getStringID(), guiSignIn.getStringPassWord());
 			
 			if(result){
-				ClientMain clientMain = new ClientMain();
+				MainFrame clientMain = new MainFrame();
 
 				clientMain.setMainFrame();
 			}
+			
+			guiSignIn.dispose();
 
 		} else if (guiSignIn.getBtnSignUp() == (JButton) e.getSource()) {
 

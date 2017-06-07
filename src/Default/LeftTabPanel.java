@@ -49,7 +49,7 @@ public class LeftTabPanel extends JPanel implements ActionListener {
 		
 		if( e.getSource() == advancedReplacementBtn){
 			
-			ClientMain.getInstance().loadAdvancedReplacementPanel();
+			MainFrame.getInstance().loadAdvancedReplacementPanel();
 		}else if( e.getSource() == repairBtn){
 			//open repair Panel.
 		}else if( e.getSource() == _POReturnBtn){

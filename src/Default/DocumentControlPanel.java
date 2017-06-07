@@ -69,7 +69,7 @@ public class DocumentControlPanel extends JPanel implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 
 		if (e.getSource() == docClearBtn) {
-			if (ClientMain.getInstance().getVariablePanel() instanceof GUIadvancedRepalcementPanel) {
+			if (MainFrame.getInstance().getVariablePanel() instanceof GUIadvancedRepalcementPanel) {
 
 				AdvancedReplacementOperation.getInstance().clearField();
 			}

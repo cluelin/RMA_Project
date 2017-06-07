@@ -1,4 +1,4 @@
-package Default;
+package JavaSignInAndUpTemplate;
 
 import javax.swing.JOptionPane;
 

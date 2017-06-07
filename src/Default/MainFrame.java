@@ -41,12 +41,12 @@ import JavaSignInAndUpTemplate.GUISignIn;
 import java.awt.Component;
 import javax.swing.border.EmptyBorder;
 
-public class ClientMain extends JFrame {
+public class MainFrame extends JFrame {
 
 	public static Dimension ScreenSize = Toolkit.getDefaultToolkit().getScreenSize();
 	private JPanel variablePanel;
 
-	private static ClientMain instance = null;
+	private static MainFrame instance = null;
 	private CommonPanel commonPanel;
 
 	public void setMainFrame() {
@@ -71,10 +71,10 @@ public class ClientMain extends JFrame {
 
 	}
 
-	public static ClientMain getInstance() {
+	public static MainFrame getInstance() {
 
 		if (instance == null) {
-			instance = new ClientMain();
+			instance = new MainFrame();
 		}
 
 		return instance;
@@ -113,44 +113,7 @@ public class ClientMain extends JFrame {
 
 	}
 
-	public static void main(String[] args) {
+	
 
-		ConnectionSocket.connectServer();
-
-		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-			public void run() {
-				System.out.println("종료 이벤트");
-				ConnectionSocket.closeConnection();
-			}
-		}));
-
-		// 로그인 패널.
-		GUISignIn guiSignIn = GUISignIn.getInstance();
-
-		guiSignIn.setElement();
-
-		
-
-	}
-
-	public boolean trySignIn(String stringID, char[] password) {
-
-		boolean result = false;
-		
-		
-		
-		
-		if(result){
-			ClientMain clientMain = new ClientMain();
-
-			clientMain.setMainFrame();
-		}else{
-			
-			JOptionPane.showMessageDialog(null, "ID / Password 불일치");
-			
-		}
-
-		return result;
-	}
 
 }
