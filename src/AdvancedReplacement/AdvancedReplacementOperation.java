@@ -276,6 +276,8 @@ public class AdvancedReplacementOperation {
 		objectToServer.put("rmaTrackingNumber", guiAdvancedRepalcementPanel.getTxtTrackingNumber().getText());
 
 		Communication.getInstance().saveRMAInformationToServer(objectToServer);
+		
+		
 	}
 
 	public boolean validityCheck() {

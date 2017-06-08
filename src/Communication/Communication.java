@@ -421,6 +421,8 @@ public class Communication {
 			OutputStream outputStream = ConnectionSocket.getInstance().getOutputStream();
 			byte[] contents;
 			long fileSize = selectedFile.length();
+			
+			System.out.println("fileSize : " + fileSize);
 			long current = 0;
 
 			while (current != fileSize) {
@@ -446,7 +448,6 @@ public class Communication {
 
 			fileInputStream.close();
 			bufferedInputStream.close();
-			outputStream.close();
 
 
 		} catch (Exception e) {

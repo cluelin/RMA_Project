@@ -20,6 +20,8 @@ public class SaveBtnListener implements ActionListener {
 
 	GUIadvancedRepalcementPanel guiAdvancedRepalcementPanel = GUIadvancedRepalcementPanel.getInstance();
 
+	static File selectedFile;
+
 	@Override
 	public void actionPerformed(ActionEvent actionEvent) {
 		// TODO Auto-generated method stub
@@ -32,6 +34,8 @@ public class SaveBtnListener implements ActionListener {
 
 				// 저장 수행
 				AdvancedReplacementOperation.getInstance().saveRMAdetailToServer();
+				Communication.getInstance().saveAttachFile(guiAdvancedRepalcementPanel.getTxtRMAnumber().getText(),
+						selectedFile);
 
 				// 저장되면 새로운 rma number를 할당받아야함.
 				String rmaNumber = Communication.getInstance().getRMAnumberFromServer();
@@ -53,15 +57,11 @@ public class SaveBtnListener implements ActionListener {
 
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				System.out.println("You chose to open this file: " + jFileChooser.getSelectedFile().getName());
-				File selectedFile = jFileChooser.getSelectedFile();
-
-				Communication.getInstance().saveAttachFile(guiAdvancedRepalcementPanel.getTxtRMAnumber().getText(),
-						selectedFile);
+				selectedFile = jFileChooser.getSelectedFile();
 
 			}
 		}
 
 	}
-
 
 }
