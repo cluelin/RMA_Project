@@ -1,9 +1,14 @@
 package Communication;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.PrintStream;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -308,15 +313,16 @@ public class Communication {
 					String rmaDate = jsonObject.get("RMAdate").toString();
 					String rmaContents = jsonObject.get("RMAcontents").toString();
 					String rmaDelivered = jsonObject.get("RMAdelivered").toString();
-					
+
 					boolean rmaDeliveredBool = false;
-					
-					if(rmaDelivered != null && rmaDelivered.equals("true")){
+
+					if (rmaDelivered != null && rmaDelivered.equals("true")) {
 						rmaDeliveredBool = true;
 					}
 
 					// history panel에 결과 출력.
-					guiAdvancedRepalcementPanel.setRelatedRMAInformation(rmaNumber, rmaDate, rmaContents, rmaDeliveredBool);
+					guiAdvancedRepalcementPanel.setRelatedRMAInformation(rmaNumber, rmaDate, rmaContents,
+							rmaDeliveredBool);
 
 					System.out.println("rmaNumber : " + rmaNumber + " rmaContents : " + rmaContents);
 
@@ -401,27 +407,35 @@ public class Communication {
 
 		return itemValidationObject;
 	}
-	
-	public void saveAttachFile(String rmaNumber, File selectedFile){
-		
-		JSONObject attachFileObj = new JSONObject();
-		
-		attachFileObj.put("Action", "attachFile");
-		attachFileObj.put("rmaNumber", rmaNumber);
-		attachFileObj.put("attachFileName", selectedFile.getName());
-		
-		ConnectionSocket.printStream.println(attachFileObj);
-		
+
+	public void saveAttachFile(String rmaNumber, File selectedFile) {
+
 		try {
+
+			// 새로운 연결 소켓 열어서 파일 전송.
+			Socket dataClient = new Socket(ServerInformation.SERVER_IP, ServerInformation.SERVER_PORT);
+			System.out.println("Client : connected");
+			
+			JSONObject attachFileObj = new JSONObject();
+
+			attachFileObj.put("Action", "saveAttachFileInfo");
+			attachFileObj.put("rmaNumber", rmaNumber);
+			attachFileObj.put("attachFileName", selectedFile.getName());
+
+			
+			PrintStream printStream = new PrintStream(dataClient.getOutputStream());
+			printStream.println(attachFileObj);
 
 			FileInputStream fileInputStream = new FileInputStream(selectedFile);
 
 			BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream);
 
-			OutputStream outputStream = ConnectionSocket.getInstance().getOutputStream();
+			OutputStream outputStream = dataClient.getOutputStream();
+			BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(outputStream);
+
 			byte[] contents;
 			long fileSize = selectedFile.length();
-			
+
 			System.out.println("fileSize : " + fileSize);
 			long current = 0;
 
@@ -445,14 +459,62 @@ public class Communication {
 			}
 
 			outputStream.flush();
+			outputStream.close();
 
 			fileInputStream.close();
 			bufferedInputStream.close();
 
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
+		// try {
+		//
+		// FileInputStream fileInputStream = new FileInputStream(selectedFile);
+		//
+		// BufferedInputStream bufferedInputStream = new
+		// BufferedInputStream(fileInputStream);
+		//
+		// OutputStream outputStream =
+		// ConnectionSocket.getInstance().getOutputStream();
+		// BufferedOutputStream bufferedOutputStream = new
+		// BufferedOutputStream(outputStream);
+		//
+		// byte[] contents;
+		// long fileSize = selectedFile.length();
+		//
+		// System.out.println("fileSize : " + fileSize);
+		// long current = 0;
+		//
+		// while (current != fileSize) {
+		// int size = 10000;
+		//
+		// if (fileSize - current >= size) {
+		//
+		// current += size;
+		// } else {
+		// size = (int) (fileSize - current);
+		// current = fileSize;
+		//
+		// }
+		// contents = new byte[size];
+		// bufferedInputStream.read(contents, 0, size);
+		// bufferedOutputStream.write(contents);
+		//
+		// System.out.print("Sending file ... " + (current * 100) / fileSize +
+		// "% complete!");
+		//
+		// }
+		//
+		// bufferedOutputStream.flush();
+		// bufferedOutputStream.close();
+		//
+		// fileInputStream.close();
+		// bufferedInputStream.close();
+		//
+		// } catch (Exception e) {
+		// e.printStackTrace();
+		// }
+
 	}
 }

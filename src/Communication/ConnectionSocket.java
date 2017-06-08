@@ -17,15 +17,15 @@ public class ConnectionSocket extends Thread {
 	public static PrintStream printStream;
 	public static BufferedReader bufferedReader;
 	public static Socket client = null;
-	
+
 	static ConnectionSocket instance = null;
-	
-	public static ConnectionSocket getInstance(){
-		
-		if(instance == null){
+
+	public static ConnectionSocket getInstance() {
+
+		if (instance == null) {
 			instance = new ConnectionSocket();
 		}
-		
+
 		return instance;
 	}
 
@@ -63,6 +63,7 @@ public class ConnectionSocket extends Thread {
 	}
 
 	public OutputStream getOutputStream() throws IOException {
+
 		return client.getOutputStream();
 	}
 

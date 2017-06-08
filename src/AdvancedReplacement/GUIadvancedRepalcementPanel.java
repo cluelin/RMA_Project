@@ -407,7 +407,7 @@ public class GUIadvancedRepalcementPanel extends JPanel implements ActionListene
 		System.out.println("countOfAttachment : " + RMADetailJSON.get("countOfAttachment"));
 		
 		for(int i = 0 ; i < Integer.parseInt(RMADetailJSON.get("countOfAttachment").toString()) ; i++){
-			System.out.println("fileName + i : " + RMADetailJSON.get("fileName"+ i));
+			System.out.println("fileName "+ i + " : " + RMADetailJSON.get("fileName"+ i));
 		}
 		
 		
