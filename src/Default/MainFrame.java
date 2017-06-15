@@ -1,50 +1,18 @@
 package Default;
 
-import java.awt.Color;
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
-import javax.swing.BorderFactory;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.JTextPane;
-import javax.swing.JButton;
-import java.awt.FlowLayout;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
-import java.awt.GridLayout;
-import javax.swing.JScrollPane;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.BoxLayout;
-import java.awt.CardLayout;
-import net.miginfocom.swing.MigLayout;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-
-import java.awt.BorderLayout;
-import javax.swing.JTextArea;
-import javax.swing.JTable;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-import org.eclipse.wb.swing.FocusTraversalOnArray;
 
 import AdvancedReplacement.AdvancedReplacementOperation;
-import AdvancedReplacement.GUIadvancedRepalcementPanel;
-import Communication.ConnectionSocket;
-import JavaSignInAndUpTemplate.GUISignIn;
-
-import java.awt.Component;
-import javax.swing.border.EmptyBorder;
 
 public class MainFrame extends JFrame {
 
 	public static Dimension ScreenSize = Toolkit.getDefaultToolkit().getScreenSize();
-	private JPanel variablePanel;
+	private static JPanel variablePanel;
 
 	private static MainFrame instance = null;
 	private CommonPanel commonPanel;
@@ -60,6 +28,7 @@ public class MainFrame extends JFrame {
 
 		// 공통 패널 소환.
 		loadCommonPanel();
+
 		// 첫번째 화면 출력.
 		loadAdvancedReplacementPanel();
 
@@ -112,8 +81,5 @@ public class MainFrame extends JFrame {
 		commonPanel.removeVariablePanel(variablePanel);
 
 	}
-
-	
-
 
 }

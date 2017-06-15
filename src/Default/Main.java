@@ -1,7 +1,7 @@
 package Default;
 
 import Communication.ConnectionSocket;
-import JavaSignInAndUpTemplate.GUISignIn;
+import SignInAndUp.GUISignIn;
 
 public class Main {
 

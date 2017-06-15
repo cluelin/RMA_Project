@@ -63,15 +63,19 @@ public class DocumentControlPanel extends JPanel implements ActionListener {
 	private void addBtnListener() {
 
 		docClearBtn.addActionListener(this);
+		docPrintBtn.addActionListener(this);
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 
-		if (e.getSource() == docClearBtn) {
-			if (MainFrame.getInstance().getVariablePanel() instanceof GUIadvancedRepalcementPanel) {
+		if (MainFrame.getInstance().getVariablePanel() instanceof GUIadvancedRepalcementPanel) {
 
+			if (e.getSource() == docClearBtn) {
 				AdvancedReplacementOperation.getInstance().clearField();
+			}else if(e.getSource() == docPrintBtn){
+				
+				AdvancedReplacementOperation.getInstance().printDocx();
 			}
 		}
 

@@ -1,21 +1,33 @@
 package AdvancedReplacement;
 
+import java.awt.Desktop;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.List;
 
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.text.JTextComponent;
 
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
+import org.apache.poi.xwpf.usermodel.XWPFParagraph;
+import org.apache.poi.xwpf.usermodel.XWPFRun;
+import org.apache.poi.xwpf.usermodel.XWPFTable;
+import org.apache.poi.xwpf.usermodel.XWPFTableCell;
+import org.apache.poi.xwpf.usermodel.XWPFTableRow;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import AdvancedReplacement.ItemTable.MyTableModel;
 import Communication.Communication;
-import Communication.ConnectionSocket;
 
 public class AdvancedReplacementOperation {
 
@@ -386,5 +398,81 @@ public class AdvancedReplacementOperation {
 		
 		
 
+	}
+	
+	public void printDocx(){
+		
+		EditDocx();
+//		
+//		PrinterJob job = PrinterJob.getPrinterJob();
+//        job.setPrintable(new PrintableClass());
+//        boolean ok = job.printDialog();
+//        if (ok) {
+//            try {
+//                 job.print();
+//            } catch (PrinterException ex) {
+//             /* The job did not successfully complete */
+//            }
+//        }
+		
+		try{
+			Desktop.getDesktop().print(new File("NAME2.docx"));
+		} catch (Exception e) {
+
+		}
+	}
+	
+	public void EditDocx(){
+		
+		try{
+			
+			XWPFDocument docx = new XWPFDocument(new FileInputStream("NAME.docx"));
+			// using XWPFWordExtractor Class
+
+			for (XWPFParagraph p : docx.getParagraphs()) {
+			    List<XWPFRun> runs = p.getRuns();
+			    if (runs != null) {
+			        for (XWPFRun r : runs) {
+			            String text = r.getText(0);
+			            
+			            System.out.println(text);
+			            if (text != null) {
+			            	if(text.contains("#DATE#")){
+			            		text = text.replace("#DATE#", guiAdvancedRepalcementPanel.getTxtDate().getText());
+				                r.setText(text, 0);
+			            	}else if(text.contains("#RMA_NUMBER#")){
+			            		text = text.replace("#RMA_NUMBER#", guiAdvancedRepalcementPanel.getTxtRMAnumber().getText());
+				                r.setText(text, 0);
+			            	}
+			            	
+			                
+			            }
+			        }
+			    }
+			}
+			for (XWPFTable tbl : docx.getTables()) {
+			   for (XWPFTableRow row : tbl.getRows()) {
+			      for (XWPFTableCell cell : row.getTableCells()) {
+			         for (XWPFParagraph p : cell.getParagraphs()) {
+			            for (XWPFRun r : p.getRuns()) {
+			              String text = r.getText(0);
+			              if (text.contains("#NAME#")) {
+			                text = text.replace("#NAME#", "haystack");
+			                r.setText(text,0);
+			              }
+			            }
+			         }
+			      }
+			   }
+			}
+
+			docx.write(new FileOutputStream("NAME2.docx"));
+			
+		}catch(FileNotFoundException fnfE){
+			fnfE.printStackTrace();
+		}catch(IOException ioE){
+			ioE.printStackTrace();
+		}
+		
 	}
 }
