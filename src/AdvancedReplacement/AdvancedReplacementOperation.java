@@ -1,6 +1,7 @@
 package AdvancedReplacement;
 
 import java.awt.Desktop;
+import java.awt.TextArea;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
@@ -35,7 +36,7 @@ public class AdvancedReplacementOperation {
 
 	Communication commnunication = Communication.getInstance();
 
-	public static AdvancedReplacementOperation instance = null;
+	private static AdvancedReplacementOperation instance = null;
 
 	JSONParser jsonParser = new JSONParser();
 
@@ -84,6 +85,7 @@ public class AdvancedReplacementOperation {
 		guiAdvancedRepalcementPanel.clearCompanyDetail();
 		guiAdvancedRepalcementPanel.clearHistoryPanel();
 		guiAdvancedRepalcementPanel.clearItemTable();
+		guiAdvancedRepalcementPanel.clearRMADetail();
 
 		guiAdvancedRepalcementPanel.getTxtContents().setText("");
 		guiAdvancedRepalcementPanel.getTxtBillTo().setText("");
@@ -241,7 +243,6 @@ public class AdvancedReplacementOperation {
 		int itemCount = getValidItemRowCount();
 
 		// Item information
-		System.out.println("0,0 : " + guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(0, 0));
 		System.out.println("itemCount : " + itemCount);
 
 		// RMA ITEM TABLE 저장
@@ -268,8 +269,6 @@ public class AdvancedReplacementOperation {
 							guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 3));
 				}
 
-				
-				System.out.println("treu? : " + guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 4));
 				if ((boolean) guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 4)) {
 					objectToServer.put("itemReceive" + i, true);
 				} else {
@@ -288,8 +287,7 @@ public class AdvancedReplacementOperation {
 		objectToServer.put("rmaTrackingNumber", guiAdvancedRepalcementPanel.getTxtTrackingNumber().getText());
 
 		Communication.getInstance().saveRMAInformationToServer(objectToServer);
-		
-		
+
 	}
 
 	public boolean validityCheck() {
@@ -328,7 +326,6 @@ public class AdvancedReplacementOperation {
 
 			// item table price check.
 			try {
-				System.out.println(guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 3).toString());
 				Integer.parseInt(guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 3).toString());
 			} catch (NumberFormatException e) {
 
@@ -362,13 +359,14 @@ public class AdvancedReplacementOperation {
 			return pass;
 		}
 
-//		if (itemTableValidObject.get("itemSerialValidation") == null) {
-//
-//		} else if ((boolean) itemTableValidObject.get("itemSerialValidation") == false) {
-//			JOptionPane.showMessageDialog(null, "SerialNumber가 중복됩니다.");
-//			pass = false;
-//			return pass;
-//		}
+		// if (itemTableValidObject.get("itemSerialValidation") == null) {
+		//
+		// } else if ((boolean) itemTableValidObject.get("itemSerialValidation")
+		// == false) {
+		// JOptionPane.showMessageDialog(null, "SerialNumber가 중복됩니다.");
+		// pass = false;
+		// return pass;
+		// }
 
 		// item, serial validate check. 추가해야함.
 
@@ -377,102 +375,103 @@ public class AdvancedReplacementOperation {
 
 	// Item Name 이 채워져있는 행 수를 return
 	public int getValidItemRowCount() {
-//
-//		int rowCount = 0;
-//
-//		for (int i = 0; i < guiAdvancedRepalcementPanel.get_RMAitemTable().getRowCount(); i++) {
-//
-//			if (guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 0) == null) {
-//
-//				rowCount = i;
-//				break;
-//			}
-//
-//		}
-//
-//		System.out.println("행 수 : " + rowCount);
-//
-//		return rowCount;
-		
-		return ((MyTableModel)guiAdvancedRepalcementPanel.get_RMAitemTable().getModel()).getValidRowCount();
-		
-		
+		//
+		// int rowCount = 0;
+		//
+		// for (int i = 0; i <
+		// guiAdvancedRepalcementPanel.get_RMAitemTable().getRowCount(); i++) {
+		//
+		// if (guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 0)
+		// == null) {
+		//
+		// rowCount = i;
+		// break;
+		// }
+		//
+		// }
+		//
+		// System.out.println("행 수 : " + rowCount);
+		//
+		// return rowCount;
+
+		return ((MyTableModel) guiAdvancedRepalcementPanel.get_RMAitemTable().getModel()).getValidRowCount();
 
 	}
-	
-	public void printDocx(){
-		
+
+	public void printDocx() {
+
 		EditDocx();
-//		
-//		PrinterJob job = PrinterJob.getPrinterJob();
-//        job.setPrintable(new PrintableClass());
-//        boolean ok = job.printDialog();
-//        if (ok) {
-//            try {
-//                 job.print();
-//            } catch (PrinterException ex) {
-//             /* The job did not successfully complete */
-//            }
-//        }
-		
-		try{
+		//
+		// PrinterJob job = PrinterJob.getPrinterJob();
+		// job.setPrintable(new PrintableClass());
+		// boolean ok = job.printDialog();
+		// if (ok) {
+		// try {
+		// job.print();
+		// } catch (PrinterException ex) {
+		// /* The job did not successfully complete */
+		// }
+		// }
+
+		try {
 			Desktop.getDesktop().print(new File("NAME2.docx"));
 		} catch (Exception e) {
 
 		}
 	}
-	
-	public void EditDocx(){
-		
-		try{
-			
+
+	public void EditDocx() {
+
+		try {
+
 			XWPFDocument docx = new XWPFDocument(new FileInputStream("NAME.docx"));
 			// using XWPFWordExtractor Class
 
 			for (XWPFParagraph p : docx.getParagraphs()) {
-			    List<XWPFRun> runs = p.getRuns();
-			    if (runs != null) {
-			        for (XWPFRun r : runs) {
-			            String text = r.getText(0);
-			            
-			            System.out.println(text);
-			            if (text != null) {
-			            	if(text.contains("#DATE#")){
-			            		text = text.replace("#DATE#", guiAdvancedRepalcementPanel.getTxtDate().getText());
-				                r.setText(text, 0);
-			            	}else if(text.contains("#RMA_NUMBER#")){
-			            		text = text.replace("#RMA_NUMBER#", guiAdvancedRepalcementPanel.getTxtRMAnumber().getText());
-				                r.setText(text, 0);
-			            	}
-			            	
-			                
-			            }
-			        }
-			    }
+				List<XWPFRun> runs = p.getRuns();
+				if (runs != null) {
+					for (XWPFRun r : runs) {
+						String text = r.getText(0);
+
+						System.out.println(text);
+						if (text != null) {
+							if (text.contains("#DATE#")) {
+								text = text.replace("#DATE#", guiAdvancedRepalcementPanel.getTxtDate().getText());
+								r.setText(text, 0);
+							} else if (text.contains("#RMA_NUMBER#")) {
+								text = text.replace("#RMA_NUMBER#",
+										guiAdvancedRepalcementPanel.getTxtRMAnumber().getText());
+								r.setText(text, 0);
+							}
+
+						}
+					}
+				}
 			}
 			for (XWPFTable tbl : docx.getTables()) {
-			   for (XWPFTableRow row : tbl.getRows()) {
-			      for (XWPFTableCell cell : row.getTableCells()) {
-			         for (XWPFParagraph p : cell.getParagraphs()) {
-			            for (XWPFRun r : p.getRuns()) {
-			              String text = r.getText(0);
-			              if (text.contains("#NAME#")) {
-			                text = text.replace("#NAME#", "haystack");
-			                r.setText(text,0);
-			              }
-			            }
-			         }
-			      }
-			   }
+				for (XWPFTableRow row : tbl.getRows()) {
+					for (XWPFTableCell cell : row.getTableCells()) {
+						for (XWPFParagraph p : cell.getParagraphs()) {
+							for (XWPFRun r : p.getRuns()) {
+								String text = r.getText(0);
+								if (text.contains("#NAME#")) {
+									text = text.replace("#NAME#", "haystack");
+									r.setText(text, 0);
+								}
+							}
+						}
+					}
+				}
 			}
 
 			docx.write(new FileOutputStream("NAME2.docx"));
-			
-		}catch(FileNotFoundException fnfE){
+
+		} catch (FileNotFoundException fnfE) {
 			fnfE.printStackTrace();
-		}catch(IOException ioE){
+		} catch (IOException ioE) {
 			ioE.printStackTrace();
 		}
-		
+
 	}
+
 }

@@ -2,25 +2,18 @@ package AdvancedReplacement;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
+import java.util.ArrayList;
 
 import javax.swing.JFileChooser;
 
 import Communication.Communication;
-import Communication.ConnectionSocket;
 
 public class SaveBtnListener implements ActionListener {
 
 	GUIadvancedRepalcementPanel guiAdvancedRepalcementPanel = GUIadvancedRepalcementPanel.getInstance();
 
-	static File selectedFile;
+	static ArrayList<File> selectedFile = new ArrayList<File>();
 
 	@Override
 	public void actionPerformed(ActionEvent actionEvent) {
@@ -34,8 +27,25 @@ public class SaveBtnListener implements ActionListener {
 
 				// 저장 수행
 				AdvancedReplacementOperation.getInstance().saveRMAdetailToServer();
-				Communication.getInstance().saveAttachFile(guiAdvancedRepalcementPanel.getTxtRMAnumber().getText(),
-						selectedFile);
+				
+				try {
+					Thread.sleep(3000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+				for (int i = 0; i < selectedFile.size(); i++) {
+					Communication.getInstance().saveAttachFile(guiAdvancedRepalcementPanel.getTxtRMAnumber().getText(),
+							selectedFile.get(i));
+				}
+
+				try {
+					Thread.sleep(3000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 
 				// 저장되면 새로운 rma number를 할당받아야함.
 				String rmaNumber = Communication.getInstance().getRMAnumberFromServer();
@@ -57,7 +67,9 @@ public class SaveBtnListener implements ActionListener {
 
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				System.out.println("You chose to open this file: " + jFileChooser.getSelectedFile().getName());
-				selectedFile = jFileChooser.getSelectedFile();
+				selectedFile.add(jFileChooser.getSelectedFile());
+
+				guiAdvancedRepalcementPanel.setAttachFileList(jFileChooser.getSelectedFile().getName());
 
 			}
 		}

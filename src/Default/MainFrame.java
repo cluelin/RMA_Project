@@ -10,12 +10,15 @@ import javax.swing.JPanel;
 import AdvancedReplacement.AdvancedReplacementOperation;
 
 public class MainFrame extends JFrame {
+	public MainFrame() {
+	}
 
 	public static Dimension ScreenSize = Toolkit.getDefaultToolkit().getScreenSize();
 	private static JPanel variablePanel;
 
 	private static MainFrame instance = null;
 	private CommonPanel commonPanel;
+	private JPanel documentControlPanel;
 
 	public void setMainFrame() {
 
@@ -28,6 +31,7 @@ public class MainFrame extends JFrame {
 
 		// 공통 패널 소환.
 		loadCommonPanel();
+		loadDocumentPanel();
 
 		// 첫번째 화면 출력.
 		loadAdvancedReplacementPanel();
@@ -59,6 +63,11 @@ public class MainFrame extends JFrame {
 
 		getContentPane().add(commonPanel, BorderLayout.CENTER);
 
+	}
+	
+	private void loadDocumentPanel(){
+		documentControlPanel = DocumentControlPanel.getInstance();
+		commonPanel.addDocumentPanel(documentControlPanel);
 	}
 
 	public JPanel getVariablePanel() {

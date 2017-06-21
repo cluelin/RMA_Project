@@ -26,9 +26,11 @@ import Communication.ConnectionSocket;
 public class ComboBoxListener implements DocumentListener {
 
 	GUIadvancedRepalcementPanel guiAdvancedRepalcementPanel = GUIadvancedRepalcementPanel.getInstance();
+	
 
 	public ComboBoxListener() {
 
+		
 		// companyUpdate();
 
 	}
@@ -88,16 +90,13 @@ public class ComboBoxListener implements DocumentListener {
 
 		String targetName = textComponent.getText();
 
-		System.out.println("targetName : " + targetName);
 
 		// 현재 입력창에 입력된 값(targetName)을 기준으로 추천단어를 검색해서 리스트에 등록.
 		List<String> targetList = Communication.getInstance().getCompanyNameListFromServer(targetName);
 
 		// targetName과 같은 회사의 이전 RMA정보를 출력.
-		System.out.println("previousRMAList 출력전");
 		Communication.getInstance().showPreviousRMAList(targetName);
 
-		System.out.println("previousRMAList 출력후");
 
 		Set<String> foundSet = new HashSet<String>();
 
@@ -125,7 +124,6 @@ public class ComboBoxListener implements DocumentListener {
 
 			// 검색어와 일치하는 회사가 있을경우 정보를 가져옴.
 
-			System.out.println("before getcompany Detail in showRecommendCompanyList");
 
 			JSONObject companyDetailObject = Communication.getInstance().getCompanyDetailJSON(targetName);
 
@@ -136,7 +134,9 @@ public class ComboBoxListener implements DocumentListener {
 			String email = companyDetailObject.get("companyEmail").toString();
 
 			guiAdvancedRepalcementPanel.setCompanyDetail(address, city, zipCode, phone, email);
-			System.out.println("after getcompany Detail in showRecommendCompanyList");
+			
+			guiAdvancedRepalcementPanel.setBillToArea(targetName, address, city, zipCode, phone);
+			
 
 		}
 
@@ -146,11 +146,9 @@ public class ComboBoxListener implements DocumentListener {
 
 		}
 
-		System.out.println("before showRecommendSiteList");
 
 		showRecommendSiteList();
 
-		System.out.println("after showRecommendSiteList");
 
 		owner.setPopupVisible(true);
 		owner.setEditable(true);

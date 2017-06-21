@@ -3,7 +3,6 @@ package AdvancedReplacement;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -20,21 +19,24 @@ import java.util.Date;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultCellEditor;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.ListModel;
+import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
 import org.json.simple.JSONObject;
@@ -57,6 +59,8 @@ public class GUIadvancedRepalcementPanel extends JPanel implements ActionListene
 	private JTextField txtCompanyCity;
 	private JTextField txtCompanyPhone;
 	private JTextField txtOrderNumber;
+
+	private JList<String> attachmentList;
 
 	private JPanel rightCompanyInformationPanel;
 	private JPanel advancedReplacementPanel;
@@ -105,6 +109,7 @@ public class GUIadvancedRepalcementPanel extends JPanel implements ActionListene
 	private JPanel panel_3;
 
 	private JComboBox itemComboBox;
+	private JPanel panel_1;
 
 	private GUIadvancedRepalcementPanel() {
 
@@ -323,9 +328,7 @@ public class GUIadvancedRepalcementPanel extends JPanel implements ActionListene
 			long diff = todayDate.getTime() - rmaDateDate.getTime();
 			long dayDiff = diff / (24 * 60 * 60 * 1000);
 
-			System.out.println("dayDiff : " + dayDiff);
-
-			//모든 아이템이 돌아오지 않음 & 기한 초과
+			// 모든 아이템이 돌아오지 않음 & 기한 초과
 			if (dayDiff >= Default.ConstInterFace.DeliverLimitDay && !rmaDelivered) {
 				previousRMAitemPanel.setBackground(new Color(255, 100, 100));
 
@@ -339,8 +342,6 @@ public class GUIadvancedRepalcementPanel extends JPanel implements ActionListene
 		previousRMAitemPanel.add(rmaDateLabel);
 		previousRMAitemPanel.add(rmaContentsLabel);
 		previousRMAitemPanel.addMouseListener(new previousRMAitemPanelClickListener(rmaNumber));
-
-		System.out.println("rmaNumber : " + rmaNumber + " rmaContents : " + rmaContents);
 
 		previousRMAListPanel.add(previousRMAitemPanel);
 		previousRMAListPanel.validate();
@@ -381,11 +382,10 @@ public class GUIadvancedRepalcementPanel extends JPanel implements ActionListene
 			String itemDescription = RMADetailJSON.get("itemDescription" + i).toString();
 			Integer itemPrice = Integer.parseInt(RMADetailJSON.get("itemPrice" + i).toString());
 			Boolean itemReceive = false;
-			
-			if(Integer.parseInt(RMADetailJSON.get("itemReceive" + i).toString()) == 1){
+
+			if (Integer.parseInt(RMADetailJSON.get("itemReceive" + i).toString()) == 1) {
 				itemReceive = true;
 			}
-			
 
 			_RMAitemTable.setValueAt(itemName, i, 0);
 			_RMAitemTable.setValueAt(serialNumber, i, 1);
@@ -403,14 +403,26 @@ public class GUIadvancedRepalcementPanel extends JPanel implements ActionListene
 		txtShipTo.setText(rmaShipTo);
 		txtTrackingNumber.setText(rmaTrackingNumber);
 
-		
 		System.out.println("countOfAttachment : " + RMADetailJSON.get("countOfAttachment"));
-		
-		for(int i = 0 ; i < Integer.parseInt(RMADetailJSON.get("countOfAttachment").toString()) ; i++){
-			System.out.println("fileName "+ i + " : " + RMADetailJSON.get("fileName"+ i));
+
+		DefaultListModel listModel = new DefaultListModel<>();
+
+		for (int i = 0; i < Integer.parseInt(RMADetailJSON.get("countOfAttachment").toString()); i++) {
+			System.out.println("fileName " + i + " : " + RMADetailJSON.get("fileName" + i));
+
+			listModel.addElement(RMADetailJSON.get("fileName" + i));
 		}
-		
-		
+
+		attachmentList.setModel(listModel);
+
+	}
+
+	public void setAttachFileList(String fileName) {
+
+		DefaultListModel<String> attachmentListModel = (DefaultListModel<String>) attachmentList.getModel();
+		attachmentListModel.addElement(fileName);
+
+		attachmentList.setModel(attachmentListModel);
 	}
 
 	public void clearRMADetail() {
@@ -421,6 +433,7 @@ public class GUIadvancedRepalcementPanel extends JPanel implements ActionListene
 		getTxtShipTo().setText("");
 		getTxtTrackingNumber().setText("");
 		getTxtOrderNumber().setText("");
+		getAttachmentList().setModel(new DefaultListModel<>());
 
 	}
 
@@ -468,9 +481,12 @@ public class GUIadvancedRepalcementPanel extends JPanel implements ActionListene
 		_RMAcontentsPanel.setLayout(new BorderLayout(0, 0));
 
 		txtContents = new JTextArea();
-		_RMAcontentsPanel.add(txtContents, BorderLayout.CENTER);
-		// txtContents.setPreferredSize(new Dimension(10, 100));
 		txtContents.setLineWrap(true);
+
+		JScrollPane contentsScroll = new JScrollPane(txtContents);
+
+		_RMAcontentsPanel.add(contentsScroll, BorderLayout.CENTER);
+		// txtContents.setPreferredSize(new Dimension(10, 100));
 
 		label_5 = new JLabel("Contents");
 		_RMAcontentsPanel.add(label_5, BorderLayout.NORTH);
@@ -489,7 +505,9 @@ public class GUIadvancedRepalcementPanel extends JPanel implements ActionListene
 
 		txtBillTo = new JTextArea();
 		txtBillTo.setLineWrap(true);
-		_RMAbillTo.add(txtBillTo, BorderLayout.CENTER);
+
+		JScrollPane billToScroll = new JScrollPane(txtBillTo);
+		_RMAbillTo.add(billToScroll, BorderLayout.CENTER);
 
 		lblBillTo = new JLabel("Bill to");
 		_RMAbillTo.add(lblBillTo, BorderLayout.NORTH);
@@ -508,14 +526,19 @@ public class GUIadvancedRepalcementPanel extends JPanel implements ActionListene
 		_RMAshipTo.add(lblShipTo, BorderLayout.NORTH);
 
 		txtShipTo = new JTextArea();
-		_RMAshipTo.add(txtShipTo, BorderLayout.CENTER);
 		txtShipTo.setLineWrap(true);
+		JScrollPane shipToScroll = new JScrollPane(txtShipTo);
+		_RMAshipTo.add(shipToScroll, BorderLayout.CENTER);
 
 		panel_4 = new JPanel();
 		panel.add(panel_4, BorderLayout.SOUTH);
 		panel_4.setLayout(new BorderLayout(0, 0));
 
 		attachFileBtn = new JButton("Attach File");
+		attachFileBtn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+			}
+		});
 
 		panel_4.add(attachFileBtn, BorderLayout.WEST);
 
@@ -525,13 +548,29 @@ public class GUIadvancedRepalcementPanel extends JPanel implements ActionListene
 
 		panel_5 = new JPanel();
 		panel_4.add(panel_5, BorderLayout.CENTER);
-		panel_5.setLayout(new FlowLayout(FlowLayout.RIGHT));
+		panel_5.setLayout(new BorderLayout());
+
+		attachmentList = new JList();
+
+		attachmentList.addMouseListener(new AttachListListener());
+		attachmentList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+		JScrollPane attachScroll = new JScrollPane(attachmentList);
+		attachScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		// attachScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		attachScroll.setMaximumSize(new Dimension(300, 10));
+		attachScroll.setPreferredSize(new Dimension(300, 10));
+		attachScroll.setViewportView(attachmentList);
+		panel_5.add(attachScroll, BorderLayout.WEST);
+
+		panel_1 = new JPanel();
+		panel_5.add(panel_1, BorderLayout.EAST);
 
 		lblNewLabel = new JLabel("Tracking Number");
-		panel_5.add(lblNewLabel);
+		panel_1.add(lblNewLabel);
 
 		txtTrackingNumber = new JTextField();
-		panel_5.add(txtTrackingNumber);
+		panel_1.add(txtTrackingNumber);
 		txtTrackingNumber.setColumns(20);
 	}
 
@@ -552,8 +591,6 @@ public class GUIadvancedRepalcementPanel extends JPanel implements ActionListene
 		txtCompanyZipCode.setText("");
 		txtCompanyPhone.setText("");
 		txtCompanyEmail.setText("");
-		
-		
 
 	}
 
@@ -629,16 +666,26 @@ public class GUIadvancedRepalcementPanel extends JPanel implements ActionListene
 		return itemComboBox;
 	}
 
+	public JList<String> getAttachmentList() {
+		return attachmentList;
+	}
 
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		// TODO Auto-generated method stub
 
-		((MyTableModel)get_RMAitemTable().getModel()).addRow();
+		((MyTableModel) get_RMAitemTable().getModel()).addRow();
 		get_RMAitemTable().repaint();
 		get_RMAitemTable().invalidate();
 		get_RMAitemTable().validate();
 
+	}
+
+	public void setBillToArea(String companyName, String address, String city, String zipCode, String phone) {
+
+		// JTextArea billTo = guiAdvancedRepalcementPanel.getTxtBillTo();
+
+		getTxtBillTo().setText(companyName + "\n" + address + "\n" + city + ", " + zipCode + "\n" + phone);
 	}
 
 }

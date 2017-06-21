@@ -27,29 +27,22 @@ public class previousRMAitemPanelClickListener implements MouseListener {
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		// TODO Auto-generated method stub
-		System.out.println("마우스 클릭됨 : " + rmaNumber);
-		
-		System.out.println("클릭된 위치 :  " + e.getSource());
-		
-		
-		
-		if(previousSelected != null){
+
+		if (previousSelected != null) {
 			previousSelected.setBackground(previousBackground);
 		}
-		
-		previousSelected = (JPanel)e.getSource();
+
+		previousSelected = (JPanel) e.getSource();
 		previousBackground = previousSelected.getBackground();
 
-		
-		previousSelected.setBackground(new Color(205,205,205));
-				
+		previousSelected.setBackground(new Color(205, 205, 205));
 
 		previousSelected.revalidate();
 		previousSelected.repaint();
 
 		JSONObject RMADetailJSON = Communication.getInstance().getRMAdetailFromServer(rmaNumber);
 
-		//set RMA information on GUI. 
+		// set RMA information on GUI.
 		GUIadvancedRepalcementPanel.getInstance().setRMADetail(RMADetailJSON);
 	}
 
@@ -76,7 +69,5 @@ public class previousRMAitemPanelClickListener implements MouseListener {
 		// TODO Auto-generated method stub
 
 	}
-
-	
 
 }

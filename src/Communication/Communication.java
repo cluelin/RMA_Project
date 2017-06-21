@@ -3,17 +3,22 @@ package Communication;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.net.Socket;
+import java.sql.ClientInfoStatus;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+
+import com.mysql.fabric.xmlrpc.Client;
 
 import AdvancedReplacement.GUIadvancedRepalcementPanel;
 
@@ -299,7 +304,6 @@ public class Communication {
 				try {
 					String input = ConnectionSocket.bufferedReader.readLine();
 
-					System.out.println("input : " + input);
 
 					if (input.equals("end")) {
 						break;
@@ -324,7 +328,6 @@ public class Communication {
 					guiAdvancedRepalcementPanel.setRelatedRMAInformation(rmaNumber, rmaDate, rmaContents,
 							rmaDeliveredBool);
 
-					System.out.println("rmaNumber : " + rmaNumber + " rmaContents : " + rmaContents);
 
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -364,11 +367,9 @@ public class Communication {
 
 				try {
 
-					System.out.println("company Name 입력 받기 전 ");
 					input = ConnectionSocket.bufferedReader.readLine();
 
 					System.out.println("input : " + input);
-					System.out.println("company Name 입력 받기 후 ");
 					if (input == null || input.equals("end")) {
 						break;
 					}
@@ -408,8 +409,11 @@ public class Communication {
 		return itemValidationObject;
 	}
 
+	//파일 하나 저장. 
 	public void saveAttachFile(String rmaNumber, File selectedFile) {
 
+		System.out.println("저장하는 파일 이름 : " + selectedFile);
+		
 		try {
 
 			// 새로운 연결 소켓 열어서 파일 전송.
@@ -420,101 +424,56 @@ public class Communication {
 
 			attachFileObj.put("Action", "saveAttachFileInfo");
 			attachFileObj.put("rmaNumber", rmaNumber);
+			
 			attachFileObj.put("attachFileName", selectedFile.getName());
 
-			
+			//서버에 파일 저장 요청. 
 			PrintStream printStream = new PrintStream(dataClient.getOutputStream());
 			printStream.println(attachFileObj);
 
+			
+			
 			FileInputStream fileInputStream = new FileInputStream(selectedFile);
-
 			BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream);
 
+			// Get socket's output stream
 			OutputStream outputStream = dataClient.getOutputStream();
-			BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(outputStream);
+			DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
 
+			// Read File Contents into contents array
 			byte[] contents;
-			long fileSize = selectedFile.length();
-
-			System.out.println("fileSize : " + fileSize);
+			long fileLength = selectedFile.length();
 			long current = 0;
 
-			while (current != fileSize) {
+			// until file length.
+			while (current != fileLength) {
 				int size = 10000;
-
-				if (fileSize - current >= size) {
-
+				if (fileLength - current >= size)
 					current += size;
-				} else {
-					size = (int) (fileSize - current);
-					current = fileSize;
-
+				else {
+					size = (int) (fileLength - current);
+					current = fileLength;
 				}
 				contents = new byte[size];
 				bufferedInputStream.read(contents, 0, size);
-				outputStream.write(contents);
-
-				System.out.print("Sending file ... " + (current * 100) / fileSize + "% complete!");
-
+				dataOutputStream.write(contents);
+				System.out.print("Sending file ... " + (current * 100) / fileLength + "% complete!");
+				
+				
 			}
 
-			outputStream.flush();
-			outputStream.close();
-
-			fileInputStream.close();
+			
+			
+			dataOutputStream.flush();
+//			
 			bufferedInputStream.close();
+			dataOutputStream.close();
+			// File transfer done. Close the socket connection!
+			dataClient.close();
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
-		// try {
-		//
-		// FileInputStream fileInputStream = new FileInputStream(selectedFile);
-		//
-		// BufferedInputStream bufferedInputStream = new
-		// BufferedInputStream(fileInputStream);
-		//
-		// OutputStream outputStream =
-		// ConnectionSocket.getInstance().getOutputStream();
-		// BufferedOutputStream bufferedOutputStream = new
-		// BufferedOutputStream(outputStream);
-		//
-		// byte[] contents;
-		// long fileSize = selectedFile.length();
-		//
-		// System.out.println("fileSize : " + fileSize);
-		// long current = 0;
-		//
-		// while (current != fileSize) {
-		// int size = 10000;
-		//
-		// if (fileSize - current >= size) {
-		//
-		// current += size;
-		// } else {
-		// size = (int) (fileSize - current);
-		// current = fileSize;
-		//
-		// }
-		// contents = new byte[size];
-		// bufferedInputStream.read(contents, 0, size);
-		// bufferedOutputStream.write(contents);
-		//
-		// System.out.print("Sending file ... " + (current * 100) / fileSize +
-		// "% complete!");
-		//
-		// }
-		//
-		// bufferedOutputStream.flush();
-		// bufferedOutputStream.close();
-		//
-		// fileInputStream.close();
-		// bufferedInputStream.close();
-		//
-		// } catch (Exception e) {
-		// e.printStackTrace();
-		// }
 
 	}
 }
