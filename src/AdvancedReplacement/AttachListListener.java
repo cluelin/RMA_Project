@@ -1,5 +1,6 @@
 package AdvancedReplacement;
 
+import java.awt.Desktop;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.BufferedInputStream;
@@ -7,13 +8,13 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.io.PrintStream;
 import java.net.Socket;
 
 import javax.swing.JList;
 
 import org.json.simple.JSONObject;
 
+import Communication.ConnectionSocket;
 import Communication.ServerInformation;
 
 public class AttachListListener implements MouseListener {
@@ -31,7 +32,7 @@ public class AttachListListener implements MouseListener {
 
 			if (list.getSelectedValue() != null)
 				getFileFromServer();
-			
+
 		} else if (e.getClickCount() == 3) {
 
 			// Triple-click detected
@@ -77,12 +78,11 @@ public class AttachListListener implements MouseListener {
 
 		fileNameObj.put("fileName", fileSavedName);
 
-		try {
-			Socket fileLoadSock = new Socket(ServerInformation.SERVER_IP, ServerInformation.SERVER_PORT);
-			System.out.println("Client : connected");
+		ConnectionSocket.getInstance().printStream.println(fileNameObj);
 
-			PrintStream printStream = new PrintStream(fileLoadSock.getOutputStream());
-			printStream.println(fileNameObj);
+		try {
+			Socket fileLoadSock = new Socket(ServerInformation.SERVER_IP, ServerInformation.DATA_PASS_PORT);
+			System.out.println("Client : connected");
 
 			// 파일 저장
 
@@ -99,7 +99,7 @@ public class AttachListListener implements MouseListener {
 			byte[] contents = new byte[10000];
 
 			// Initialize the FileOutputStream to the output file's full path.
-			FileOutputStream fileOutputStream = new FileOutputStream(fileDir + "/" + fileName);
+			FileOutputStream fileOutputStream = new FileOutputStream(fileDir + "/" + fileSavedName);
 			BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
 
 			InputStream inputStream = fileLoadSock.getInputStream();
@@ -112,8 +112,16 @@ public class AttachListListener implements MouseListener {
 				bufferedOutputStream.write(contents, 0, bytesRead);
 
 			bufferedOutputStream.flush();
+			bufferedOutputStream.close();
+			
 			bufferedInputStream.close();
-			fileOutputStream.close();
+			
+			fileLoadSock.close();
+			
+			File file = new File(fileDir + "/" + fileSavedName);
+			
+			Desktop dt = Desktop.getDesktop();
+		    dt.open(file);
 
 			System.out.println("파일 저장완료");
 

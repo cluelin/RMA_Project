@@ -66,5 +66,9 @@ public class ConnectionSocket extends Thread {
 
 		return client.getOutputStream();
 	}
+	
+	public Socket getSocket(){
+		return client;
+	}
 
 }

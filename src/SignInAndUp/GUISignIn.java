@@ -3,6 +3,8 @@ package SignInAndUp;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Toolkit;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -12,7 +14,7 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
-public class GUISignIn extends JFrame {
+public class GUISignIn extends JFrame implements KeyListener{
 
 	static private GUISignIn instance = null;
 	
@@ -78,12 +80,14 @@ public class GUISignIn extends JFrame {
 				ID_FIELD_WIDTH, ID_FILED_HEIGHT);
 		getContentPane().add(IDTextField);
 		IDTextField.setColumns(10);
+		
 
 		passWordTextField = new JPasswordField();
 		passWordTextField.setBounds(LOGIN_FRAME_WIDTH / 2 - ID_FIELD_WIDTH / 2,
 				lblSignIn.getY() + lblSignIn.getHeight() + 2 * ID_FILED_HEIGHT, ID_FIELD_WIDTH, ID_FILED_HEIGHT);
 		getContentPane().add(passWordTextField);
 		passWordTextField.setColumns(10);
+		
 	}
 
 	private void addSignInUpBtn() {
@@ -91,8 +95,10 @@ public class GUISignIn extends JFrame {
 		btnSignIn = new JButton("Sign In");
 		btnSignIn.setBounds(LOGIN_FRAME_WIDTH / 2 - ID_FIELD_WIDTH / 2, LOGIN_FRAME_HEIGHT / 2, ID_FIELD_WIDTH,
 				ID_FILED_HEIGHT);
-
+		
 		btnSignIn.addActionListener(new BtnClickListener());
+		this.getRootPane().setDefaultButton(btnSignIn);
+
 
 		getContentPane().add(btnSignIn);
 
@@ -102,6 +108,8 @@ public class GUISignIn extends JFrame {
 		
 		btnSignUp.addActionListener(new BtnClickListener());
 		getContentPane().add(btnSignUp);
+		
+		btnSignUp.addKeyListener(this);
 
 	}
 
@@ -153,6 +161,29 @@ public class GUISignIn extends JFrame {
 
 	public JButton getBtnSignUp() {
 		return btnSignUp;
+	}
+
+	@Override
+	public void keyPressed(KeyEvent e) {
+		// TODO Auto-generated method stub
+		
+		if(e.getSource() == btnSignUp && e.getKeyCode() == KeyEvent.VK_ENTER){
+			
+			new BtnClickListener().showSignUpPanel();
+		}
+		
+	}
+
+	@Override
+	public void keyReleased(KeyEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void keyTyped(KeyEvent e) {
+		// TODO Auto-generated method stub
+		
 	}
 
 

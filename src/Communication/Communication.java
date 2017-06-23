@@ -1,24 +1,16 @@
 package Communication;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.PrintStream;
 import java.net.Socket;
-import java.sql.ClientInfoStatus;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-
-import com.mysql.fabric.xmlrpc.Client;
 
 import AdvancedReplacement.GUIadvancedRepalcementPanel;
 
@@ -304,7 +296,6 @@ public class Communication {
 				try {
 					String input = ConnectionSocket.bufferedReader.readLine();
 
-
 					if (input.equals("end")) {
 						break;
 					}
@@ -327,7 +318,6 @@ public class Communication {
 					// history panel에 결과 출력.
 					guiAdvancedRepalcementPanel.setRelatedRMAInformation(rmaNumber, rmaDate, rmaContents,
 							rmaDeliveredBool);
-
 
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -409,67 +399,60 @@ public class Communication {
 		return itemValidationObject;
 	}
 
-	//파일 하나 저장. 
+	// 파일 하나 저장.
 	public void saveAttachFile(String rmaNumber, File selectedFile) {
 
 		System.out.println("저장하는 파일 이름 : " + selectedFile);
-		
+
 		try {
 
-			// 새로운 연결 소켓 열어서 파일 전송.
-			Socket dataClient = new Socket(ServerInformation.SERVER_IP, ServerInformation.SERVER_PORT);
-			System.out.println("Client : connected");
-			
 			JSONObject attachFileObj = new JSONObject();
 
 			attachFileObj.put("Action", "saveAttachFileInfo");
 			attachFileObj.put("rmaNumber", rmaNumber);
-			
+
 			attachFileObj.put("attachFileName", selectedFile.getName());
 
-			//서버에 파일 저장 요청. 
-			PrintStream printStream = new PrintStream(dataClient.getOutputStream());
-			printStream.println(attachFileObj);
+			ConnectionSocket.printStream.println(attachFileObj);
 
-			
-			
+			ConnectionSocket.printStream.flush();
+
+			Socket dataPassSock = new Socket(ServerInformation.SERVER_IP, ServerInformation.DATA_PASS_PORT);
+
 			FileInputStream fileInputStream = new FileInputStream(selectedFile);
 			BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream);
 
 			// Get socket's output stream
-			OutputStream outputStream = dataClient.getOutputStream();
+			OutputStream outputStream = dataPassSock.getOutputStream();
 			DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
 
 			// Read File Contents into contents array
-			byte[] contents;
-			long fileLength = selectedFile.length();
+			byte[] contents = new byte[10000];
+
 			long current = 0;
+			int bufferSize = contents.length;
+			long fileLength = selectedFile.length();
 
 			// until file length.
 			while (current != fileLength) {
-				int size = 10000;
-				if (fileLength - current >= size)
-					current += size;
+
+				if (fileLength - current >= bufferSize)
+					current += bufferSize;
 				else {
-					size = (int) (fileLength - current);
-					current = fileLength;
+					bufferSize = (int) (fileLength - current);
+					current += bufferSize;
 				}
-				contents = new byte[size];
-				bufferedInputStream.read(contents, 0, size);
-				dataOutputStream.write(contents);
-				System.out.print("Sending file ... " + (current * 100) / fileLength + "% complete!");
-				
-				
+
+				bufferedInputStream.read(contents, 0, bufferSize);
+				dataOutputStream.write(contents, 0, bufferSize);
+				System.out.println("contents.length : " + contents.length);
+				System.out.println("Sending file ... " + (current * 100) / fileLength + "% complete!");
+
 			}
 
-			
-			
 			dataOutputStream.flush();
-//			
-			bufferedInputStream.close();
 			dataOutputStream.close();
-			// File transfer done. Close the socket connection!
-			dataClient.close();
+			bufferedInputStream.close();
 
 		} catch (Exception e) {
 			e.printStackTrace();

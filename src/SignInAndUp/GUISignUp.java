@@ -100,6 +100,8 @@ public class GUISignUp extends JFrame {
 		confirmBtn.setBounds(79, 348, 89, 23);
 		confirmBtn.addActionListener(new BtnClickListener());
 		
+		this.getRootPane().setDefaultButton(confirmBtn);
+		
 		signUpPanel.add(confirmBtn);
 
 		cancelBtn = new JButton("Cancel");

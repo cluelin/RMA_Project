@@ -194,6 +194,10 @@ public class ComboBoxListener implements DocumentListener {
 			owner.addItem(siteName);
 
 		} else {
+			
+			//일치하는 경우
+			
+			
 
 		}
 

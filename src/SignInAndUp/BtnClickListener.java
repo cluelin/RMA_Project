@@ -29,20 +29,18 @@ public class BtnClickListener implements ActionListener {
 			// DB에 연결해서 확인 받아온후 다음 프로세스 진행.
 
 			boolean result = UserInfo.getInterface().signInUser(guiSignIn.getStringID(), guiSignIn.getStringPassWord());
-			
-			if(result){
+
+			if (result) {
 				MainFrame clientMain = new MainFrame();
 
 				clientMain.setMainFrame();
+
+				guiSignIn.dispose();
 			}
-			
-			guiSignIn.dispose();
 
 		} else if (guiSignIn.getBtnSignUp() == (JButton) e.getSource()) {
 
-			guiSignIn.dispose();
-
-			guiSignUp.setVisible(true);
+			showSignUpPanel();
 
 		} else if (guiSignUp.getCancelBtn() == (JButton) e.getSource()) {
 
@@ -91,6 +89,12 @@ public class BtnClickListener implements ActionListener {
 
 		return result;
 
+	}
+
+	public void showSignUpPanel() {
+		guiSignIn.dispose();
+
+		guiSignUp.setVisible(true);
 	}
 
 }
