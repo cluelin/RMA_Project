@@ -278,7 +278,7 @@ public class Communication {
 	}
 
 	// CompanyName으로 검색해서 해당 company에서 신청한 RMA를 검색해서 뿌려줌.
-	public void showPreviousRMAList(String targetName) {
+	public void showPreviousRMAList(String targetName, String siteName) {
 
 		try {
 
@@ -288,6 +288,7 @@ public class Communication {
 
 			obj.put("Action", "requestSearchRelatedRMA");
 			obj.put("companyName", targetName);
+			obj.put("siteName", siteName);
 
 			ConnectionSocket.printStream.println(obj.toJSONString());
 

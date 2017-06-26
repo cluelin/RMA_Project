@@ -26,11 +26,9 @@ import Communication.ConnectionSocket;
 public class ComboBoxListener implements DocumentListener {
 
 	GUIadvancedRepalcementPanel guiAdvancedRepalcementPanel = GUIadvancedRepalcementPanel.getInstance();
-	
 
 	public ComboBoxListener() {
 
-		
 		// companyUpdate();
 
 	}
@@ -90,13 +88,11 @@ public class ComboBoxListener implements DocumentListener {
 
 		String targetName = textComponent.getText();
 
-
 		// 현재 입력창에 입력된 값(targetName)을 기준으로 추천단어를 검색해서 리스트에 등록.
 		List<String> targetList = Communication.getInstance().getCompanyNameListFromServer(targetName);
 
 		// targetName과 같은 회사의 이전 RMA정보를 출력.
-		Communication.getInstance().showPreviousRMAList(targetName);
-
+		Communication.getInstance().showPreviousRMAList(targetName, "");
 
 		Set<String> foundSet = new HashSet<String>();
 
@@ -124,7 +120,6 @@ public class ComboBoxListener implements DocumentListener {
 
 			// 검색어와 일치하는 회사가 있을경우 정보를 가져옴.
 
-
 			JSONObject companyDetailObject = Communication.getInstance().getCompanyDetailJSON(targetName);
 
 			String address = companyDetailObject.get("companyAddress").toString();
@@ -134,9 +129,8 @@ public class ComboBoxListener implements DocumentListener {
 			String email = companyDetailObject.get("companyEmail").toString();
 
 			guiAdvancedRepalcementPanel.setCompanyDetail(address, city, zipCode, phone, email);
-			
+
 			guiAdvancedRepalcementPanel.setBillToArea(targetName, address, city, zipCode, phone);
-			
 
 		}
 
@@ -146,9 +140,7 @@ public class ComboBoxListener implements DocumentListener {
 
 		}
 
-
 		showRecommendSiteList();
-
 
 		owner.setPopupVisible(true);
 		owner.setEditable(true);
@@ -164,13 +156,11 @@ public class ComboBoxListener implements DocumentListener {
 		JTextComponent textComponent = (JTextComponent) component;
 
 		String siteName = textComponent.getText();
+		String companyName = guiAdvancedRepalcementPanel.getTxtCompanyName().getEditor().getItem().toString();
 
-		System.out.println("before getSiteNameFromServer");
+		
 
-		List<String> founds = Communication.getInstance().getSiteNameListFromServer(siteName,
-				guiAdvancedRepalcementPanel.getTxtCompanyName().getEditor().getItem().toString());
-
-		System.out.println("after getSiteNameFromServer");
+		List<String> founds = Communication.getInstance().getSiteNameListFromServer(siteName, companyName);
 
 		Set<String> foundSet = new HashSet<String>();
 
@@ -194,12 +184,21 @@ public class ComboBoxListener implements DocumentListener {
 			owner.addItem(siteName);
 
 		} else {
-			
-			//일치하는 경우
-			
+
+			// 일치하는 경우
+
 			
 
 		}
+		
+		System.out.println("siteName : " + siteName);
+		
+		if(siteName.equals("")){
+			System.out.println("siteName 공백 ");
+		}
+		
+		Communication.getInstance().showPreviousRMAList(companyName, siteName);
+		
 
 		for (String s : founds) {
 

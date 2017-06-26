@@ -16,6 +16,7 @@ import java.util.List;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.JTextComponent;
 
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
@@ -400,63 +401,74 @@ public class AdvancedReplacementOperation {
 
 	public void printDocx() {
 
-		EditDocx();
-		//
-		// PrinterJob job = PrinterJob.getPrinterJob();
-		// job.setPrintable(new PrintableClass());
-		// boolean ok = job.printDialog();
-		// if (ok) {
-		// try {
-		// job.print();
-		// } catch (PrinterException ex) {
-		// /* The job did not successfully complete */
-		// }
-		// }
+		String fileName = EditDocx();
 
 		try {
-			Desktop.getDesktop().print(new File("NAME2.docx"));
+			// Desktop.getDesktop().print(new File(fileName));
 		} catch (Exception e) {
 
 		}
 	}
 
-	public void EditDocx() {
+	public String EditDocx() {
+
+		String fileName = null;
 
 		try {
 
-			XWPFDocument docx = new XWPFDocument(new FileInputStream("NAME.docx"));
-			// using XWPFWordExtractor Class
+			String templetFileName = "COMMERCIAL INVOICE - BLANK.docx";
 
-			for (XWPFParagraph p : docx.getParagraphs()) {
-				List<XWPFRun> runs = p.getRuns();
-				if (runs != null) {
-					for (XWPFRun r : runs) {
-						String text = r.getText(0);
+			XWPFDocument docx = new XWPFDocument(new FileInputStream(templetFileName));
 
-						System.out.println(text);
-						if (text != null) {
-							if (text.contains("#DATE#")) {
-								text = text.replace("#DATE#", guiAdvancedRepalcementPanel.getTxtDate().getText());
-								r.setText(text, 0);
-							} else if (text.contains("#RMA_NUMBER#")) {
-								text = text.replace("#RMA_NUMBER#",
-										guiAdvancedRepalcementPanel.getTxtRMAnumber().getText());
-								r.setText(text, 0);
-							}
-
-						}
-					}
-				}
-			}
 			for (XWPFTable tbl : docx.getTables()) {
 				for (XWPFTableRow row : tbl.getRows()) {
 					for (XWPFTableCell cell : row.getTableCells()) {
 						for (XWPFParagraph p : cell.getParagraphs()) {
 							for (XWPFRun r : p.getRuns()) {
 								String text = r.getText(0);
-								if (text.contains("#NAME#")) {
-									text = text.replace("#NAME#", "haystack");
+
+								System.out.println(text);
+
+								if (text == null)
+									continue;
+
+								if (text.contains("#DATE#")) {
+									text = text.replace("#DATE#", guiAdvancedRepalcementPanel.getTxtDate().getText());
 									r.setText(text, 0);
+								} else if (text.contains("#RMA_NUMBER#")) {
+									text = text.replace("#RMA_NUMBER#",
+											guiAdvancedRepalcementPanel.getTxtRMAnumber().getText());
+									r.setText(text, 0);
+								} else if (text.contains("#Biling#")) {
+
+									text = text.replace("#Biling#", "");
+									r.setText(text, 0);
+
+									for (String trimText : guiAdvancedRepalcementPanel.getTxtBillTo().getText()
+											.toString().split("\n")) {
+
+										r.setText(trimText.trim());
+										r.addBreak();
+
+									}
+
+								} else if (text.contains("#Shipping#")) {
+									text = text.replace("#Shipping#", "");
+									r.setText(text, 0);
+
+									for (String trimText : guiAdvancedRepalcementPanel.getTxtShipTo().getText()
+											.toString().split("\n")) {
+
+										r.setText(trimText.trim());
+										r.addBreak();
+
+									}
+
+								} else if (text.contains("#price#")) {
+
+									text = text.replace("#price#", "" +getTotalPrice());
+									r.setText(text, 0);
+
 								}
 							}
 						}
@@ -464,13 +476,44 @@ public class AdvancedReplacementOperation {
 				}
 			}
 
-			docx.write(new FileOutputStream("NAME2.docx"));
+			File dir = new File("Attached");
+
+			if (!dir.exists()) {
+				try {
+					dir.mkdirs();
+				} catch (SecurityException e) {
+					e.printStackTrace();
+				}
+			}
+
+			fileName = dir + File.separator + guiAdvancedRepalcementPanel.getTxtRMAnumber().getText() + templetFileName;
+
+			docx.write(new FileOutputStream(fileName));
+
+			System.out.println("total price : " + getTotalPrice());
 
 		} catch (FileNotFoundException fnfE) {
 			fnfE.printStackTrace();
 		} catch (IOException ioE) {
 			ioE.printStackTrace();
 		}
+
+		return fileName;
+
+	}
+
+	public double getTotalPrice() {
+
+		double totalPrice = 0.00;
+
+		System.out.println("total price : " + totalPrice);
+
+		for (int i = 0; i < getValidItemRowCount(); i++) {
+
+			totalPrice += (int) guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 3);
+		}
+
+		return totalPrice;
 
 	}
 
