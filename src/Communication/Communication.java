@@ -225,9 +225,10 @@ public class Communication {
 	}
 
 	// 서버로 부터 keyword에 해당하는 Item 검색
-	public List<String> getItemNameFromServer(String partialItemName) {
+	public JSONObject getItemNameFromServer(String partialItemName) {
 
-		ArrayList resultArryList = new ArrayList<String>();
+		ArrayList<String> itemNameResultArryList = new ArrayList<String>();
+		JSONObject resultJSON = new JSONObject();
 
 		try {
 
@@ -241,6 +242,8 @@ public class Communication {
 			JSONParser jsonParser = new JSONParser();
 
 			String input;
+			
+			
 
 			while (true) {
 
@@ -257,15 +260,25 @@ public class Communication {
 					// Integer itemCode =
 					// Integer.parseInt(jsonObject.get("itemCode").toString());
 					String itemName = jsonObject.get("itemName").toString();
-					String itemDescription = jsonObject.get("itemDescription").toString();
-					Integer itemPrice = Integer.parseInt(jsonObject.get("itemPrice").toString());
 
-					resultArryList.add(itemName);
+					if ((boolean) jsonObject.get("coinside")) {
+						
+						String itemDescription = jsonObject.get("itemDescription").toString();
+						Integer itemPrice = Integer.parseInt(jsonObject.get("itemPrice").toString());
+						
+						resultJSON.put("itemDescription", itemDescription);
+						resultJSON.put("itemPrice", itemPrice);
+						
+					}
+
+					itemNameResultArryList.add(itemName);
 
 				} catch (Exception ex) {
 					ex.printStackTrace();
 				}
 			}
+			
+			resultJSON.put("itemName", itemNameResultArryList);
 
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -273,7 +286,7 @@ public class Communication {
 			// Client.closeConnection();
 		}
 
-		return resultArryList;
+		return resultJSON;
 
 	}
 

@@ -31,8 +31,9 @@ public class BtnClickListener implements ActionListener {
 			boolean result = UserInfo.getInterface().signInUser(guiSignIn.getStringID(), guiSignIn.getStringPassWord());
 
 			if (result) {
-				MainFrame clientMain = new MainFrame();
+				MainFrame clientMain = MainFrame.getInstance();
 
+				UserInfo.getInterface().setUserID(guiSignIn.getStringID()); 
 				clientMain.setMainFrame();
 
 				guiSignIn.dispose();

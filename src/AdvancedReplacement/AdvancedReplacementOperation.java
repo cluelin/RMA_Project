@@ -30,6 +30,7 @@ import org.json.simple.parser.JSONParser;
 
 import AdvancedReplacement.ItemTable.MyTableModel;
 import Communication.Communication;
+import SignInAndUp.UserInfo;
 
 public class AdvancedReplacementOperation {
 
@@ -228,6 +229,8 @@ public class AdvancedReplacementOperation {
 		JSONObject objectToServer = new JSONObject();
 
 		objectToServer.put("Action", "requestSaveRMAData");
+		
+		objectToServer.put("USER_ID", UserInfo.getInterface().getUserID());
 
 		// company detail information.
 		objectToServer.put("companyName",

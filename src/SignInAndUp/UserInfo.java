@@ -9,7 +9,8 @@ import Communication.ConnectionSocket;
 
 public class UserInfo {
 
-	static UserInfo instance = null;
+	private static UserInfo instance = null;
+	private static String USER_ID = null;
 
 	JSONParser jsonParser = new JSONParser();
 	JSONObject resultObj = new JSONObject();
@@ -25,6 +26,13 @@ public class UserInfo {
 		}
 
 		return instance;
+	}
+	
+	
+	public void setUserID(String ID){
+		
+		USER_ID = ID;
+		
 	}
 
 	public boolean registerUser(String stringID, char[] passWord) {
@@ -54,6 +62,8 @@ public class UserInfo {
 
 		if (resultObj.get("result").equals("OK")) {
 			result = true;
+			
+			USER_ID = stringID;
 		}
 
 		return result;
@@ -97,5 +107,10 @@ public class UserInfo {
 		}
 		
 		return result;
+	}
+	
+	public String getUserID(){
+		
+		return USER_ID;
 	}
 }

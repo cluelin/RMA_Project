@@ -28,6 +28,8 @@ public class SaveBtnListener implements ActionListener {
 				// 历厘 荐青
 				AdvancedReplacementOperation.getInstance().saveRMAdetailToServer();
 
+				
+				//梅何颇老 历厘.
 				for (int i = 0; i < selectedFile.size(); i++) {
 					Communication.getInstance().saveAttachFile(guiAdvancedRepalcementPanel.getTxtRMAnumber().getText(),
 							selectedFile.get(i));

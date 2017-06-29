@@ -1,7 +1,6 @@
 package AdvancedReplacement;
 
 import java.awt.Component;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -13,15 +12,12 @@ import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.event.PopupMenuEvent;
-import javax.swing.event.PopupMenuListener;
+import javax.swing.text.Element;
 import javax.swing.text.JTextComponent;
 
 import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 
 import Communication.Communication;
-import Communication.ConnectionSocket;
 
 public class ComboBoxListener implements DocumentListener {
 
@@ -158,8 +154,6 @@ public class ComboBoxListener implements DocumentListener {
 		String siteName = textComponent.getText();
 		String companyName = guiAdvancedRepalcementPanel.getTxtCompanyName().getEditor().getItem().toString();
 
-		
-
 		List<String> founds = Communication.getInstance().getSiteNameListFromServer(siteName, companyName);
 
 		Set<String> foundSet = new HashSet<String>();
@@ -187,18 +181,15 @@ public class ComboBoxListener implements DocumentListener {
 
 			// 일치하는 경우
 
-			
-
 		}
-		
+
 		System.out.println("siteName : " + siteName);
-		
-		if(siteName.equals("")){
+
+		if (siteName.equals("")) {
 			System.out.println("siteName 공백 ");
 		}
-		
+
 		Communication.getInstance().showPreviousRMAList(companyName, siteName);
-		
 
 		for (String s : founds) {
 
@@ -213,24 +204,26 @@ public class ComboBoxListener implements DocumentListener {
 
 	private void showRecommendItemList() {
 
-		JComboBox owner = guiAdvancedRepalcementPanel.getItemComboBox();
-		Component component = owner.getEditor().getEditorComponent();
-		JTextComponent textComponent = (JTextComponent) component;
+		JComboBox itemNameCombo = guiAdvancedRepalcementPanel.getItemComboBox();
+		Component itemNameComponent = itemNameCombo.getEditor().getEditorComponent();
+		JTextComponent itemNameTextComponent = (JTextComponent) itemNameComponent;
 
-		String partialOfItemName = textComponent.getText();
+		String partialOfItemName = itemNameTextComponent.getText();
 
 		// Keyword Result list
-		List<String> founds = Communication.getInstance().getItemNameFromServer(partialOfItemName);
+
+		JSONObject resultJSON = Communication.getInstance().getItemNameFromServer(partialOfItemName);
+		List<String> nameFounds = (List<String>) resultJSON.get("itemName");
 
 		Set<String> foundSet = new HashSet<String>();
 
-		for (String temp : founds) {
+		for (String temp : nameFounds) {
 
 			foundSet.add(temp.toLowerCase());
 
 		}
 
-		Collections.sort(founds);// sort alphabetically
+		Collections.sort(nameFounds);// sort alphabetically
 
 		DefaultComboBoxModel boxModel = new DefaultComboBoxModel();
 
@@ -240,9 +233,23 @@ public class ComboBoxListener implements DocumentListener {
 
 		} else {
 
+			JTable itemTable = guiAdvancedRepalcementPanel.get_RMAitemTable();
+			int rowIndex = itemTable.getSelectedRow();
+
+			if (resultJSON.get("itemDescription") != null && resultJSON.get("itemPrice") != null) {
+				String itemDescription = resultJSON.get("itemDescription").toString();
+				int itemPrice = (int) resultJSON.get("itemPrice");
+				 
+				itemTable.setValueAt(itemDescription, rowIndex, 2);
+				itemTable.setValueAt(itemPrice, rowIndex, 3);
+				
+				
+
+			}
+
 		}
 
-		for (String temp : founds) {
+		for (String temp : nameFounds) {
 
 			boxModel.addElement(temp);
 
@@ -250,13 +257,13 @@ public class ComboBoxListener implements DocumentListener {
 
 		// owner.setEditable(false);
 
-		owner.setModel(boxModel);
+		itemNameCombo.setModel(boxModel);
 
 		// owner.addPopupMenuListener(new ItemPopupListener(founds));
 
 		// owner.setPopupVisible(true);
-		owner.setEditable(true);
-		owner.requestFocus();
+		itemNameCombo.setEditable(true);
+		itemNameCombo.requestFocus();
 
 	}
 
@@ -273,6 +280,10 @@ public class ComboBoxListener implements DocumentListener {
 
 			siteUpdate();
 		} else if (e.getDocument().getProperty("owner").equals("itemName")) {
+
+			for (Element element : e.getDocument().getRootElements()) {
+				System.out.println("엘리먼트 이름 : " + element.getName());
+			}
 
 			itemUpdate();
 		}
@@ -292,6 +303,10 @@ public class ComboBoxListener implements DocumentListener {
 
 			siteUpdate();
 		} else if (e.getDocument().getProperty("owner").equals("itemName")) {
+
+			for (Element element : e.getDocument().getRootElements()) {
+				System.out.println("엘리먼트 이름 : " + element.getName());
+			}
 
 			itemUpdate();
 		}
