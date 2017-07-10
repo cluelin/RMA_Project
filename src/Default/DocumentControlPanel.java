@@ -10,6 +10,7 @@ import javax.swing.JPanel;
 
 import AdvancedReplacement.AdvancedReplacementOperation;
 import AdvancedReplacement.GUIadvancedRepalcementPanel;
+import AdvancedReplacement.function.Function;
 
 public class DocumentControlPanel extends JPanel implements ActionListener {
 
@@ -64,6 +65,7 @@ public class DocumentControlPanel extends JPanel implements ActionListener {
 
 		docClearBtn.addActionListener(this);
 		docPrintBtn.addActionListener(this);
+		docSaveBtn.addActionListener(this);
 	}
 
 	@Override
@@ -81,7 +83,7 @@ public class DocumentControlPanel extends JPanel implements ActionListener {
 				advancedReplacementOperation.printDocx();
 			}else if(e.getSource() == docSaveBtn){
 				
-				advancedReplacementOperation.saveRMAdetailToServer();
+				Function.getInstance().saveRMADetailDataToServer();
 			}
 		}
 

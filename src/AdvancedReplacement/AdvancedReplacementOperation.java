@@ -12,6 +12,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JComboBox;
@@ -33,7 +34,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import AdvancedReplacement.ItemTable.MyTableModel;
+import AdvancedReplacement.function.Function;
 import Communication.Communication;
+import Communication.ConnectionSocket;
 import SignInAndUp.UserInfo;
 
 public class AdvancedReplacementOperation {
@@ -229,24 +232,31 @@ public class AdvancedReplacementOperation {
 		guiAdvancedRepalcementPanel.getTxtRMAnumber().setText(rmaNumber);
 	}
 
-	public void saveRMAdetailToServer() {
-		JSONObject objectToServer = new JSONObject();
+	public JSONObject getRMAdetailJSONobj() {
 
-		objectToServer.put("Action", "requestSaveRMAData");
+		//조건이 안맞으면 종료. 
+		if (!rmaInformationValidityCheck()) {
 
-		objectToServer.put("USER_ID", UserInfo.getInterface().getUserID());
+			return null;
+		}
+
+		JSONObject RMADetailObj = new JSONObject();
+
+		RMADetailObj.put("Action", "requestSaveRMAData");
+
+		RMADetailObj.put("USER_ID", UserInfo.getInterface().getUserID());
 
 		// company detail information.
-		objectToServer.put("companyName",
+		RMADetailObj.put("companyName",
 				guiAdvancedRepalcementPanel.getTxtCompanyName().getEditor().getItem().toString());
-		objectToServer.put("companyAddress", guiAdvancedRepalcementPanel.getTxtCompanyAddress().getText());
-		objectToServer.put("companyCity", guiAdvancedRepalcementPanel.getTxtCompanyCity().getText());
-		objectToServer.put("companyZipCode", guiAdvancedRepalcementPanel.getTxtCompanyZipCode().getText());
-		objectToServer.put("companyPhone", guiAdvancedRepalcementPanel.getTxtCompanyPhone().getText());
-		objectToServer.put("companyEmail", guiAdvancedRepalcementPanel.getTxtCompanyEmail().getText());
+		RMADetailObj.put("companyAddress", guiAdvancedRepalcementPanel.getTxtCompanyAddress().getText());
+		RMADetailObj.put("companyCity", guiAdvancedRepalcementPanel.getTxtCompanyCity().getText());
+		RMADetailObj.put("companyZipCode", guiAdvancedRepalcementPanel.getTxtCompanyZipCode().getText());
+		RMADetailObj.put("companyPhone", guiAdvancedRepalcementPanel.getTxtCompanyPhone().getText());
+		RMADetailObj.put("companyEmail", guiAdvancedRepalcementPanel.getTxtCompanyEmail().getText());
 
 		// company에 종속적. 없으면 추가해야함.
-		objectToServer.put("siteName", guiAdvancedRepalcementPanel.getTxtSiteName().getEditor().getItem().toString());
+		RMADetailObj.put("siteName", guiAdvancedRepalcementPanel.getTxtSiteName().getEditor().getItem().toString());
 
 		int itemCount = getValidItemRowCount();
 
@@ -255,50 +265,82 @@ public class AdvancedReplacementOperation {
 
 		// RMA ITEM TABLE 저장
 		{
-			objectToServer.put("itemCount", itemCount);
+			RMADetailObj.put("itemCount", itemCount);
 
 			for (int i = 0; i < itemCount; i++) {
 
-				objectToServer.put("itemName" + i, guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 0));
-				objectToServer.put("itemSerialNumber" + i,
+				RMADetailObj.put("itemName" + i, guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 0));
+				RMADetailObj.put("itemSerialNumber" + i,
 						guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 1));
 
 				if (guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 2) == null) {
-					objectToServer.put("itemDescription" + i, "");
+					RMADetailObj.put("itemDescription" + i, "");
 				} else {
-					objectToServer.put("itemDescription" + i,
+					RMADetailObj.put("itemDescription" + i,
 							guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 2));
 				}
 
 				if (guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 3) == null) {
-					objectToServer.put("itemPrice" + i, 0);
+					RMADetailObj.put("itemPrice" + i, 0);
 				} else {
-					objectToServer.put("itemPrice" + i,
+					RMADetailObj.put("itemPrice" + i,
 							guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 3));
 				}
 
 				if ((boolean) guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 4)) {
-					objectToServer.put("itemReceive" + i, true);
+					RMADetailObj.put("itemReceive" + i, true);
 				} else {
-					objectToServer.put("itemReceive" + i, false);
+					RMADetailObj.put("itemReceive" + i, false);
 				}
 
 			}
 		}
 
-		objectToServer.put("rmaNumber", guiAdvancedRepalcementPanel.getTxtRMAnumber().getText());
-		objectToServer.put("rmaDate", guiAdvancedRepalcementPanel.getTxtDate().getText());
-		objectToServer.put("rmaOrderNumber", guiAdvancedRepalcementPanel.getTxtOrderNumber().getText());
-		objectToServer.put("rmaContents", guiAdvancedRepalcementPanel.getTxtContents().getText());
-		objectToServer.put("rmaBillTo", guiAdvancedRepalcementPanel.getTxtBillTo().getText());
-		objectToServer.put("rmaShipTo", guiAdvancedRepalcementPanel.getTxtShipTo().getText());
-		objectToServer.put("rmaTrackingNumber", guiAdvancedRepalcementPanel.getTxtTrackingNumber().getText());
+		RMADetailObj.put("rmaNumber", guiAdvancedRepalcementPanel.getTxtRMAnumber().getText());
+		RMADetailObj.put("rmaDate", guiAdvancedRepalcementPanel.getTxtDate().getText());
+		RMADetailObj.put("rmaOrderNumber", guiAdvancedRepalcementPanel.getTxtOrderNumber().getText());
+		RMADetailObj.put("rmaContents", guiAdvancedRepalcementPanel.getTxtContents().getText());
+		RMADetailObj.put("rmaBillTo", guiAdvancedRepalcementPanel.getTxtBillTo().getText());
+		RMADetailObj.put("rmaShipTo", guiAdvancedRepalcementPanel.getTxtShipTo().getText());
+		RMADetailObj.put("rmaTrackingNumber", guiAdvancedRepalcementPanel.getTxtTrackingNumber().getText());
 
-		Communication.getInstance().saveRMAInformationToServer(objectToServer);
+		// String companyName =
+		// guiAdvancedRepalcementPanel.getTxtCompanyName().getEditor().getItem().toString();
+		// String companyAddress =
+		// guiAdvancedRepalcementPanel.getTxtCompanyAddress().getText();
+		// String companyCity =
+		// guiAdvancedRepalcementPanel.getTxtCompanyCity().getText();
+		// String companyZipCode =
+		// guiAdvancedRepalcementPanel.getTxtCompanyZipCode().getText();
+		// String companyPhone =
+		// guiAdvancedRepalcementPanel.getTxtCompanyPhone().getText();
+		// String companyEmail =
+		// guiAdvancedRepalcementPanel.getTxtCompanyEmail().getText();
+		// String siteName =
+		// guiAdvancedRepalcementPanel.getTxtSiteName().getEditor().getItem().toString();
+		//
+		// String rmaNumber =
+		// guiAdvancedRepalcementPanel.getTxtRMAnumber().getText();
+		// String rmaDate = guiAdvancedRepalcementPanel.getTxtDate().getText();
+		// String rmaOrderNumber =
+		// guiAdvancedRepalcementPanel.getTxtOrderNumber().getText();
+		// String rmaContents =
+		// guiAdvancedRepalcementPanel.getTxtContents().getText();
+		// String rmaBillTo =
+		// guiAdvancedRepalcementPanel.getTxtBillTo().getText();
+		// String rmaShipTo =
+		// guiAdvancedRepalcementPanel.getTxtShipTo().getText();
+		// String rmaTrackingNumber =
+		// guiAdvancedRepalcementPanel.getTxtTrackingNumber().getText();
+
+
+		return RMADetailObj;
 
 	}
 
-	public boolean validityCheck() {
+	public boolean rmaInformationValidityCheck() {
+		// 현재 RMA가 저장될 수 있는 상태인지 확인.
+
 		boolean pass = true;
 
 		// Company Name 작성 여부 확인
@@ -573,9 +615,9 @@ public class AdvancedReplacementOperation {
 	}
 
 	public JComboBox getItemComboBox() {
-		
+
 		return guiAdvancedRepalcementPanel.getItemComboBox();
-		
+
 	}
 
 	public String getCompanyName() {
@@ -583,11 +625,11 @@ public class AdvancedReplacementOperation {
 		return guiAdvancedRepalcementPanel.getTxtCompanyName().getEditor().getItem().toString();
 
 	}
-	
-	public JTable get_RMAitemTable(){
-		
+
+	public JTable get_RMAitemTable() {
+
 		return guiAdvancedRepalcementPanel.get_RMAitemTable();
-		
+
 	}
 
 }

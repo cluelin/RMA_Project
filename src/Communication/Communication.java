@@ -18,7 +18,7 @@ public class Communication {
 
 	static GUIadvancedRepalcementPanel guiAdvancedRepalcementPanel = GUIadvancedRepalcementPanel.getInstance();
 
-	public static Communication instance = null;
+	private static Communication instance = null;
 	JSONParser jsonParser = new JSONParser();
 
 	private Communication() {
@@ -32,6 +32,19 @@ public class Communication {
 		}
 
 		return instance;
+	}
+
+	public void sendJSONobjToServer(JSONObject obj) {
+
+		try {
+
+			ConnectionSocket.printStream.println(obj.toJSONString());
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("서버 연결 에러");
+		}
+
 	}
 
 	// 2017.04.25
@@ -95,20 +108,6 @@ public class Communication {
 		// 2017.04.25
 		// 이렇게 끝내도 되는지 모르겠음. 확신이없다.
 		return false;
-	}
-
-	// save RMA Information To Database
-	public void saveRMAInformationToServer(JSONObject rmaDetailObj) {
-
-		try {
-
-			ConnectionSocket.printStream.println(rmaDetailObj.toJSONString());
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.out.println("서버 연결 에러");
-		}
-
 	}
 
 	// 2017.04.21
@@ -242,8 +241,6 @@ public class Communication {
 			JSONParser jsonParser = new JSONParser();
 
 			String input;
-			
-			
 
 			while (true) {
 
@@ -262,13 +259,13 @@ public class Communication {
 					String itemName = jsonObject.get("itemName").toString();
 
 					if ((boolean) jsonObject.get("coinside")) {
-						
+
 						String itemDescription = jsonObject.get("itemDescription").toString();
 						Integer itemPrice = Integer.parseInt(jsonObject.get("itemPrice").toString());
-						
+
 						resultJSON.put("itemDescription", itemDescription);
 						resultJSON.put("itemPrice", itemPrice);
-						
+
 					}
 
 					itemNameResultArryList.add(itemName);
@@ -277,7 +274,7 @@ public class Communication {
 					ex.printStackTrace();
 				}
 			}
-			
+
 			resultJSON.put("itemName", itemNameResultArryList);
 
 		} catch (Exception ex) {
