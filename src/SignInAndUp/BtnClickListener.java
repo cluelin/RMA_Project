@@ -2,6 +2,8 @@ package SignInAndUp;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
 import javax.swing.JButton;
@@ -16,7 +18,16 @@ public class BtnClickListener implements ActionListener {
 
 	String stringID;
 
+	private static MessageDigest messageDigest;
+
 	public BtnClickListener() {
+		
+		try{
+			messageDigest =  MessageDigest.getInstance("SHA-256");
+		}catch(NoSuchAlgorithmException e){
+			e.printStackTrace();
+		}
+		 
 
 	}
 
@@ -28,12 +39,17 @@ public class BtnClickListener implements ActionListener {
 
 			// DB에 연결해서 확인 받아온후 다음 프로세스 진행.
 
-			boolean result = UserInfo.getInterface().signInUser(guiSignIn.getStringID(), guiSignIn.getStringPassWord());
+			boolean result = false;
+			
+			if(guiSignIn.getStringID() != null){
+				result = UserInfo.getInterface().signInUser(guiSignIn.getStringID(), guiSignIn.getStringPassWord());
+			}
+			
 
 			if (result) {
 				MainFrame clientMain = MainFrame.getInstance();
 
-				UserInfo.getInterface().setUserID(guiSignIn.getStringID()); 
+				UserInfo.getInterface().setUserID(guiSignIn.getStringID());
 				clientMain.setMainFrame();
 
 				guiSignIn.dispose();
@@ -61,6 +77,7 @@ public class BtnClickListener implements ActionListener {
 				boolean result = UserInfo.getInterface().registerUser(guiSignUp.getIDtextField().getText(),
 						guiSignUp.getPassWordTextField().getPassword());
 
+				
 				if (!result) {
 					JOptionPane.showMessageDialog(null, "ID가 이미 존재합니다.");
 				}

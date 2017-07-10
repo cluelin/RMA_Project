@@ -1,4 +1,7 @@
 package SignInAndUp;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
 import javax.swing.JOptionPane;
 
 import org.json.simple.JSONObject;
@@ -15,8 +18,17 @@ public class UserInfo {
 	JSONParser jsonParser = new JSONParser();
 	JSONObject resultObj = new JSONObject();
 
+	
+	private static MessageDigest messageDigest;
+	
 	private UserInfo() {
 
+		try{
+			messageDigest =  MessageDigest.getInstance("SHA-256");
+		}catch(NoSuchAlgorithmException e){
+			e.printStackTrace();
+		}
+		
 	}
 
 	public static UserInfo getInterface() {
@@ -38,13 +50,28 @@ public class UserInfo {
 	public boolean registerUser(String stringID, char[] passWord) {
 		boolean result = false;
 
-		// UserInfo.getInterface().registerUser(stringID, passWord);
+		String pass = new String(passWord);
+		messageDigest.update(pass.getBytes());
+
+		byte byteData[] = messageDigest.digest();
+
+		StringBuffer encryptedPassword = new StringBuffer();
+
+		for (int i = 0; i < byteData.length; i++) {
+			encryptedPassword.append(Integer.toString((byteData[i] & 0xff) + 0x100, 1).substring(1));
+
+		}
+
+		// 비밀번호 암호화
+		System.out.println("비밀번호  : " + encryptedPassword.toString());
+
+		
 
 		JSONObject registerObj = new JSONObject();
 
 		registerObj.put("Action", "SignUp");
 		registerObj.put("stringID", stringID);
-		registerObj.put("passWord", new String(passWord));
+		registerObj.put("passWord", encryptedPassword.toString());
 
 		System.out.println("passWord.toString() : " + new String(passWord));
 
@@ -74,12 +101,29 @@ public class UserInfo {
 
 		boolean result = false;
 		
+		String pass = new String(passWord);
+		messageDigest.update(pass.getBytes());
+
+		byte byteData[] = messageDigest.digest();
+
+		StringBuffer encryptedPassword = new StringBuffer();
+
+		for (int i = 0; i < byteData.length; i++) {
+			encryptedPassword.append(Integer.toString((byteData[i] & 0xff) + 0x100, 1).substring(1));
+
+		}
+
+		// 비밀번호 암호화
+		System.out.println("비밀번호  : " + encryptedPassword.toString());
+		
+		
 		JSONObject signInObj = new JSONObject();
 
 		signInObj.put("Action", "SignIn");
 		signInObj.put("stringID", stringID);
-		signInObj.put("passWord", new String(passWord));
+		signInObj.put("passWord", encryptedPassword.toString());
 		
+				
 		ConnectionSocket.printStream.println(signInObj);
 		
 		try {

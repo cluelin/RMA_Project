@@ -21,7 +21,7 @@ import Communication.Communication;
 
 public class ComboBoxListener implements DocumentListener {
 
-	GUIadvancedRepalcementPanel guiAdvancedRepalcementPanel = GUIadvancedRepalcementPanel.getInstance();
+	GUIadvancedRepalcementPanel advancedReplacementOperation = GUIadvancedRepalcementPanel.getInstance();
 
 	public ComboBoxListener() {
 
@@ -78,7 +78,7 @@ public class ComboBoxListener implements DocumentListener {
 	private void showRecommendCompanyList() {
 
 		// 이벤트 발생지를 Company로 조정한다.
-		JComboBox owner = guiAdvancedRepalcementPanel.getTxtCompanyName();
+		JComboBox owner = advancedReplacementOperation.getTxtCompanyName();
 		Component component = owner.getEditor().getEditorComponent();
 		JTextComponent textComponent = (JTextComponent) component;
 
@@ -110,7 +110,7 @@ public class ComboBoxListener implements DocumentListener {
 		if (!foundSet.contains(targetName.toLowerCase())) {
 
 			owner.addItem(targetName);
-			guiAdvancedRepalcementPanel.clearCompanyDetail();
+			advancedReplacementOperation.clearCompanyDetail();
 
 		} else {
 
@@ -124,9 +124,9 @@ public class ComboBoxListener implements DocumentListener {
 			String phone = companyDetailObject.get("companyPhone").toString();
 			String email = companyDetailObject.get("companyEmail").toString();
 
-			guiAdvancedRepalcementPanel.setCompanyDetail(address, city, zipCode, phone, email);
+			advancedReplacementOperation.setCompanyDetail(address, city, zipCode, phone, email);
 
-			guiAdvancedRepalcementPanel.setBillToArea(targetName, address, city, zipCode, phone);
+			advancedReplacementOperation.setBillToArea(targetName, address, city, zipCode, phone);
 
 		}
 
@@ -146,13 +146,18 @@ public class ComboBoxListener implements DocumentListener {
 
 	private void showRecommendSiteList() {
 
-		JComboBox owner = guiAdvancedRepalcementPanel.getTxtSiteName();
 
+		JComboBox owner = advancedReplacementOperation.getTxtSiteName();
+		
+		
 		Component component = owner.getEditor().getEditorComponent();
 		JTextComponent textComponent = (JTextComponent) component;
 
 		String siteName = textComponent.getText();
-		String companyName = guiAdvancedRepalcementPanel.getTxtCompanyName().getEditor().getItem().toString();
+		String companyName = advancedReplacementOperation.getTxtCompanyName().getEditor().getItem().toString();
+		
+//		String siteName = advancedReplacementOperation.getSiteName();
+//		String companyName = advancedReplacementOperation.getCompanyName();
 
 		List<String> founds = Communication.getInstance().getSiteNameListFromServer(siteName, companyName);
 
@@ -204,7 +209,7 @@ public class ComboBoxListener implements DocumentListener {
 
 	private void showRecommendItemList() {
 
-		JComboBox itemNameCombo = guiAdvancedRepalcementPanel.getItemComboBox();
+		JComboBox itemNameCombo = advancedReplacementOperation.getItemComboBox();
 		Component itemNameComponent = itemNameCombo.getEditor().getEditorComponent();
 		JTextComponent itemNameTextComponent = (JTextComponent) itemNameComponent;
 
@@ -233,17 +238,15 @@ public class ComboBoxListener implements DocumentListener {
 
 		} else {
 
-			JTable itemTable = guiAdvancedRepalcementPanel.get_RMAitemTable();
+			JTable itemTable = advancedReplacementOperation.get_RMAitemTable();
 			int rowIndex = itemTable.getSelectedRow();
 
 			if (resultJSON.get("itemDescription") != null && resultJSON.get("itemPrice") != null) {
 				String itemDescription = resultJSON.get("itemDescription").toString();
 				int itemPrice = (int) resultJSON.get("itemPrice");
-				 
+
 				itemTable.setValueAt(itemDescription, rowIndex, 2);
 				itemTable.setValueAt(itemPrice, rowIndex, 3);
-				
-				
 
 			}
 

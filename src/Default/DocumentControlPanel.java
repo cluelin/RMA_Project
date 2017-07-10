@@ -68,14 +68,20 @@ public class DocumentControlPanel extends JPanel implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		
+		AdvancedReplacementOperation advancedReplacementOperation = AdvancedReplacementOperation.getInstance();
+		
 
 		if (MainFrame.getInstance().getVariablePanel() instanceof GUIadvancedRepalcementPanel) {
 
 			if (e.getSource() == docClearBtn) {
-				AdvancedReplacementOperation.getInstance().clearField();
+				advancedReplacementOperation.clearField();
 			}else if(e.getSource() == docPrintBtn){
 				
-				AdvancedReplacementOperation.getInstance().printDocx();
+				advancedReplacementOperation.printDocx();
+			}else if(e.getSource() == docSaveBtn){
+				
+				advancedReplacementOperation.saveRMAdetailToServer();
 			}
 		}
 

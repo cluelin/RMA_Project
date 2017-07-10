@@ -1,5 +1,6 @@
 package AdvancedReplacement;
 
+import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.TextArea;
 import java.awt.event.FocusEvent;
@@ -14,8 +15,11 @@ import java.io.IOException;
 import java.util.List;
 
 import javax.swing.JComboBox;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.JTextComponent;
 
@@ -34,7 +38,7 @@ import SignInAndUp.UserInfo;
 
 public class AdvancedReplacementOperation {
 
-	static GUIadvancedRepalcementPanel guiAdvancedRepalcementPanel = GUIadvancedRepalcementPanel.getInstance();
+	static private GUIadvancedRepalcementPanel guiAdvancedRepalcementPanel = GUIadvancedRepalcementPanel.getInstance();
 
 	Communication commnunication = Communication.getInstance();
 
@@ -229,7 +233,7 @@ public class AdvancedReplacementOperation {
 		JSONObject objectToServer = new JSONObject();
 
 		objectToServer.put("Action", "requestSaveRMAData");
-		
+
 		objectToServer.put("USER_ID", UserInfo.getInterface().getUserID());
 
 		// company detail information.
@@ -469,7 +473,7 @@ public class AdvancedReplacementOperation {
 
 								} else if (text.contains("#price#")) {
 
-									text = text.replace("#price#", "" +getTotalPrice());
+									text = text.replace("#price#", "" + getTotalPrice());
 									r.setText(text, 0);
 
 								}
@@ -518,6 +522,72 @@ public class AdvancedReplacementOperation {
 
 		return totalPrice;
 
+	}
+
+	public JList<String> getAttachmentList() {
+		return guiAdvancedRepalcementPanel.getAttachmentList();
+	}
+
+	public String getTxtRMAnumber() {
+		return guiAdvancedRepalcementPanel.getTxtRMAnumber().getText();
+	}
+
+	public void clearCompanyDetail() {
+
+		guiAdvancedRepalcementPanel.clearCompanyDetail();
+	}
+
+	public void setCompanyDetail(String address, String city, String zipCode, String phone, String email) {
+
+		guiAdvancedRepalcementPanel.setCompanyDetail(address, city, zipCode, phone, email);
+
+	}
+
+	public void setBillToArea(String companyName, String address, String city, String zipCode, String phone) {
+
+		guiAdvancedRepalcementPanel.setBillToArea(companyName, address, city, zipCode, phone);
+
+	}
+
+	public JComboBox getTxtCompanyName() {
+		return guiAdvancedRepalcementPanel.getTxtCompanyName();
+	}
+
+	public String getSiteName() {
+
+		JComboBox owner = guiAdvancedRepalcementPanel.getTxtSiteName();
+
+		Component component = owner.getEditor().getEditorComponent();
+		JTextComponent textComponent = (JTextComponent) component;
+
+		String siteName = textComponent.getText();
+
+		return siteName;
+
+	}
+
+	public JComboBox getComboSiteName() {
+
+		return guiAdvancedRepalcementPanel.getTxtSiteName();
+
+	}
+
+	public JComboBox getItemComboBox() {
+		
+		return guiAdvancedRepalcementPanel.getItemComboBox();
+		
+	}
+
+	public String getCompanyName() {
+
+		return guiAdvancedRepalcementPanel.getTxtCompanyName().getEditor().getItem().toString();
+
+	}
+	
+	public JTable get_RMAitemTable(){
+		
+		return guiAdvancedRepalcementPanel.get_RMAitemTable();
+		
 	}
 
 }

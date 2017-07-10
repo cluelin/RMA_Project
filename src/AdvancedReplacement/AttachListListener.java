@@ -67,9 +67,9 @@ public class AttachListListener implements MouseListener {
 
 	private void getFileFromServer() {
 		// index에 있는 파일 이름을 서버에 전송해서 해당 파일 복사해오기.
-		String fileName = GUIadvancedRepalcementPanel.getInstance().getAttachmentList().getSelectedValue();
+		String fileName = AdvancedReplacementOperation.getInstance().getAttachmentList().getSelectedValue();
 
-		String fileSavedName = GUIadvancedRepalcementPanel.getInstance().getTxtRMAnumber().getText() + fileName;
+		String fileSavedName = AdvancedReplacementOperation.getInstance().getTxtRMAnumber() + fileName;
 
 		System.out.println("fileName : " + fileSavedName);
 
