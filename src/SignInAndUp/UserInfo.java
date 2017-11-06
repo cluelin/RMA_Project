@@ -79,7 +79,7 @@ public class UserInfo {
 
 		try {
 
-			String input = ConnectionSocket.bufferedReader.readLine();
+			String input = ConnectionSocket.getInstance().readLineFromServer();
 
 			resultObj = (JSONObject) jsonParser.parse(input);
 
@@ -128,7 +128,7 @@ public class UserInfo {
 		
 		try {
 
-			String input = ConnectionSocket.bufferedReader.readLine();
+			String input = ConnectionSocket.getInstance().readLineFromServer();
 
 			resultObj = (JSONObject) jsonParser.parse(input);
 

@@ -62,7 +62,7 @@ public class Communication {
 		try {
 
 			// 받아온 RMA number 설정.
-			String input = ConnectionSocket.bufferedReader.readLine();
+			String input = ConnectionSocket.getInstance().readLineFromServer();
 
 			if (input != null) {
 				JSONObject jsonObject = (JSONObject) jsonParser.parse(input);
@@ -92,7 +92,7 @@ public class Communication {
 		try {
 
 			// 받아온 RMA number 설정.
-			String input = ConnectionSocket.bufferedReader.readLine();
+			String input = ConnectionSocket.getInstance().readLineFromServer();
 
 			if (input != null) {
 				JSONObject jsonObject = (JSONObject) jsonParser.parse(input);
@@ -129,7 +129,7 @@ public class Communication {
 
 		try {
 
-			input = ConnectionSocket.bufferedReader.readLine();
+			input = ConnectionSocket.getInstance().readLineFromServer();
 
 			JSONObject RMADetailObject = (JSONObject) jsonParser.parse(input);
 
@@ -159,7 +159,7 @@ public class Communication {
 
 		try {
 
-			input = ConnectionSocket.bufferedReader.readLine();
+			input = ConnectionSocket.getInstance().readLineFromServer();
 
 			JSONObject companyDetailObject = (JSONObject) jsonParser.parse(input);
 
@@ -198,7 +198,7 @@ public class Communication {
 
 				try {
 
-					input = ConnectionSocket.bufferedReader.readLine();
+					input = ConnectionSocket.getInstance().readLineFromServer();
 
 					System.out.println("get site input : " + input);
 					if (input == null || input.equals("end")) {
@@ -246,7 +246,7 @@ public class Communication {
 
 				try {
 
-					input = ConnectionSocket.bufferedReader.readLine();
+					input = ConnectionSocket.getInstance().readLineFromServer();
 
 					if (input.equals("end")) {
 						break;
@@ -305,7 +305,7 @@ public class Communication {
 			while (true) {
 
 				try {
-					String input = ConnectionSocket.bufferedReader.readLine();
+					String input = ConnectionSocket.getInstance().readLineFromServer();
 
 					if (input.equals("end")) {
 						break;
@@ -368,7 +368,7 @@ public class Communication {
 
 				try {
 
-					input = ConnectionSocket.bufferedReader.readLine();
+					input = ConnectionSocket.getInstance().readLineFromServer();
 
 					System.out.println("input : " + input);
 					if (input == null || input.equals("end")) {
@@ -399,7 +399,7 @@ public class Communication {
 
 		try {
 
-			String input = ConnectionSocket.bufferedReader.readLine();
+			String input = ConnectionSocket.getInstance().readLineFromServer();
 
 			itemValidationObject = (JSONObject) jsonParser.parse(input);
 

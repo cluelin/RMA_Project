@@ -2,7 +2,6 @@ package AdvancedReplacement;
 
 import java.awt.Component;
 import java.awt.Desktop;
-import java.awt.TextArea;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
@@ -12,16 +11,13 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
+import javax.print.DocFlavor;
 import javax.swing.JComboBox;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.JTextComponent;
 
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
@@ -34,9 +30,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import AdvancedReplacement.ItemTable.MyTableModel;
-import AdvancedReplacement.function.Function;
 import Communication.Communication;
-import Communication.ConnectionSocket;
 import SignInAndUp.UserInfo;
 
 public class AdvancedReplacementOperation {
@@ -234,7 +228,7 @@ public class AdvancedReplacementOperation {
 
 	public JSONObject getRMAdetailJSONobj() {
 
-		//조건이 안맞으면 종료. 
+		// 조건이 안맞으면 종료.
 		if (!rmaInformationValidityCheck()) {
 
 			return null;
@@ -283,8 +277,7 @@ public class AdvancedReplacementOperation {
 				if (guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 3) == null) {
 					RMADetailObj.put("itemPrice" + i, 0);
 				} else {
-					RMADetailObj.put("itemPrice" + i,
-							guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 3));
+					RMADetailObj.put("itemPrice" + i, guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 3));
 				}
 
 				if ((boolean) guiAdvancedRepalcementPanel.get_RMAitemTable().getValueAt(i, 4)) {
@@ -332,7 +325,6 @@ public class AdvancedReplacementOperation {
 		// guiAdvancedRepalcementPanel.getTxtShipTo().getText();
 		// String rmaTrackingNumber =
 		// guiAdvancedRepalcementPanel.getTxtTrackingNumber().getText();
-
 
 		return RMADetailObj;
 
@@ -450,10 +442,26 @@ public class AdvancedReplacementOperation {
 
 	public void printDocx() {
 
+		if (!rmaInformationValidityCheck()) {
+			return;
+		}
+
 		String fileName = EditDocx();
 
 		try {
-			// Desktop.getDesktop().print(new File(fileName));
+//
+//			PrinterJob pj = PrinterJob.getPrinterJob();
+//			if (pj.printDialog()) {
+//				try {
+//					pj.print();
+//				} catch (PrinterException exc) {
+//					System.out.println(exc);
+//				}
+//			}
+
+			
+			Desktop.getDesktop().print(new File(fileName));
+
 		} catch (Exception e) {
 
 		}
